@@ -1,4 +1,4 @@
-import { DashboardService } from "../../../../services/DashboardService";
+import { DashboardService } from "@/services/DashboardService";
 
 export async function GET(request: Request) {
   const responseStream = new ReadableStream({

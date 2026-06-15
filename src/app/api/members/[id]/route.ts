@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import { MemberService } from "../../../../services/MemberService";
-import { updateMemberSchema } from "../../../../backend/validations/member";
-import { BaseError } from "../../../../backend/errors";
+import { MemberService } from "@/services/MemberService";
+import { updateMemberSchema } from "@/backend/validations/member";
+import { BaseError } from "@/backend/errors";
 
-interface Context {
-  params: {
-    id: string;
-  };
-}
+interface Context { params: Promise<{ id: string }> }
 
 export async function GET(request: Request, { params }: Context) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const member = await MemberService.getMemberById(id);
     return NextResponse.json(member);
   } catch (error) {
@@ -32,7 +28,7 @@ export async function GET(request: Request, { params }: Context) {
 
 export async function PUT(request: Request, { params }: Context) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Validate update payload
@@ -68,7 +64,7 @@ export async function PUT(request: Request, { params }: Context) {
 
 export async function DELETE(request: Request, { params }: Context) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const result = await MemberService.deleteMember(id);
     return NextResponse.json(result);
   } catch (error) {

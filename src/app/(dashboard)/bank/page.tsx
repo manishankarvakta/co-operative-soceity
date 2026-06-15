@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import BankTransactionForm from "../../../components/forms/BankTransactionForm";
+import BankTransactionForm from "@/components/forms/BankTransactionForm";
 
 export default function BankWorkspacePage() {
   const [lang, setLang] = useState<"BN" | "EN">("BN");

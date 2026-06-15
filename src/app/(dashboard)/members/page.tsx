@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import MemberSearchFilters from "../../../components/widgets/MemberSearchFilters";
+import MemberSearchFilters from "@/components/widgets/MemberSearchFilters";
 
 export default function MembersListPage() {
   const [members, setMembers] = useState<any[]>([]);

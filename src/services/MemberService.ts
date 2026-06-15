@@ -1,6 +1,6 @@
 import * as bcrypt from "bcryptjs";
-import { prisma } from "../lib/db";
-import { ConflictError, NotFoundError } from "../backend/errors";
+import { prisma } from "@/lib/db";
+import { ConflictError, NotFoundError } from "@/backend/errors";
 import { DashboardService } from "./DashboardService";
 import { MemberStatus } from "@prisma/client";
 import { NotificationService } from "./NotificationService";

@@ -1,5 +1,5 @@
-import { prisma } from "../lib/db";
-import { redis } from "../lib/redis";
+import { prisma } from "@/lib/db";
+import { redis } from "@/lib/redis";
 import { AuditService } from "./AuditService";
 import * as fs from "fs";
 import * as path from "path";

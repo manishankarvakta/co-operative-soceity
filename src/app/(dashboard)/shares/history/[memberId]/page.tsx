@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 
 interface HistoryPageProps {
-  params: {
+  params: Promise<{
     memberId: string;
-  };
+  }>;
 }
 
 export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
-  const { memberId } = params;
+  const { memberId } = use(params);
   const [lang, setLang] = useState<"BN" | "EN">("BN");
   const [history, setHistory] = useState<any[]>([]);
   const [member, setMember] = useState<any>(null);

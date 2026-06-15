@@ -1,5 +1,5 @@
-import { prisma } from "../lib/db";
-import { NotFoundError, ValidationError } from "../backend/errors";
+import { prisma } from "@/lib/db";
+import { NotFoundError, ValidationError } from "@/backend/errors";
 import { ProjectStatus } from "@prisma/client";
 import { AccountingService } from "./AccountingService";
 

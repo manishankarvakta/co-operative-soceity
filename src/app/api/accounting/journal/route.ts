@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../../lib/auth";
-import { AccountingService } from "../../../../services/AccountingService";
-import { createJournalEntrySchema } from "../../../../backend/validations/accounting";
-import { BaseError } from "../../../../backend/errors";
-import { prisma } from "../../../../lib/db";
+import { auth } from "@/lib/auth";
+import { AccountingService } from "@/services/AccountingService";
+import { createJournalEntrySchema } from "@/backend/validations/accounting";
+import { BaseError } from "@/backend/errors";
+import { prisma } from "@/lib/db";
 
 export async function GET(request: Request) {
   try {

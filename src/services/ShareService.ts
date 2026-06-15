@@ -1,5 +1,5 @@
-import { prisma } from "../lib/db";
-import { NotFoundError } from "../backend/errors";
+import { prisma } from "@/lib/db";
+import { NotFoundError } from "@/backend/errors";
 
 export class ShareService {
   /**

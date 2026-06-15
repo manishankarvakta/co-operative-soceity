@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
-import { DepositService } from "../../../../services/DepositService";
-import { BaseError } from "../../../../backend/errors";
+import { DepositService } from "@/services/DepositService";
+import { BaseError } from "@/backend/errors";
 
-interface Context {
-  params: {
-    id: string;
-  };
-}
+interface Context { params: Promise<{ id: string }> }
 
 export async function GET(request: Request, { params }: Context) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const deposit = await DepositService.getDepositById(id);
     return NextResponse.json(deposit);
   } catch (error) {

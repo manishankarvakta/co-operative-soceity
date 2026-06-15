@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../lib/auth";
-import { DepositService } from "../../../services/DepositService";
-import { createDepositSchema } from "../../../backend/validations/deposit";
-import { BaseError, ForbiddenError } from "../../../backend/errors";
+import { auth } from "@/lib/auth";
+import { DepositService } from "@/services/DepositService";
+import { createDepositSchema } from "@/backend/validations/deposit";
+import { BaseError, ForbiddenError } from "@/backend/errors";
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
-    if (!session) {
+    if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session) {
+    if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 

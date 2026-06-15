@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ExpenseForm from "../../../components/forms/ExpenseForm";
+import ExpenseForm from "@/components/forms/ExpenseForm";
 
 export default function ExpensesPage() {
   const [lang, setLang] = useState<"BN" | "EN">("BN");

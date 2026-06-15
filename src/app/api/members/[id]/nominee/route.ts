@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import { NomineeService } from "../../../../../services/NomineeService";
-import { nomineeSchema } from "../../../../../backend/validations/member";
-import { BaseError } from "../../../../../backend/errors";
+import { NomineeService } from "@/services/NomineeService";
+import { nomineeSchema } from "@/backend/validations/member";
+import { BaseError } from "@/backend/errors";
 
-interface Context {
-  params: {
-    id: string;
-  };
-}
+interface Context { params: Promise<{ id: string }> }
 
 export async function GET(request: Request, { params }: Context) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const nominee = await NomineeService.getNomineeByMemberId(id);
     return NextResponse.json(nominee);
   } catch (error) {
@@ -32,7 +28,7 @@ export async function GET(request: Request, { params }: Context) {
 
 export async function PUT(request: Request, { params }: Context) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Validate nominee schema using Zod

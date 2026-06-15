@@ -1,5 +1,5 @@
-import { prisma } from "../lib/db";
-import { NotFoundError, ValidationError } from "../backend/errors";
+import { prisma } from "@/lib/db";
+import { NotFoundError, ValidationError } from "@/backend/errors";
 import { DepositType, PaymentMode, TransactionType } from "@prisma/client";
 
 export class ReportService {

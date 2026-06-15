@@ -1,5 +1,5 @@
-import { prisma } from "../lib/db";
-import { redis } from "../lib/redis";
+import { prisma } from "@/lib/db";
+import { redis } from "@/lib/redis";
 
 export class DashboardService {
   /**

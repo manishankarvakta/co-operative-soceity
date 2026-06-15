@@ -1,4 +1,4 @@
-import MemberForm from "../../../../components/forms/MemberForm";
+import MemberForm from "@/components/forms/MemberForm";
 
 export default function NewMemberPage() {
   return (

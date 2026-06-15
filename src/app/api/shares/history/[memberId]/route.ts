@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../../../lib/auth";
-import { ShareService } from "../../../../../services/ShareService";
-import { BaseError } from "../../../../../backend/errors";
+import { auth } from "@/lib/auth";
+import { ShareService } from "@/services/ShareService";
+import { BaseError } from "@/backend/errors";
 
-interface Context {
-  params: {
-    memberId: string;
-  };
-}
+interface Context { params: Promise<{ memberId: string }> }
 
 export async function GET(request: Request, { params }: Context) {
   try {
@@ -16,7 +12,7 @@ export async function GET(request: Request, { params }: Context) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
-    const { memberId } = params;
+    const { memberId } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../../lib/auth";
-import { BankService } from "../../../../services/BankService";
-import { createBankTransactionSchema, createBankTransferSchema } from "../../../../backend/validations/bank";
-import { BaseError } from "../../../../backend/errors";
+import { auth } from "@/lib/auth";
+import { BankService } from "@/services/BankService";
+import { createBankTransactionSchema, createBankTransferSchema } from "@/backend/validations/bank";
+import { BaseError } from "@/backend/errors";
 
 export async function GET(request: Request) {
   try {

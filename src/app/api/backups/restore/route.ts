@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../../lib/auth";
-import { BackupService } from "../../../../services/BackupService";
-import { BaseError } from "../../../../backend/errors";
+import { auth } from "@/lib/auth";
+import { BackupService } from "@/services/BackupService";
+import { BaseError } from "@/backend/errors";
 
 /**
  * POST: Restores the database to the state of a given backup ID.

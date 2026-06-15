@@ -1,10 +1,11 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { AuthService } from "../services/AuthService";
-import { loginSchema } from "../backend/validations/auth";
-import { AuditService } from "../services/AuditService";
+import { AuthService } from "@/services/AuthService";
+import { loginSchema } from "@/backend/validations/auth";
+import { AuditService } from "@/services/AuditService";
 
 export const authConfig: NextAuthConfig = {
+  secret: process.env.AUTH_SECRET || "erp_production_auth_secret_change_me",
   providers: [
     CredentialsProvider({
       name: "Credentials",

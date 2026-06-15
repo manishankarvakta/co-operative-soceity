@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import MemberForm from "../../../../components/forms/MemberForm";
-import NomineeForm from "../../../../components/forms/NomineeForm";
+import MemberForm from "@/components/forms/MemberForm";
+import NomineeForm from "@/components/forms/NomineeForm";
 
 interface ProfilePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function MemberProfilePage({ params }: ProfilePageProps) {
-  const { id } = params;
+  const { id } = use(params);
   const router = useRouter();
   const [member, setMember] = useState<any>(null);
   const [loading, setLoading] = useState(true);

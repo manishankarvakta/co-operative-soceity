@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import DepositReceipt from "../../../../components/widgets/DepositReceipt";
+import { use, useEffect, useState } from "react";
+import DepositReceipt from "@/components/widgets/DepositReceipt";
 
 interface DepositReceiptPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function DepositReceiptPage({ params }: DepositReceiptPageProps) {
-  const { id } = params;
+  const { id } = use(params);
   const [deposit, setDeposit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../../../lib/auth";
-import { BankService } from "../../../../../services/BankService";
-import { BaseError } from "../../../../../backend/errors";
+import { auth } from "@/lib/auth";
+import { BankService } from "@/services/BankService";
+import { BaseError } from "@/backend/errors";
 
-interface Context {
-  params: {
-    id: string;
-  };
-}
+interface Context { params: Promise<{ id: string }> }
 
 export async function POST(request: Request, { params }: Context) {
   try {
     const session = await auth();
-    if (!session) {
+    if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { signatureType } = body;
 

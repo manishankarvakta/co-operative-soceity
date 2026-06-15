@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../../lib/auth";
-import { DashboardService } from "../../../../services/DashboardService";
+import { auth } from "@/lib/auth";
+import { DashboardService } from "@/services/DashboardService";
 
 export async function GET() {
   try {

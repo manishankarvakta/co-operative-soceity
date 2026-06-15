@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../lib/auth";
-import { ProjectService } from "../../../services/ProjectService";
-import { createProjectSchema } from "../../../backend/validations/project";
-import { BaseError } from "../../../backend/errors";
+import { auth } from "@/lib/auth";
+import { ProjectService } from "@/services/ProjectService";
+import { createProjectSchema } from "@/backend/validations/project";
+import { BaseError } from "@/backend/errors";
 
 export async function GET(request: Request) {
   try {

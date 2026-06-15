@@ -251,7 +251,8 @@ export default function AccountingPage() {
       debit: "ডেবিট (Debit)",
       credit: "ক্রেডিট (Credit)",
       total: "সর্বমোট",
-      ref: "রেফারেন্স"
+      ref: "রেফারেন্স",
+      date: "তারিখ"
     },
     EN: {
       title: "Accounting & Retained Ledger",
@@ -273,7 +274,8 @@ export default function AccountingPage() {
       debit: "Debit",
       credit: "Credit",
       total: "Total",
-      ref: "Reference"
+      ref: "Reference",
+      date: "Date"
     }
   };
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { MemberService } from "../../../services/MemberService";
-import { createMemberSchema } from "../../../backend/validations/member";
-import { BaseError } from "../../../backend/errors";
+import { MemberService } from "@/services/MemberService";
+import { createMemberSchema } from "@/backend/validations/member";
+import { BaseError } from "@/backend/errors";
 import { MemberStatus } from "@prisma/client";
 
 export async function GET(request: Request) {

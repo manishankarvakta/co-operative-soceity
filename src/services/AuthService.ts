@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "../lib/db";
-import { redis } from "../lib/redis";
-import { AuthenticationError, ForbiddenError, NotFoundError, ValidationError } from "../backend/errors";
+import { prisma } from "@/lib/db";
+import { redis } from "@/lib/redis";
+import { AuthenticationError, ForbiddenError, NotFoundError, ValidationError } from "@/backend/errors";
 
 export class AuthService {
   /**

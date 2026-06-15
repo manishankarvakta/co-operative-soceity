@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProjectForm from "../../../components/forms/ProjectForm";
+import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function ProjectsPage() {
   const [lang, setLang] = useState<"BN" | "EN">("BN");

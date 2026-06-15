@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { AuthService } from "../../../../services/AuthService";
-import { resetVerifySchema } from "../../../../backend/validations/auth";
-import { BaseError } from "../../../../backend/errors";
+import { AuthService } from "@/services/AuthService";
+import { resetVerifySchema } from "@/backend/validations/auth";
+import { BaseError } from "@/backend/errors";
 
 export async function POST(request: Request) {
   try {

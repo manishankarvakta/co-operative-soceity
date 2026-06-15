@@ -1,4 +1,4 @@
-import DepositForm from "../../../components/forms/DepositForm";
+import DepositForm from "@/components/forms/DepositForm";
 
 export default function NewDepositPage() {
   return (
