@@ -1,0 +1,356 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String         @id @default(uuid()) @db.Uuid
+  email            String         @unique
+  passwordHash     String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+  userRoles        UserRole[]
+  members          Member[]
+  loggedExpenses   Expense[]      @relation("LoggedExpenses")
+  approvedExpenses Expense[]      @relation("ApprovedExpenses")
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+}
+
+model Role {
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique
+  description     String?
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+}
+
+model Permission {
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique
+  description     String?
+  rolePermissions RolePermission[]
+}
+
+model UserRole {
+  userId String @db.Uuid
+  roleId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String     @db.Uuid
+  permissionId String     @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Member {
+  id          String              @id @default(uuid()) @db.Uuid
+  userId      String?             @db.Uuid
+  user        User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  memberCode  String              @unique
+  name        String
+  phone       String              @unique
+  email       String?
+  address     String
+  joinDate    DateTime
+  status      MemberStatus        @default(ACTIVE)
+  deletedAt   DateTime?
+  nominee     Nominee?
+  deposits    Deposit[]
+  shares      ShareRecord[]
+  investments ProjectInvestment[]
+
+  @@index([phone])
+  @@index([memberCode])
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model Nominee {
+  id               String    @id @default(uuid()) @db.Uuid
+  memberId         String    @unique @db.Uuid
+  member           Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  name             String
+  relationship     String
+  phone            String
+  address          String
+  emergencyContact String
+  deletedAt        DateTime?
+}
+
+model Deposit {
+  id           String        @id @default(uuid()) @db.Uuid
+  memberId     String        @db.Uuid
+  member       Member        @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  receivedById String        @db.Uuid
+  paymentMode  PaymentMode
+  receiptId    String?       @unique @db.Uuid
+  receipt      Receipt?      @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  remarks      String?
+  createdAt    DateTime      @default(now())
+  deletedAt    DateTime?
+  items        DepositItem[]
+
+  @@index([memberId])
+  @@index([createdAt])
+}
+
+enum PaymentMode {
+  CASH
+  BANK
+}
+
+model DepositItem {
+  id            String      @id @default(uuid()) @db.Uuid
+  depositId     String      @db.Uuid
+  deposit       Deposit     @relation(fields: [depositId], references: [id], onDelete: Cascade)
+  type          DepositType
+  amount        Int // Stored in BDT Paisa/Cents
+  sharesCount   Decimal     @db.Decimal(12, 2)
+  periodDetails String
+  deletedAt     DateTime?
+
+  @@index([depositId])
+}
+
+enum DepositType {
+  WEEKLY_SUBSCRIPTION
+  ADMISSION_FEE
+  PENALTY
+  OTHER
+}
+
+model ShareRecord {
+  id            String    @id @default(uuid()) @db.Uuid
+  memberId      String    @db.Uuid
+  member        Member    @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  transactionId String?   @db.Uuid
+  count         Decimal   @db.Decimal(12, 2)
+  createdAt     DateTime  @default(now())
+  deletedAt     DateTime?
+
+  @@index([memberId])
+}
+
+model Expense {
+  id           String        @id @default(uuid()) @db.Uuid
+  category     String
+  date         DateTime
+  amount       Int // Stored in BDT Paisa/Cents
+  projectName  String?
+  projectId    String?       @db.Uuid
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  location     String?
+  receiptId    String?       @unique @db.Uuid
+  receipt      Receipt?      @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  status       ExpenseStatus @default(PENDING)
+  loggedById   String        @db.Uuid
+  loggedBy     User          @relation("LoggedExpenses", fields: [loggedById], references: [id], onDelete: Restrict)
+  approvedById String?       @db.Uuid
+  approvedBy   User?         @relation("ApprovedExpenses", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt   DateTime?
+  deletedAt    DateTime?
+
+  @@index([projectId])
+  @@index([status])
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Project {
+  id             String              @id @default(uuid()) @db.Uuid
+  name           String
+  location       String
+  targetCapital  Int // Stored in BDT Paisa/Cents
+  currentCapital Int                 @default(0) // Stored in BDT Paisa/Cents
+  status         ProjectStatus       @default(FUNDING)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  deletedAt      DateTime?
+  investments    ProjectInvestment[]
+  expenses       Expense[]
+}
+
+enum ProjectStatus {
+  FUNDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model ProjectInvestment {
+  id        String    @id @default(uuid()) @db.Uuid
+  projectId String    @db.Uuid
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  memberId  String    @db.Uuid
+  member    Member    @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  amount    Int // Stored in BDT Paisa/Cents
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([projectId])
+  @@index([memberId])
+}
+
+model ProfitDistribution {
+  id            String   @id @default(uuid()) @db.Uuid
+  projectId     String?  @db.Uuid
+  totalProfit   Int // Stored in BDT Paisa/Cents
+  devFund       Int // Stored in BDT Paisa/Cents (95%)
+  destituteFund Int // Stored in BDT Paisa/Cents (2.5%)
+  sportsFund    Int // Stored in BDT Paisa/Cents (2.5%)
+  fixedDeposit  Int // Stored in BDT Paisa/Cents (7.5%)
+  createdAt     DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model BankAccount {
+  id            String            @id @default(uuid()) @db.Uuid
+  name          String
+  accountNumber String            @unique
+  balance       Int               @default(0) // Stored in BDT Paisa/Cents
+  deletedAt     DateTime?
+  transactions  BankTransaction[]
+}
+
+model BankTransaction {
+  id                String          @id @default(uuid()) @db.Uuid
+  bankAccountId     String          @db.Uuid
+  bankAccount       BankAccount     @relation(fields: [bankAccountId], references: [id], onDelete: Restrict)
+  amount            Int // Stored in BDT Paisa/Cents
+  type              TransactionType
+  presidentApproved Boolean         @default(false)
+  secretaryApproved Boolean         @default(false)
+  treasurerApproved Boolean         @default(false)
+  isApproved        Boolean         @default(false)
+  reference         String?
+  createdAt         DateTime        @default(now())
+  deletedAt         DateTime?
+
+  @@index([bankAccountId])
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+}
+
+model Receipt {
+  id         String    @id @default(uuid()) @db.Uuid
+  imageUrl   String
+  fileSize   Int
+  mimeType   String
+  uploadedAt DateTime  @default(now())
+  deposit    Deposit?
+  expense    Expense?
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  tableName String
+  recordId  String?
+  oldData   Json?
+  newData   Json?
+  ipAddress String?
+  timestamp DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model BackupHistory {
+  id          String    @id @default(uuid()) @db.Uuid
+  filename    String
+  fileSize    Int
+  status      String
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  storagePath String
+}
+
+model Account {
+  id        String        @id @default(uuid()) @db.Uuid
+  code      String        @unique
+  name      String
+  type      AccountType
+  balance   Int           @default(0) // Stored in BDT Paisa/Cents
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?
+  lines     JournalLine[]
+
+  @@index([code])
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+model JournalEntry {
+  id          String        @id @default(uuid()) @db.Uuid
+  reference   String?
+  description String
+  date        DateTime
+  createdAt   DateTime      @default(now())
+  lines       JournalLine[]
+
+  @@index([date])
+}
+
+model JournalLine {
+  id             String          @id @default(uuid()) @db.Uuid
+  journalEntryId String          @db.Uuid
+  journalEntry   JournalEntry    @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  accountId      String          @db.Uuid
+  account        Account         @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  amount         Int // Always positive, stored in BDT Paisa/Cents
+  type           JournalLineType
+
+  @@index([journalEntryId])
+  @@index([accountId])
+}
+
+enum JournalLineType {
+  DEBIT
+  CREDIT
+}
+

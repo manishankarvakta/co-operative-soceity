@@ -1,0 +1,152 @@
+{
+  "teamName": "Co-operative Society AI Agent Development Team",
+  "version": "1.0.0",
+  "workspaceRoot": "d:/ratul project/company/co-operative-soceity",
+  "agents": [
+    {
+      "id": "orchestrator",
+      "name": "Orchestrator & Release Manager",
+      "roleFile": "agents/roles/01_orchestrator.md",
+      "responsibilities": [
+        "Task routing",
+        "Integration checks",
+        "PR/Merge approval"
+      ]
+    },
+    {
+      "id": "product_owner",
+      "name": "Product Owner & Requirements Engineer",
+      "roleFile": "agents/roles/02_product_owner.md",
+      "responsibilities": [
+        "Feature definitions",
+        "User stories",
+        "Requirement refinement"
+      ]
+    },
+    {
+      "id": "system_architect",
+      "name": "System Architect",
+      "roleFile": "agents/roles/03_system_architect.md",
+      "responsibilities": [
+        "System design",
+        "Database schema",
+        "API specs"
+      ]
+    },
+    {
+      "id": "frontend_lead",
+      "name": "Frontend Lead Developer",
+      "roleFile": "agents/roles/04_frontend_lead.md",
+      "responsibilities": [
+        "Component structure",
+        "State management",
+        "UI logic"
+      ]
+    },
+    {
+      "id": "backend_lead",
+      "name": "Backend Lead Developer",
+      "roleFile": "agents/roles/05_backend_lead.md",
+      "responsibilities": [
+        "API routes & logic",
+        "Third-party integrations",
+        "Server configuration"
+      ]
+    },
+    {
+      "id": "database_administrator",
+      "name": "Database Administrator (DBA)",
+      "roleFile": "agents/roles/06_database_administrator.md",
+      "responsibilities": [
+        "Database migration scripts",
+        "Performance tuning",
+        "Data schema integrity"
+      ]
+    },
+    {
+      "id": "devops_engineer",
+      "name": "DevOps & Infrastructure Engineer",
+      "roleFile": "agents/roles/07_devops_engineer.md",
+      "responsibilities": [
+        "Docker configuration",
+        "CI/CD workflow",
+        "Deployment settings"
+      ]
+    },
+    {
+      "id": "qa_engineer",
+      "name": "QA & Testing Engineer",
+      "roleFile": "agents/roles/08_qa_engineer.md",
+      "responsibilities": [
+        "Test automation suites",
+        "Code coverage",
+        "Linter checks"
+      ]
+    },
+    {
+      "id": "security_specialist",
+      "name": "Security Specialist",
+      "roleFile": "agents/roles/09_security_specialist.md",
+      "responsibilities": [
+        "Auth security validation",
+        "Vulnerability scanning",
+        "CORS & header settings"
+      ]
+    },
+    {
+      "id": "ui_ux_accessibility",
+      "name": "UI/UX & Accessibility Designer",
+      "roleFile": "agents/roles/10_ui_ux_accessibility.md",
+      "responsibilities": [
+        "Styling standards",
+        "Responsive design layouts",
+        "A11y compliance (WCAG)"
+      ]
+    }
+  ],
+  "collaborationRules": {
+    "governanceDocument": "C:/Users/Jahid Rohan/.gemini/antigravity-ide/brain/b7db11fc-3f86-40c6-8d62-ca27650ec9f0/ai_development_governance.md",
+    "sequentialWorkflow": {
+      "phases": [
+        "1. Product Owner defines requirements and user stories.",
+        "2. System Architect designs APIs and logical database ERDs.",
+        "3. Database Administrator translates designs to Prisma schema migrations.",
+        "4. Frontend Lead scaffolds modules and state interfaces.",
+        "5. Backend Lead scaffolds controllers and route handlers.",
+        "6. UI/UX Designer builds theme properties and CSS style tokens.",
+        "7. Security Specialist audits routes and authentication configuration.",
+        "8. QA Engineer writes test blueprints and configures linting schemas.",
+        "9. DevOps Engineer wraps services in Docker containerization and Dokploy files.",
+        "10. Orchestrator executes final validation and merge checks."
+      ]
+    },
+    "parallelWorkflow": {
+      "description": "After DBA migrates models, Backend, Frontend, and UI/UX scaffold features concurrently. Security audits backend changes while QA schedules frontend validation tests.",
+      "allowedParallelTracks": [
+        ["backend_lead", "security_specialist"],
+        ["frontend_lead", "ui_ux_accessibility"],
+        ["qa_engineer", "devops_engineer"]
+      ]
+    },
+    "moduleWorkflow": {
+      "steps": [
+        "1. PO writes feature backlog user stories.",
+        "2. Architect generates OpenAPI contract.",
+        "3. DBA updates Prisma model configurations.",
+        "4. Developers scaffold the mock integration layouts.",
+        "5. QA maps testing scenarios.",
+        "6. Orchestrator validates feature completeness."
+      ]
+    },
+    "sprintWorkflow": {
+      "schedule": "2-week cycles",
+      "milestones": {
+        "planning": "Days 1-2 (PO requirements + Architect designs)",
+        "development": "Days 3-7 (DBA migrations + Dev configurations + UI/UX styles)",
+        "hardening": "Days 8-9 (Security audits + QA tests + DevOps containers)",
+        "release": "Day 10 (Orchestrator reviews, approves, and packages release)"
+      }
+    },
+    "noCodeConstraint": "Do not execute or build final application codebase. Only write configuration files, documentation, scaffolding templates, and agent assets."
+  }
+}

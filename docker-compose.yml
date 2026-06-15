@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: erp-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: erp_user
+      POSTGRES_PASSWORD: erp_secure_password
+      POSTGRES_DB: cooperative_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp_user -d cooperative_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: erp-redis
+    restart: always
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://erp_user:erp_secure_password@postgres:5432/cooperative_db?schema=public
+      REDIS_URL: redis://redis:6379
+      NEXTAUTH_SECRET: erp_production_auth_secret_change_me
+      NEXTAUTH_URL: http://localhost:3000
+      BACKUP_DIR: /app/backups
+      BACKUP_CRON_HOUR: "0" # Daily automated backup at 00:00 midnight
+      BACKUP_CRON_MINUTE: "0"
+      PG_DUMP_PATH: pg_dump
+      PSQL_PATH: psql
+      NODE_ENV: production
+    volumes:
+      - backup-data:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # Node.js zero-dependency health check querying the /api/health endpoint
+      test: ["CMD", "node", "-e", "const http = require('http'); http.get('http://localhost:3000/api/health', (res) => { if (res.statusCode === 200) { process.exit(0); } else { process.exit(1); } }).on('error', () => process.exit(1));"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres-data:
+    name: erp-postgres-data
+  redis-data:
+    name: erp-redis-data
+  backup-data:
+    name: erp-backup-data
