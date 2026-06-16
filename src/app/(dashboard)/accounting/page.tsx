@@ -43,9 +43,10 @@ export default function AccountingPage() {
     try {
       const res = await fetch("/api/accounting/accounts");
       const data = await res.json();
-      setAccounts(Array.isArray(data) ? data : (data.accounts || []));
+      setAccounts(res.ok && Array.isArray(data) ? data : (data?.accounts || []));
     } catch (err) {
       console.error(err);
+      setAccounts([]);
     } finally {
       setLoading(false);
     }
@@ -56,9 +57,10 @@ export default function AccountingPage() {
     try {
       const res = await fetch("/api/accounting/journal");
       const data = await res.json();
-      setJournalEntries(data.entries || []);
+      setJournalEntries(res.ok ? (data?.entries || []) : []);
     } catch (err) {
       console.error(err);
+      setJournalEntries([]);
     } finally {
       setLoading(false);
     }
@@ -69,9 +71,10 @@ export default function AccountingPage() {
     try {
       const res = await fetch(`/api/accounting/reports?type=${reportType}`);
       const data = await res.json();
-      setReportData(data);
+      setReportData(res.ok && !data?.error ? data : null);
     } catch (err) {
       console.error(err);
+      setReportData(null);
     } finally {
       setLoading(false);
     }
@@ -82,12 +85,15 @@ export default function AccountingPage() {
     try {
       const res = await fetch("/api/accounting/profit-distribution");
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data?.success) {
         setNetProfitBdt(data.netProfitBdt || 0);
         setDistributionsList(data.distributions || []);
+      } else {
+        setDistributionsList([]);
       }
     } catch (err) {
       console.error(err);
+      setDistributionsList([]);
     } finally {
       setLoading(false);
     }
