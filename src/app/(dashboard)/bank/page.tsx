@@ -27,8 +27,8 @@ export default function BankWorkspacePage() {
       ]);
       const dataAcc = await resAcc.json();
       const dataTx = await resTx.json();
-      setAccounts(dataAcc || []);
-      setTransactions(dataTx.transactions || []);
+      setAccounts(Array.isArray(dataAcc) ? dataAcc : (dataAcc.accounts || []));
+      setTransactions(Array.isArray(dataTx.transactions) ? dataTx.transactions : []);
     } catch (err) {
       console.error(err);
     } finally {
