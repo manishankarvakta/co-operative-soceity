@@ -43,7 +43,7 @@ export default function AccountingPage() {
     try {
       const res = await fetch("/api/accounting/accounts");
       const data = await res.json();
-      setAccounts(data || []);
+      setAccounts(Array.isArray(data) ? data : (data.accounts || []));
     } catch (err) {
       console.error(err);
     } finally {
