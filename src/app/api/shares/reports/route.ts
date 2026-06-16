@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { ShareService } from "@/services/ShareService";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "deposits", "read") || session.user.roles?.includes("MEMBER")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const result = await ShareService.getShareReports();

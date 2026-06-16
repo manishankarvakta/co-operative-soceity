@@ -2,13 +2,17 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { DepositService } from "@/services/DepositService";
 import { createDepositSchema } from "@/backend/validations/deposit";
-import { BaseError, ForbiddenError } from "@/backend/errors";
+import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "deposits", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -31,6 +35,9 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "deposits", "write")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const officerId = session.user.id;
@@ -66,3 +73,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

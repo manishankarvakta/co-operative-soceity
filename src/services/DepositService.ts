@@ -48,9 +48,11 @@ export class DepositService {
         amount: number; // Stored in Paisa/Cents
         periodDetails: string;
       }>;
-    }
+    },
+    tx?: any
   ) {
-    const member = await prisma.member.findUnique({
+    const db = tx || prisma;
+    const member = await db.member.findUnique({
       where: { id: data.memberId }
     });
 
@@ -68,9 +70,9 @@ export class DepositService {
     const receiptCode = await this.generateReceiptNumber(today);
     const totalPaisa = data.items.reduce((sum, item) => sum + item.amount, 0);
 
-    const result = await prisma.$transaction(async (tx) => {
+    const execute = async (transactionClient: any) => {
       // 1. Create parent Deposit record
-      const deposit = await tx.deposit.create({
+      const deposit = await transactionClient.deposit.create({
         data: {
           memberId: data.memberId,
           receivedById: officerId,
@@ -90,7 +92,7 @@ export class DepositService {
         }
 
         // Create DepositItem
-        await tx.depositItem.create({
+        await transactionClient.depositItem.create({
           data: {
             depositId: deposit.id,
             type: item.type,
@@ -102,7 +104,7 @@ export class DepositService {
 
         // Generate ShareRecord for weekly subscriptions
         if (shares > 0) {
-          await tx.shareRecord.create({
+          await transactionClient.shareRecord.create({
             data: {
               memberId: data.memberId,
               transactionId: deposit.id,
@@ -116,24 +118,24 @@ export class DepositService {
       // 3. Update Balance Ledgers
       if (data.paymentMode === "CASH") {
         // Increment primary Cash balance account (represented as BankAccount with name 'Cash on Hand')
-        const cashAccount = await tx.bankAccount.findFirst({
+        const cashAccount = await transactionClient.bankAccount.findFirst({
           where: { name: "Cash on Hand" }
         });
 
         if (cashAccount) {
-          await tx.bankAccount.update({
+          await transactionClient.bankAccount.update({
             where: { id: cashAccount.id },
             data: { balance: { increment: totalPaisa } }
           });
         }
       } else {
         // Increment Bank balance
-        const bankAccount = await tx.bankAccount.findFirst({
+        const bankAccount = await transactionClient.bankAccount.findFirst({
           where: { NOT: { name: "Cash on Hand" } }
         });
 
         if (bankAccount) {
-          await tx.bankAccount.update({
+          await transactionClient.bankAccount.update({
             where: { id: bankAccount.id },
             data: { balance: { increment: totalPaisa } }
           });
@@ -164,7 +166,7 @@ export class DepositService {
         })
       ];
 
-      await AccountingService.postJournalEntry(tx, {
+      await AccountingService.postJournalEntry(transactionClient, {
         reference: receiptCode,
         description: `সদস্য জমা কালেকশন - ${member.name} (${member.memberCode})`,
         date: today,
@@ -173,7 +175,7 @@ export class DepositService {
 
       // 5. Handle member reactivation if penalty paid
       if (member.status === "SUSPENDED" && data.items.some(i => i.type === "PENALTY")) {
-        await tx.member.update({
+        await transactionClient.member.update({
           where: { id: data.memberId },
           data: { status: "ACTIVE" }
         });
@@ -186,7 +188,9 @@ export class DepositService {
         memberCode: member.memberCode,
         memberName: member.name
       };
-    });
+    };
+
+    const result = tx ? await execute(tx) : await prisma.$transaction(execute);
 
     await DashboardService.invalidateCache();
 

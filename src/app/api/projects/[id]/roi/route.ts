@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { ProjectService } from "@/services/ProjectService";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 interface Context { params: Promise<{ id: string }> }
 
@@ -10,6 +11,9 @@ export async function GET(request: Request, { params }: Context) {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "projects", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const { id } = await params;
@@ -37,10 +41,7 @@ export async function POST(request: Request, { params }: Context) {
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
-
-    const roles = (session.user as any).roles || [];
-    const isAdminOrAccountant = roles.some((r: any) => r.role.name === "SUPER_ADMIN" || r.role.name === "ACCOUNTANT");
-    if (!isAdminOrAccountant) {
+    if (!canAccess(session.user as any, "projects", "distribute_roi")) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
@@ -72,3 +73,4 @@ export async function POST(request: Request, { params }: Context) {
     );
   }
 }
+

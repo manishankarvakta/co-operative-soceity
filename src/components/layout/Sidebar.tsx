@@ -5,16 +5,18 @@ import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: "home" },
-  { name: "Members", href: "/members", icon: "users" },
-  { name: "Deposits", href: "/deposits", icon: "wallet" },
-  { name: "Shares", href: "/shares", icon: "pie-chart" },
-  { name: "Expenses", href: "/expenses", icon: "credit-card" },
-  { name: "Accounting", href: "/accounting", icon: "book-open" },
-  { name: "Bank", href: "/bank", icon: "building" },
-  { name: "Projects", href: "/projects", icon: "briefcase" },
+  { name: "Members", href: "/dashboard/members", icon: "users" },
+  { name: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
+  { name: "Shares", href: "/dashboard/shares", icon: "pie-chart" },
+  { name: "Expenses", href: "/dashboard/expenses", icon: "credit-card" },
+  { name: "Accounting", href: "/dashboard/accounting", icon: "book-open" },
+  { name: "Bank", href: "/dashboard/bank", icon: "building" },
+  { name: "Projects", href: "/dashboard/projects", icon: "briefcase" },
   { name: "Reports", href: "/reports", icon: "file-text" },
   { name: "Backups", href: "/backups", icon: "database" },
 ];
+
+import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 
 const getIcon = (iconName: string) => {
   switch (iconName) {
@@ -86,6 +88,14 @@ const getIcon = (iconName: string) => {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const user = session?.user;
+  const userInitials = user?.name
+    ? user.name.substring(0, 2).toUpperCase()
+    : user?.email
+      ? user.email.substring(0, 2).toUpperCase()
+      : "US";
 
   return (
     <div className="flex h-screen w-64 flex-col bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 shadow-sm fixed z-40 overflow-y-auto">
@@ -108,11 +118,10 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                isActive
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all duration-200 ${isActive
                   ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 shadow-sm"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-zinc-900/50"
-              }`}
+                }`}
             >
               {getIcon(item.icon)}
               {item.name}
@@ -121,14 +130,31 @@ export default function Sidebar() {
         })}
       </nav>
       <div className="p-4 border-t border-gray-200 dark:border-zinc-800">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
-            <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">AD</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 px-1 py-2 overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                {userInitials}
+              </span>
+            </div>
+            <div className="truncate min-w-0">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                {user?.name || "Active User"}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {user?.email || "Signed in"}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">Admin User</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">admin@somoby.com</p>
-          </div>
+          <button
+            onClick={() => nextAuthSignOut({ callbackUrl: "/login" })}
+            className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-900 shrink-0 transition-colors"
+            title="Log out"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

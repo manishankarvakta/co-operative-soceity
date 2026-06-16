@@ -321,7 +321,7 @@ describe("Backup System Comprehensive Tests", () => {
     it("should return 403 Forbidden if user holds a non-admin role (e.g. MEMBER)", async () => {
       const memberSession = {
         user: {
-          roles: [{ role: { name: "MEMBER" } }]
+          roles: ["MEMBER"]
         }
       };
       (auth as unknown as jest.Mock).mockResolvedValue(memberSession);
@@ -343,7 +343,7 @@ describe("Backup System Comprehensive Tests", () => {
     it("should return 403 Forbidden if user is an ACCOUNTANT", async () => {
       const accountantSession = {
         user: {
-          roles: [{ role: { name: "ACCOUNTANT" } }]
+          roles: ["ACCOUNTANT"]
         }
       };
       (auth as unknown as jest.Mock).mockResolvedValue(accountantSession);
@@ -363,7 +363,7 @@ describe("Backup System Comprehensive Tests", () => {
     const adminSession = {
       user: {
         id: "admin-uuid",
-        roles: [{ role: { name: "SUPER_ADMIN" } }]
+        roles: ["SUPER_ADMIN"]
       }
     };
 

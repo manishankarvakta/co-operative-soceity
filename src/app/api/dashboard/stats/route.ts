@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { DashboardService } from "@/services/DashboardService";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET() {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "reports", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const stats = await DashboardService.getDashboardStats();
@@ -19,3 +23,4 @@ export async function GET() {
     );
   }
 }
+

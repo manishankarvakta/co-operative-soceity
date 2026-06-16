@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { AccountingService } from "@/services/AccountingService";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "accounting", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -43,3 +47,4 @@ export async function GET(request: Request) {
     );
   }
 }
+

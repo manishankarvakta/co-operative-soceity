@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NotFoundError, ValidationError } from "@/backend/errors";
 import { AccountType, JournalLineType } from "@prisma/client";
+import { FiscalYearService } from "./FiscalYearService";
 
 export class AccountingService {
   /**
@@ -13,26 +14,25 @@ export class AccountingService {
       { code: "1010", name: "Bank Account (ব্যাংক হিসাব)", type: AccountType.ASSET },
       { code: "1020", name: "Land and Assets (ভূমি ও সম্পত্তি)", type: AccountType.ASSET },
       { code: "1030", name: "Fixed Deposit Account (স্থায়ী আমানত হিসাব)", type: AccountType.ASSET },
+      { code: "1040", name: "Loan Receivable (ঋণ প্রাপ্যতা)", type: AccountType.ASSET },
       
       // Liabilities (2000 - 2999)
       { code: "2000", name: "Member Savings (সদস্য সঞ্চয়)", type: AccountType.LIABILITY },
       
       // Equity (3000 - 3999)
-      { code: "3000", name: "Member Share Capital (শেয়ার মূলধন)", type: AccountType.EQUITY },
-      { code: "3010", name: "Business Development Fund (ব্যবসা উন্নয়ন তহবিল)", type: AccountType.EQUITY },
-      { code: "3020", name: "Poor & Destitute Fund (দরিদ্র তহবিল)", type: AccountType.EQUITY },
-      { code: "3030", name: "Sports & Entertainment Fund (ক্রীড়া ও বিনোদন তহবিল)", type: AccountType.EQUITY },
+      { code: "3000", name: "Share Capital (শেয়ার মূলধন)", type: AccountType.EQUITY },
+      { code: "3010", name: "Development Fund (উন্নয়ন তহবিল)", type: AccountType.EQUITY },
+      { code: "3020", name: "Destitute Fund (দুস্থ কল্যাণ তহবিল)", type: AccountType.EQUITY },
+      { code: "3030", name: "Sports and Cultural Fund (ক্রীড়া ও সাংস্কৃতিক তহবিল)", type: AccountType.EQUITY },
       
       // Revenue (4000 - 4999)
-      { code: "4000", name: "Admission Fee Income (ভর্তি ফি আয়)", type: AccountType.REVENUE },
-      { code: "4010", name: "Penalty/Fine Income (জরিমানা আয়)", type: AccountType.REVENUE },
-      { code: "4020", name: "Investment Revenue (বিনিয়োগ লভ্যাংশ আয়)", type: AccountType.REVENUE },
+      { code: "4000", name: "Admission Fees (ভর্তি ফি)", type: AccountType.REVENUE },
+      { code: "4010", name: "Penalty Income (জরিমানা বাবদ আয়)", type: AccountType.REVENUE },
+      { code: "4020", name: "Investment Revenue (বিনিয়োগ লভ্যাংশ)", type: AccountType.REVENUE },
+      { code: "4030", name: "Interest Income (সুদ বাবদ আয়)", type: AccountType.REVENUE },
       
       // Expenses (5000 - 5999)
-      { code: "5000", name: "Office Rent Expense (অফিস ভাড়া খরচ)", type: AccountType.EXPENSE },
-      { code: "5010", name: "Transport Expense (যাতায়াত খরচ)", type: AccountType.EXPENSE },
-      { code: "5020", name: "Entertainment Expense (আপ্যায়ন খরচ)", type: AccountType.EXPENSE },
-      { code: "5030", name: "General Expense (সাধারণ খরচ)", type: AccountType.EXPENSE }
+      { code: "5000", name: "Office Expense (অফিস খরচ)", type: AccountType.EXPENSE }
     ];
 
     for (const acc of defaultAccounts) {
@@ -84,7 +84,10 @@ export class AccountingService {
       }>;
     }
   ) {
-    // 1. Double-entry validation: Sum of Debits must equal Sum of Credits
+    // 1. Validate that the transaction date is within the active fiscal year
+    await FiscalYearService.validateDate(data.date);
+
+    // 2. Double-entry validation: Sum of Debits must equal Sum of Credits
     const debitSum = data.lines
       .filter((l) => l.type === "DEBIT")
       .reduce((sum, l) => sum + l.amount, 0);
@@ -104,7 +107,7 @@ export class AccountingService {
 
     const entryDate = new Date(data.date);
 
-    // 2. Create the parent JournalEntry record
+    // 3. Create the parent JournalEntry record
     const entry = await tx.journalEntry.create({
       data: {
         reference: data.reference || undefined,
@@ -113,7 +116,7 @@ export class AccountingService {
       }
     });
 
-    // 3. Create lines and update balances
+    // 4. Create lines and update balances
     for (const line of data.lines) {
       const account = await tx.account.findUnique({
         where: { code: line.accountCode }
@@ -160,6 +163,50 @@ export class AccountingService {
     }
 
     return entry;
+  }
+
+  /**
+   * Reverses a journal entry by posting a new entry with debits and credits swapped.
+   */
+  static async reverseJournalEntry(tx: any, originalEntryId: string) {
+    const originalEntry = await tx.journalEntry.findUnique({
+      where: { id: originalEntryId },
+      include: {
+        lines: {
+          include: { account: true }
+        }
+      }
+    });
+
+    if (!originalEntry) {
+      throw new NotFoundError("মূল জার্নাল এন্ট্রি খুঁজে পাওয়া যায়নি।");
+    }
+
+    // Swapping lines (DEBIT becomes CREDIT, CREDIT becomes DEBIT)
+    const reversalLines = originalEntry.lines.map((line: any) => ({
+      accountCode: line.account.code,
+      amount: line.amount,
+      type: line.type === "DEBIT" ? "CREDIT" as const : "DEBIT" as const
+    }));
+
+    // Create the reversal description
+    const reversalDescription = `রিভার্সাল জার্নাল এন্ট্রি (মূল এন্ট্রি #${originalEntryId.slice(0, 8)}): ${originalEntry.description}`;
+
+    // Post the new reversal journal entry (reversal posted as of today or original date, we'll try today's date if valid or original date)
+    let reversalDate = new Date();
+    try {
+      await FiscalYearService.validateDate(reversalDate);
+    } catch {
+      // If today is outside active fiscal year, fall back to the original entry's date (which must be valid)
+      reversalDate = new Date(originalEntry.date);
+    }
+
+    return await this.postJournalEntry(tx, {
+      reference: originalEntry.reference ? `REV-${originalEntry.reference}` : `REV-${originalEntryId.slice(0, 8)}`,
+      description: reversalDescription,
+      date: reversalDate,
+      lines: reversalLines
+    });
   }
 
   /**

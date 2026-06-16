@@ -4,10 +4,10 @@ import { z } from "zod";
 const bdPhoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
 
 export const loginSchema = z.object({
-  email: z.string().email("সঠিক ইমেইল ঠিকানা লিখুন।"),
+  email: z.string().min(1, "ইমেইল, মোবাইল নম্বর বা মেম্বার আইডি লিখুন।"),
   password: z.string().min(6, "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।"),
   rememberMe: z.boolean().optional().default(false),
-}).strict();
+});
 
 export const resetRequestSchema = z.object({
   emailOrPhone: z.string().refine((val) => {

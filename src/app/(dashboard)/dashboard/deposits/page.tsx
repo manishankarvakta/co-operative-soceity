@@ -66,7 +66,7 @@ export default function DepositsListPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">সমিতিতে সদস্যদের জমানো সাপ্তাহিক/মাসিক চাঁদা ও অন্যান্য ফি কালেকশন রেকর্ড।</p>
         </div>
         <Link
-          href="/deposits/new"
+          href="/dashboard/deposits/new"
           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-md transition-all duration-200"
         >
           + নতুন জমা এন্ট্রি

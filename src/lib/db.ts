@@ -9,4 +9,17 @@ export const prisma =
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 
+if (!globalForPrisma.prisma) {
+  prisma.$use(async (params, next) => {
+    const immutableModels = ["JournalEntry", "JournalLine"];
+    if (immutableModels.includes(params.model || "")) {
+      const forbiddenActions = ["update", "updateMany", "delete", "deleteMany", "upsert"];
+      if (forbiddenActions.includes(params.action)) {
+        throw new Error(`Immutable ledger error: Modification of ${params.model} is strictly forbidden.`);
+      }
+    }
+    return next(params);
+  });
+}
+
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

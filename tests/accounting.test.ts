@@ -17,12 +17,27 @@ jest.mock("../src/lib/db", () => ({
     journalEntry: {
       create: jest.fn(),
       count: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn()
     },
     journalLine: {
-      create: jest.fn()
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn()
     },
-    $transaction: jest.fn((cb) => cb(prisma))
+    fiscalYear: {
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn()
+    },
+    $transaction: jest.fn((cb) => {
+      if (typeof cb === "function") return cb(prisma);
+      return Promise.all(cb);
+    })
   }
 }));
 
@@ -75,17 +90,41 @@ describe("AccountingService Double-Entry Logic", () => {
   });
 
   describe("postJournalEntry", () => {
+    beforeEach(() => {
+      // Mock active fiscal year (July 1, 2025 - June 30, 2026)
+      (prisma.fiscalYear.findFirst as jest.Mock).mockResolvedValue({
+        id: "fy-2025",
+        name: "FY 2025-2026",
+        startDate: new Date("2025-07-01T00:00:00.000Z"),
+        endDate: new Date("2026-06-30T23:59:59.999Z"),
+        isActive: true
+      });
+    });
+
     it("should throw ValidationError if debits do not equal credits", async () => {
       await expect(
         AccountingService.postJournalEntry(prisma, {
           description: "Unbalanced",
-          date: new Date(),
+          date: "2026-06-15",
           lines: [
             { accountCode: "1000", amount: 10000, type: "DEBIT" },
             { accountCode: "3000", amount: 9000, type: "CREDIT" }
           ]
         })
       ).rejects.toThrow("দ্বৈত দাখিলা নীতি লঙ্ঘন");
+    });
+
+    it("should throw ValidationError if transaction date is outside active fiscal year", async () => {
+      await expect(
+        AccountingService.postJournalEntry(prisma, {
+          description: "Out of Period",
+          date: "2027-01-01",
+          lines: [
+            { accountCode: "1000", amount: 5000, type: "DEBIT" },
+            { accountCode: "3000", amount: 5000, type: "CREDIT" }
+          ]
+        })
+      ).rejects.toThrow("সক্রিয় অর্থবছর");
     });
 
     it("should successfully post balanced journal entry and adjust account balances correctly", async () => {
@@ -125,6 +164,64 @@ describe("AccountingService Double-Entry Logic", () => {
         where: { id: "acc-equity" },
         data: { balance: { increment: 20000 } }
       });
+    });
+  });
+
+  describe("reverseJournalEntry", () => {
+    beforeEach(() => {
+      (prisma.fiscalYear.findFirst as jest.Mock).mockResolvedValue({
+        id: "fy-2025",
+        name: "FY 2025-2026",
+        startDate: new Date("2025-07-01T00:00:00.000Z"),
+        endDate: new Date("2026-06-30T23:59:59.999Z"),
+        isActive: true
+      });
+    });
+
+    it("should successfully reverse an existing journal entry by swapping debits and credits", async () => {
+      const originalEntry = {
+        id: "orig-123",
+        reference: "VOUCHER-99",
+        description: "Original entry",
+        date: new Date("2026-06-15"),
+        lines: [
+          { account: { code: "1000" }, amount: 15000, type: "DEBIT" },
+          { account: { code: "3000" }, amount: 15000, type: "CREDIT" }
+        ]
+      };
+
+      (prisma.journalEntry.findUnique as jest.Mock).mockResolvedValue(originalEntry);
+      (prisma.journalEntry.create as jest.Mock).mockResolvedValue({ id: "rev-entry-1" });
+      (prisma.account.findUnique as jest.Mock).mockImplementation((args: any) => {
+        if (args.where.code === "1000") {
+          return Promise.resolve({ id: "acc-cash", code: "1000", type: AccountType.ASSET, balance: 10000 });
+        }
+        if (args.where.code === "3000") {
+          return Promise.resolve({ id: "acc-equity", code: "3000", type: AccountType.EQUITY, balance: 50000 });
+        }
+        return Promise.resolve(null);
+      });
+
+      const reversed = await AccountingService.reverseJournalEntry(prisma, "orig-123");
+
+      expect(reversed.id).toBe("rev-entry-1");
+      expect(prisma.journalLine.create).toHaveBeenCalledTimes(2);
+
+      // Verify the lines are created with reversed types
+      // The original Cash had DEBIT, so reversed should be CREDIT
+      // The original Equity had CREDIT, so reversed should be DEBIT
+      expect(prisma.journalLine.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
+        data: expect.objectContaining({
+          amount: 15000,
+          type: "CREDIT"
+        })
+      }));
+      expect(prisma.journalLine.create).toHaveBeenNthCalledWith(2, expect.objectContaining({
+        data: expect.objectContaining({
+          amount: 15000,
+          type: "DEBIT"
+        })
+      }));
     });
   });
 

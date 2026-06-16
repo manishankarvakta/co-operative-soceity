@@ -3,9 +3,19 @@ import { MemberService } from "@/services/MemberService";
 import { createMemberSchema } from "@/backend/validations/member";
 import { BaseError } from "@/backend/errors";
 import { MemberStatus } from "@prisma/client";
+import { auth } from "@/lib/auth";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET(request: Request) {
   try {
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "members", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || undefined;
     const status = (searchParams.get("status") as MemberStatus) || undefined;
@@ -25,6 +35,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "members", "write")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
+    const officerId = session.user.id;
     const body = await request.json();
 
     // Validate inputs using Zod
@@ -40,8 +59,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await MemberService.createMember(parsed.data);
-    return NextResponse.json({ success: true, member: result }, { status: 21 });
+    const result = await MemberService.createMember(parsed.data, officerId);
+    return NextResponse.json({ success: true, member: result }, { status: 201 });
   } catch (error) {
     if (error instanceof BaseError) {
       return NextResponse.json(
@@ -57,3 +76,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

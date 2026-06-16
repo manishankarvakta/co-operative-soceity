@@ -27,10 +27,11 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Setup database schema folder permissions and backups folder
-RUN mkdir -p /app/backups && chown -R node:node /app/backups
+# Copy built files with node user ownership
+COPY --from=builder --chown=node:node /app ./
 
-COPY --from=builder /app ./
+# Setup backups folder and adjust permissions
+RUN mkdir -p /app/backups && chown -R node:node /app/backups
 
 EXPOSE 3000
 

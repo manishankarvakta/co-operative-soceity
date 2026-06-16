@@ -13,6 +13,15 @@ export async function GET(request: Request, { params }: Context) {
     }
 
     const { memberId } = await params;
+    const isOwner = session.user.memberId && session.user.memberId === memberId;
+    const isStaffOrAdmin = session.user.roles?.some((role: string) =>
+      ["SUPER_ADMIN", "ACCOUNTANT", "PRESIDENT", "SECRETARY", "TREASURER"].includes(role)
+    );
+
+    if (!isOwner && !isStaffOrAdmin) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);

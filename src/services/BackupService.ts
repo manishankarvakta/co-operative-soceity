@@ -15,6 +15,7 @@ const STATIC_TABLE_NAMES = [
   "User",
   "UserRole",
   "BankAccount",
+  "FiscalYear",
   "Project",
   "Receipt",
   "Member",
@@ -31,6 +32,9 @@ const STATIC_TABLE_NAMES = [
   "Account",
   "JournalEntry",
   "JournalLine",
+  "Loan",
+  "LoanSchedule",
+  "LoanPayment",
   "BackupHistory"
 ];
 
@@ -393,41 +397,15 @@ export class BackupService {
    * Starts the background interval clock scheduler.
    */
   static initScheduler() {
-    if (this.schedulerInterval) {
-      return; // Already initialized
-    }
-
-    console.log("[BackupService] Starting automated backup scheduler...");
-
-    // Check time conditions every 60 seconds
-    this.schedulerInterval = setInterval(async () => {
-      try {
-        const now = new Date();
-        const targetHour = parseInt(process.env.BACKUP_CRON_HOUR || "0", 10);
-        const targetMinute = parseInt(process.env.BACKUP_CRON_MINUTE || "0", 10);
-
-        if (now.getHours() === targetHour && now.getMinutes() === targetMinute) {
-          await this.triggerDailyBackup();
-        }
-      } catch (err) {
-        console.error("[BackupService] Automated backup scheduler tick error:", err);
-      }
-    }, 60000);
-
-    // Unref the timer to allow clean process termination during testing
-    if (this.schedulerInterval.unref) {
-      this.schedulerInterval.unref();
-    }
+    const { SchedulerService } = require("./SchedulerService");
+    SchedulerService.start();
   }
 
   /**
    * Clean-up function for shutting down timers (useful in test suites).
    */
   static stopScheduler() {
-    if (this.schedulerInterval) {
-      clearInterval(this.schedulerInterval);
-      this.schedulerInterval = null;
-      console.log("[BackupService] Automated backup scheduler stopped.");
-    }
+    const { SchedulerService } = require("./SchedulerService");
+    SchedulerService.stop();
   }
 }

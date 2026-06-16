@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Providers } from "@/components/Providers";
 
 export const metadata = {
   title: "Cooperative Society ERP",
@@ -14,9 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-white dark:bg-zinc-950 text-gray-900 dark:text-zinc-100">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

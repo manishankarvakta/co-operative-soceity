@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { BankService } from "@/services/BankService";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 interface Context { params: Promise<{ id: string }> }
 
@@ -23,10 +24,8 @@ export async function POST(request: Request, { params }: Context) {
       );
     }
 
-    // Role-based auth gate
-    const roles = (session.user as any).roles || [];
-    const isAdminOrAccountant = roles.some((r: any) => r.role.name === "SUPER_ADMIN" || r.role.name === "ACCOUNTANT");
-    if (!isAdminOrAccountant) {
+    // RBAC access check
+    if (!canAccess(session.user as any, "bank", "sign")) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
@@ -48,3 +47,4 @@ export async function POST(request: Request, { params }: Context) {
     );
   }
 }
+

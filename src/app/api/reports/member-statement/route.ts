@@ -20,6 +20,15 @@ export async function GET(request: Request) {
       );
     }
 
+    const isOwner = session.user.memberId && session.user.memberId === memberId;
+    const isStaffOrAdmin = session.user.roles?.some((role: string) =>
+      ["SUPER_ADMIN", "ACCOUNTANT", "PRESIDENT", "SECRETARY", "TREASURER"].includes(role)
+    );
+
+    if (!isOwner && !isStaffOrAdmin) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
     const report = await ReportService.getMemberStatement(memberId);
 
     return NextResponse.json({ success: true, ...report });

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { ProjectService } from "@/services/ProjectService";
 import { createInvestmentSchema } from "@/backend/validations/project";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 interface Context { params: Promise<{ id: string }> }
 
@@ -29,6 +30,14 @@ export async function POST(request: Request, { params }: Context) {
       );
     }
 
+    // A standard Member can only invest for themselves
+    const isSelf = session.user.memberId && session.user.memberId === parsed.data.memberId;
+    const hasAccess = canAccess(session.user as any, "projects", "write") || canAccess(session.user as any, "projects", "invest");
+
+    if (!isSelf && !hasAccess) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
     const result = await ProjectService.recordInvestment(parsed.data);
     return NextResponse.json({ success: true, investment: result });
   } catch (error) {
@@ -46,3 +55,4 @@ export async function POST(request: Request, { params }: Context) {
     );
   }
 }
+

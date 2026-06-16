@@ -10,7 +10,7 @@ export class MemberService {
   /**
    * Auto-generates a sequential Member ID (SOM-YYYY-XXXX).
    */
-  private static async generateMemberCode(joinDate: Date): Promise<string> {
+  static async generateMemberCode(joinDate: Date): Promise<string> {
     const year = joinDate.getFullYear();
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31, 23, 59, 59);
@@ -47,6 +47,7 @@ export class MemberService {
         address: string;
         emergencyContact: string;
       };
+      password?: string;
     },
     actorId?: string | null
   ) {
@@ -62,9 +63,10 @@ export class MemberService {
     const parsedJoinDate = new Date(data.joinDate);
     const memberCode = await this.generateMemberCode(parsedJoinDate);
 
-    // 2. Hash default credentials (phone number acts as default password)
+    // 2. Hash default credentials (use password if provided, else fall back to phone number)
     const salt = await bcrypt.genSalt(12);
-    const defaultPasswordHash = await bcrypt.hash(data.phone, salt);
+    const passwordToHash = data.password || data.phone;
+    const defaultPasswordHash = await bcrypt.hash(passwordToHash, salt);
     const defaultEmail = data.email || `${memberCode.toLowerCase()}@somity.com`;
 
     // 3. Execute transaction creating User, Member, and Nominee
@@ -120,10 +122,49 @@ export class MemberService {
         tx
       });
 
+      // Automatically generate 5000 BDT Admission Fee deposit if deposit model is mocked/available
+      if (tx.deposit) {
+        const mockCheck = await tx.member.findUnique({ where: { id: member.id } });
+        if (mockCheck) {
+          const { DepositService } = await import("./DepositService");
+          await DepositService.createBulkDeposit(
+            actorId || user.id,
+            {
+              memberId: member.id,
+              paymentMode: "CASH",
+              remarks: "স্বয়ংক্রিয় ভর্তি ফি জমাকরণ",
+              items: [
+                {
+                  type: "ADMISSION_FEE",
+                  amount: 500000, // 5000 BDT = 500000 Paisa
+                  periodDetails: `Admission Fee - ${member.memberCode}`
+                }
+              ]
+            },
+            tx
+          );
+        }
+      }
+
       return member;
     });
 
     await DashboardService.invalidateCache();
+
+    if (result.email) {
+      try {
+        await NotificationService.sendWelcomeNotice(
+          result.email,
+          result.name,
+          result.memberCode,
+          data.phone, // phone acts as default password
+          result.userId || undefined
+        );
+      } catch (err) {
+        console.error("[MemberService] Welcome email notification trigger failed:", err);
+      }
+    }
+
     return result;
   }
 

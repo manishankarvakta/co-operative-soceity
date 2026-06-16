@@ -17,7 +17,8 @@ export const createMemberSchema = z.object({
   address: z.string().min(5, "সদস্যের বর্তমান ঠিকানা লিখুন।"),
   joinDate: z.string().refine((val) => !isNaN(Date.parse(val)), "ভর্তির সঠিক তারিখ উল্লেখ করুন।"),
   status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).default("ACTIVE"),
-  nominee: nomineeSchema
+  nominee: nomineeSchema,
+  password: z.string().min(6, "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।").optional()
 }).strict();
 
 export const updateMemberSchema = z.object({
@@ -29,3 +30,19 @@ export const updateMemberSchema = z.object({
   status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).optional(),
   nominee: nomineeSchema.partial().optional()
 }).strict();
+
+export const deathTransferSchema = z.object({
+  deceasedMemberId: z.string().uuid("মৃত সদস্যের আইডি সঠিক নয়।"),
+  recipientType: z.enum(["NOMINEE", "MEMBER"], {
+    errorMap: () => ({ message: "গ্রহীতার ধরণ অবশ্যই NOMINEE অথবা MEMBER হতে হবে।" })
+  }),
+  recipientId: z.string().uuid("গ্রহীতা সদস্যের আইডি সঠিক নয়।").optional()
+}).strict().refine((data) => {
+  if (data.recipientType === "MEMBER" && !data.recipientId) {
+    return false;
+  }
+  return true;
+}, {
+  message: "গ্রহীতা সদস্যের আইডি প্রয়োজন যখন গ্রহীতার ধরণ MEMBER নির্বাচন করা হয়।",
+  path: ["recipientId"]
+});

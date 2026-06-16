@@ -4,13 +4,20 @@ export async function GET(request: Request) {
   const responseStream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
+      let intervalId: NodeJS.Timeout;
 
       const sendStats = async () => {
         try {
           const stats = await DashboardService.getDashboardStats();
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(stats)}\n\n`));
+          return true;
         } catch (err) {
           console.error("SSE send statistics exception:", err);
+          clearInterval(intervalId);
+          try {
+            controller.close();
+          } catch (_) {}
+          return false;
         }
       };
 
@@ -18,19 +25,19 @@ export async function GET(request: Request) {
       await sendStats();
 
       // Poll database / cache every 5 seconds to push updates
-      const intervalId = setInterval(async () => {
-        try {
-          await sendStats();
-        } catch (err) {
+      intervalId = setInterval(async () => {
+        const success = await sendStats();
+        if (!success) {
           clearInterval(intervalId);
-          controller.close();
         }
       }, 5000);
 
       // Clean up on stream abort (e.g. client page navigated away or closed)
       request.signal.addEventListener("abort", () => {
         clearInterval(intervalId);
-        controller.close();
+        try {
+          controller.close();
+        } catch (_) {}
       });
     }
   });

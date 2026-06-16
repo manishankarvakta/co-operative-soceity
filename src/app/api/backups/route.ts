@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { BackupService } from "@/services/BackupService";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 /**
  * GET: Retrieves a list of all database backups.
- * Restricts access to SUPER_ADMIN only.
+ * Restricts access via RBAC checks.
  */
 export async function GET() {
   try {
@@ -14,9 +15,7 @@ export async function GET() {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
-    const roles = (session.user as any).roles || [];
-    const isSuperAdmin = roles.some((r: any) => r.role.name === "SUPER_ADMIN");
-    if (!isSuperAdmin) {
+    if (!canAccess(session.user as any, "backups", "read")) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
@@ -33,7 +32,7 @@ export async function GET() {
 
 /**
  * POST: Triggers a manual database backup immediately.
- * Restricts access to SUPER_ADMIN only.
+ * Restricts access via RBAC checks.
  */
 export async function POST() {
   try {
@@ -42,9 +41,7 @@ export async function POST() {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
-    const roles = (session.user as any).roles || [];
-    const isSuperAdmin = roles.some((r: any) => r.role.name === "SUPER_ADMIN");
-    if (!isSuperAdmin) {
+    if (!canAccess(session.user as any, "backups", "write")) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
@@ -68,7 +65,7 @@ export async function POST() {
 
 /**
  * DELETE: Deletes a backup record and its corresponding file.
- * Restricts access to SUPER_ADMIN only.
+ * Restricts access via RBAC checks.
  */
 export async function DELETE(request: Request) {
   try {
@@ -77,9 +74,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
-    const roles = (session.user as any).roles || [];
-    const isSuperAdmin = roles.some((r: any) => r.role.name === "SUPER_ADMIN");
-    if (!isSuperAdmin) {
+    if (!canAccess(session.user as any, "backups", "delete")) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
@@ -110,3 +105,4 @@ export async function DELETE(request: Request) {
     );
   }
 }
+

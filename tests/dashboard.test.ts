@@ -66,18 +66,20 @@ describe("DashboardService Unit Tests", () => {
       (prisma.member.count as jest.Mock).mockResolvedValue(22);
 
       // Setup Deposit aggregate mocks
-      // The first call returns the total deposits.
-      // The subsequent 6 calls in the loop return the monthly deposits.
-      (prisma.depositItem.aggregate as jest.Mock)
-        .mockResolvedValueOnce({ _sum: { amount: 650000 } }) // 6500 BDT total
-        .mockResolvedValue({ _sum: { amount: 100000 } });   // 1000 BDT monthly
+      (prisma.depositItem.aggregate as jest.Mock).mockImplementation((args: any) => {
+        if (args?.where && "deposit" in args.where) {
+          return Promise.resolve({ _sum: { amount: 100000 } }); // 1000 BDT monthly
+        }
+        return Promise.resolve({ _sum: { amount: 650000 } }); // 6500 BDT total
+      });
 
       // Setup Expense aggregate mocks
-      // The first call returns the total expenses.
-      // The subsequent 6 calls in the loop return the monthly expenses.
-      (prisma.expense.aggregate as jest.Mock)
-        .mockResolvedValueOnce({ _sum: { amount: 320000 } }) // 3200 BDT total
-        .mockResolvedValue({ _sum: { amount: 50000 } });    // 500 BDT monthly
+      (prisma.expense.aggregate as jest.Mock).mockImplementation((args: any) => {
+        if (args?.where && "date" in args.where) {
+          return Promise.resolve({ _sum: { amount: 50000 } }); // 500 BDT monthly
+        }
+        return Promise.resolve({ _sum: { amount: 320000 } }); // 3200 BDT total
+      });
 
       // Setup Bank account list mock
       (prisma.bankAccount.findMany as jest.Mock).mockResolvedValue([

@@ -16,25 +16,27 @@ export default function LoginForm() {
   const labels = {
     BN: {
       title: "সমিতি ম্যানেজমেন্ট পোর্টাল",
-      email: "ইমেইল বা ইউজার আইডি",
+      email: "ইমেইল, মোবাইল বা মেম্বার আইডি",
       password: "পাসওয়ার্ড",
       rememberMe: "মনে রাখুন (Remember Me)",
       forgotPass: "পাসওয়ার্ড ভুলে গেছেন?",
       loginBtn: "লগইন করুন",
       loadingBtn: "অপেক্ষা করুন...",
-      emailPlaceholder: "example@email.com",
-      passPlaceholder: "••••••"
+      emailPlaceholder: "ইমেইল, মোবাইল বা মেম্বার আইডি",
+      passPlaceholder: "••••••",
+      signupLink: "নতুন সদস্য? সাইন-আপ করুন"
     },
     EN: {
       title: "Cooperative Society ERP",
-      email: "Email or User ID",
+      email: "Email, Phone or Member ID",
       password: "Password",
       rememberMe: "Remember Me",
       forgotPass: "Forgot Password?",
       loginBtn: "Login Now",
       loadingBtn: "Logging in...",
-      emailPlaceholder: "example@email.com",
-      passPlaceholder: "••••••"
+      emailPlaceholder: "Email, Phone or Member ID",
+      passPlaceholder: "••••••",
+      signupLink: "New member? Sign Up"
     }
   };
 
@@ -102,7 +104,7 @@ export default function LoginForm() {
             {labels[lang].email} <span className="text-red-500">*</span>
           </label>
           <input
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={labels[lang].emailPlaceholder}
@@ -147,10 +149,19 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full py-2.5 px-4 font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 mb-4"
         >
           {loading ? labels[lang].loadingBtn : labels[lang].loginBtn}
         </button>
+
+        <div className="text-center text-sm">
+          <a
+            href="/signup"
+            className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline transition-all"
+          >
+            {labels[lang].signupLink}
+          </a>
+        </div>
       </form>
     </div>
   );

@@ -9,7 +9,7 @@ export class AuthService {
    * Checks password hash and active status restrictions.
    */
   static async verifyCredentials(email: string, passwordInput: string) {
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { email },
       include: {
         userRoles: {
@@ -28,6 +28,41 @@ export class AuthService {
         members: true
       }
     });
+
+    if (!user) {
+      const member = await prisma.member.findFirst({
+        where: {
+          deletedAt: null,
+          OR: [
+            { phone: email },
+            { memberCode: { equals: email, mode: "insensitive" } }
+          ]
+        },
+        include: {
+          user: {
+            include: {
+              userRoles: {
+                include: {
+                  role: {
+                    include: {
+                      rolePermissions: {
+                        include: {
+                          permission: true
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              members: true
+            }
+          }
+        }
+      });
+      if (member && member.user) {
+        user = member.user as any;
+      }
+    }
 
     if (!user || user.deletedAt) {
       throw new AuthenticationError();

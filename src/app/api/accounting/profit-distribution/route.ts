@@ -4,12 +4,16 @@ import { ProfitDistributionService } from "@/services/ProfitDistributionService"
 import { AccountingService } from "@/services/AccountingService";
 import { createProfitDistributionSchema } from "@/backend/validations/accounting";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET() {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "accounting", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     // Get net profit from Profit & Loss statement (in BDT)
@@ -38,6 +42,9 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "accounting", "execute_distribution")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     // Get admin user ID from session
@@ -80,3 +87,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

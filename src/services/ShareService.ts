@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/db";
-import { NotFoundError } from "@/backend/errors";
+import { NotFoundError, ValidationError } from "@/backend/errors";
+import { AuditService } from "./AuditService";
+import { DashboardService } from "./DashboardService";
+import { AccountingService } from "./AccountingService";
+import { MemberService } from "./MemberService";
+import * as bcrypt from "bcryptjs";
 
 export class ShareService {
   /**
@@ -259,5 +264,166 @@ export class ShareService {
       },
       recentLogs
     };
+  }
+
+  /**
+   * Transfers all outstanding shares from a deceased member to their nominee or an existing member.
+   * Marks the deceased member as INACTIVE and posts double-entry accounting records.
+   */
+  static async transferSharesOnDeath(data: {
+    deceasedMemberId: string;
+    recipientType: "NOMINEE" | "MEMBER";
+    recipientId?: string;
+    actorId: string;
+  }) {
+    const deceased = await prisma.member.findUnique({
+      where: { id: data.deceasedMemberId },
+      include: { nominee: true, shares: { where: { deletedAt: null } } }
+    });
+
+    if (!deceased || deceased.deletedAt) {
+      throw new NotFoundError("মৃত সদস্য খুঁজে পাওয়া যায়নি।");
+    }
+
+    const totalShares = deceased.shares.reduce(
+      (sum, s) => sum + (parseFloat(s.count as any) || 0),
+      0
+    );
+
+    if (totalShares <= 0) {
+      throw new ValidationError("মৃত সদস্যের কোনো শেয়ার নেই যা স্থানান্তর করা যাবে।");
+    }
+
+    let recipientMemberId: string;
+
+    const result = await prisma.$transaction(async (tx) => {
+      if (data.recipientType === "NOMINEE") {
+        if (!deceased.nominee) {
+          throw new ValidationError("মৃত সদস্যের কোনো নমিনি নেই।");
+        }
+
+        // Check if nominee is already registered as a member using phone number
+        let nomineeMember = await tx.member.findUnique({
+          where: { phone: deceased.nominee.phone }
+        });
+
+        if (!nomineeMember || nomineeMember.deletedAt) {
+          // Register nominee as a new member
+          const parsedJoinDate = new Date();
+          const memberCode = await MemberService.generateMemberCode(parsedJoinDate);
+
+          const salt = await bcrypt.genSalt(12);
+          const defaultPasswordHash = await bcrypt.hash(deceased.nominee.phone, salt);
+          const defaultEmail = `${memberCode.toLowerCase()}@somity.com`;
+
+          const user = await tx.user.create({
+            data: {
+              email: defaultEmail,
+              passwordHash: defaultPasswordHash,
+              userRoles: {
+                create: {
+                  role: {
+                    connect: { name: "MEMBER" }
+                  }
+                }
+              }
+            }
+          });
+
+          nomineeMember = await tx.member.create({
+            data: {
+              userId: user.id,
+              memberCode,
+              name: deceased.nominee.name,
+              phone: deceased.nominee.phone,
+              email: defaultEmail,
+              address: deceased.nominee.address,
+              joinDate: parsedJoinDate,
+              status: "ACTIVE"
+            }
+          });
+        }
+
+        recipientMemberId = nomineeMember.id;
+      } else {
+        if (!data.recipientId) {
+          throw new ValidationError("স্থানান্তরের জন্য গ্রহীতা সদস্যের আইডি প্রয়োজন।");
+        }
+        const recipient = await tx.member.findUnique({
+          where: { id: data.recipientId }
+        });
+        if (!recipient || recipient.deletedAt) {
+          throw new NotFoundError("গ্রহীতা সদস্য খুঁজে পাওয়া যায়নি।");
+        }
+        recipientMemberId = recipient.id;
+      }
+
+      const today = new Date();
+      const valuePaisa = totalShares * 1000 * 100; // 1 share = 1,000 BDT = 100,000 Paisa
+
+      // Create negative share record for deceased member
+      await tx.shareRecord.create({
+        data: {
+          memberId: deceased.id,
+          count: -totalShares,
+          createdAt: today
+        }
+      });
+
+      // Create positive share record for recipient member
+      await tx.shareRecord.create({
+        data: {
+          memberId: recipientMemberId,
+          count: totalShares,
+          createdAt: today
+        }
+      });
+
+      // Post double-entry journal logs to attribute equity to the recipient
+      const reference = `DTH-TR-${deceased.memberCode.replace("SOM-", "")}`;
+      await AccountingService.postJournalEntry(tx, {
+        reference,
+        description: `মৃত সদস্য ${deceased.name} (${deceased.memberCode}) এর শেয়ার স্থানান্তর গ্রহীতা সদস্য আইডি ${recipientMemberId} এ`,
+        date: today,
+        lines: [
+          {
+            accountCode: "3000",
+            amount: valuePaisa,
+            type: "DEBIT"
+          },
+          {
+            accountCode: "3000",
+            amount: valuePaisa,
+            type: "CREDIT"
+          }
+        ]
+      });
+
+      // Update deceased member status to INACTIVE
+      await tx.member.update({
+        where: { id: deceased.id },
+        data: { status: "INACTIVE" }
+      });
+
+      // Write transaction logs
+      await AuditService.log({
+        userId: data.actorId,
+        action: "UPDATE",
+        tableName: "ShareRecord",
+        recordId: deceased.id,
+        oldData: { totalShares },
+        newData: { transferredTo: recipientMemberId, count: totalShares },
+        tx
+      });
+
+      return {
+        success: true,
+        transferredShares: totalShares,
+        recipientMemberId
+      };
+    });
+
+    await DashboardService.invalidateCache();
+    return result;
   }
 }

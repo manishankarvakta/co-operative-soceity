@@ -3,12 +3,16 @@ import { auth } from "@/lib/auth";
 import { BankService } from "@/services/BankService";
 import { createBankAccountSchema } from "@/backend/validations/bank";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "bank", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const result = await BankService.listAccounts();
@@ -27,6 +31,9 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "bank", "write")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -60,3 +67,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

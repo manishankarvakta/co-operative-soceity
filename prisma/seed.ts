@@ -16,6 +16,15 @@ async function main() {
     },
   });
 
+  const memberRole = await prisma.role.upsert({
+    where: { name: 'MEMBER' },
+    update: {},
+    create: {
+      name: 'MEMBER',
+      description: 'Member of the cooperative',
+    },
+  });
+
   const accountantRole = await prisma.role.upsert({
     where: { name: 'ACCOUNTANT' },
     update: {},
@@ -154,6 +163,19 @@ async function main() {
     },
   });
   console.log('Test bank account created.');
+
+  // Seed default active fiscal year (July 1, 2025 - June 30, 2026)
+  await prisma.fiscalYear.upsert({
+    where: { name: 'FY 2025-2026' },
+    update: {},
+    create: {
+      name: 'FY 2025-2026',
+      startDate: new Date('2025-07-01T00:00:00.000Z'),
+      endDate: new Date('2026-06-30T23:59:59.999Z'),
+      isActive: true
+    }
+  });
+  console.log('Test active fiscal year created.');
 
   console.log('Seeding finished successfully.');
 }

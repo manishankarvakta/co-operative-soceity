@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { BackupService } from "@/services/BackupService";
 import { BaseError } from "@/backend/errors";
+import { canAccess } from "@/lib/rbac";
 
 /**
  * POST: Restores the database to the state of a given backup ID.
- * Restricts access to SUPER_ADMIN only.
+ * Restricts access via RBAC checks.
  */
 export async function POST(request: Request) {
   try {
@@ -14,9 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
     }
 
-    const roles = (session.user as any).roles || [];
-    const isSuperAdmin = roles.some((r: any) => r.role.name === "SUPER_ADMIN");
-    if (!isSuperAdmin) {
+    if (!canAccess(session.user as any, "backups", "restore")) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
@@ -47,3 +46,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

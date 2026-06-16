@@ -21,6 +21,8 @@ model User {
   approvedExpenses Expense[]      @relation("ApprovedExpenses")
   auditLogs        AuditLog[]
   notifications    Notification[]
+  loansDisbursed   Loan[]         @relation("LoansDisbursed")
+  receivedPayments LoanPayment[]  @relation("ReceivedPayments")
 }
 
 model Role {
@@ -72,6 +74,7 @@ model Member {
   deposits    Deposit[]
   shares      ShareRecord[]
   investments ProjectInvestment[]
+  loans       Loan[]
 
   @@index([phone])
   @@index([memberCode])
@@ -268,15 +271,21 @@ model Receipt {
 }
 
 model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String?  @db.Uuid
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  message      String
+  read         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  to           String?
+  htmlBody     String?
+  status       String   @default("SENT")
+  retryCount   Int      @default(0)
+  errorMessage String?
 
   @@index([userId])
+  @@index([status, retryCount])
 }
 
 model AuditLog {
@@ -354,4 +363,91 @@ enum JournalLineType {
   DEBIT
   CREDIT
 }
+
+model FiscalYear {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LoanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  PAID
+  DEFAULTED
+}
+
+enum ScheduleStatus {
+  UNPAID
+  PAID
+  PARTIAL
+  OVERDUE
+}
+
+model Loan {
+  id             String          @id @default(uuid()) @db.Uuid
+  memberId       String          @db.Uuid
+  member         Member          @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  amount         Int             // Stored in BDT Paisa/Cents
+  interestRate   Decimal         @db.Decimal(5, 2) // annual interest rate (e.g., 12.50%)
+  durationMonths Int
+  emiAmount      Int             // Stored in BDT Paisa/Cents
+  status         LoanStatus      @default(PENDING)
+  disbursedAt    DateTime?
+  disbursedById  String?         @db.Uuid
+  disbursedBy    User?           @relation("LoansDisbursed", fields: [disbursedById], references: [id], onDelete: SetNull)
+  remarks        String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+  schedules      LoanSchedule[]
+  payments       LoanPayment[]
+
+  @@index([memberId])
+  @@index([status])
+}
+
+model LoanSchedule {
+  id              String         @id @default(uuid()) @db.Uuid
+  loanId          String         @db.Uuid
+  loan            Loan           @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  dueDate         DateTime
+  emiNumber       Int
+  principalAmount Int            // Stored in BDT Paisa/Cents
+  interestAmount  Int            // Stored in BDT Paisa/Cents
+  totalAmount     Int            // Stored in BDT Paisa/Cents
+  paidAmount      Int            @default(0) // Stored in BDT Paisa/Cents
+  status          ScheduleStatus @default(UNPAID)
+  paidAt          DateTime?
+
+  @@index([loanId])
+  @@index([dueDate])
+  @@index([status])
+}
+
+model LoanPayment {
+  id            String      @id @default(uuid()) @db.Uuid
+  loanId        String      @db.Uuid
+  loan          Loan        @relation(fields: [loanId], references: [id], onDelete: Restrict)
+  amount        Int         // Total amount paid in BDT Paisa/Cents
+  interestPaid  Int         // Amount applied to interest
+  principalPaid Int         // Amount applied to principal
+  paymentDate   DateTime
+  paymentMode   PaymentMode
+  bankAccountId String?     @db.Uuid
+  receivedById  String      @db.Uuid
+  receivedBy    User        @relation("ReceivedPayments", fields: [receivedById], references: [id], onDelete: Restrict)
+  remarks       String?
+  createdAt     DateTime    @default(now())
+
+  @@index([loanId])
+  @@index([paymentDate])
+}
+
 

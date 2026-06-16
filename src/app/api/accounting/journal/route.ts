@@ -4,12 +4,16 @@ import { AccountingService } from "@/services/AccountingService";
 import { createJournalEntrySchema } from "@/backend/validations/accounting";
 import { BaseError } from "@/backend/errors";
 import { prisma } from "@/lib/db";
+import { canAccess } from "@/lib/rbac";
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "accounting", "read")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -32,6 +36,9 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+    if (!canAccess(session.user as any, "accounting", "write")) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -69,3 +76,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

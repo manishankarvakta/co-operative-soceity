@@ -48,7 +48,16 @@ jest.mock("../src/lib/db", () => ({
       create: jest.fn()
     },
     notification: {
-      create: jest.fn()
+      create: jest.fn(),
+      update: jest.fn(),
+      findMany: jest.fn()
+    },
+    loan: {
+      findUnique: jest.fn(),
+      update: jest.fn()
+    },
+    loanSchedule: {
+      createMany: jest.fn()
     },
     $transaction: jest.fn((cb) => cb(prisma))
   }
@@ -309,6 +318,178 @@ describe("Notification System Unit Tests", () => {
         expect(email.to).toBe("treasurer@somity.com");
         expect(email.subject).toBe("অনুমোদন সম্পন্ন নোটিশ: ব্যাংক লেনদেন (REC-TX-1)");
         expect(email.html).toContain("2500.00 BDT");
+      });
+    });
+
+    describe("Member Registration Welcome Email (MemberService)", () => {
+      it("should trigger welcome notice email on member registration", async () => {
+        (prisma.member.findUnique as jest.Mock).mockResolvedValue(null);
+        (prisma.user.create as jest.Mock).mockResolvedValue({ id: "user-1" });
+        (prisma.member.create as jest.Mock).mockResolvedValue({
+          id: "member-1",
+          memberCode: "SOM-2026-0001",
+          name: "Ratul Ahmed",
+          phone: "01700000000",
+          email: "ratul@somity.com",
+          userId: "user-1",
+          status: "ACTIVE"
+        });
+        (prisma.notification.create as jest.Mock).mockResolvedValue({ id: "notif-1" });
+        (prisma.notification.update as jest.Mock).mockResolvedValue({ id: "notif-1" });
+
+        await MemberService.createMember({
+          name: "Ratul Ahmed",
+          phone: "01700000000",
+          email: "ratul@somity.com",
+          address: "Dhaka",
+          joinDate: "2026-06-15",
+          nominee: {
+            name: "Nominee",
+            relationship: "Brother",
+            phone: "01800000000",
+            address: "Dhaka",
+            emergencyContact: "01900000000"
+          }
+        });
+
+        // We expect the welcome email to have been sent
+        expect(NotificationService.sentEmails.length).toBe(1);
+        const welcomeEmail = NotificationService.sentEmails[0];
+        expect(welcomeEmail.to).toBe("ratul@somity.com");
+        expect(welcomeEmail.subject).toBe("সমিতি সদস্য নিবন্ধকরণ সম্পন্ন - স্বাগতম!");
+        expect(welcomeEmail.html).toContain("SOM-2026-0001");
+        expect(welcomeEmail.html).toContain("01700000000"); // default password
+      });
+    });
+
+    describe("Loan Status Notification (LoanService)", () => {
+      it("should trigger approval email on loan approval", async () => {
+        const mockLoan = {
+          id: "loan-1",
+          amount: 500000,
+          interestRate: 10,
+          durationMonths: 12,
+          emiAmount: 45000,
+          remarks: "Approval test",
+          status: "PENDING",
+          member: {
+            id: "member-1",
+            name: "Adnan",
+            email: "adnan@somity.com",
+            userId: "user-1"
+          }
+        };
+
+        const { LoanService } = await import("../src/services/LoanService");
+        
+        (prisma.loan.findUnique as jest.Mock).mockResolvedValue(mockLoan);
+        (prisma.bankAccount.findFirst as jest.Mock).mockResolvedValue({
+          id: "cash-acc",
+          name: "Cash on Hand",
+          balance: 1000000
+        });
+        (prisma.loan.update as jest.Mock).mockResolvedValue({
+          ...mockLoan,
+          status: "ACTIVE"
+        });
+        (prisma.loanSchedule.createMany as jest.Mock).mockResolvedValue({ count: 12 });
+        (prisma.notification.create as jest.Mock).mockResolvedValue({ id: "notif-3" });
+        (prisma.notification.update as jest.Mock).mockResolvedValue({ id: "notif-3" });
+
+        await LoanService.approveLoan("loan-1", "APPROVED", "actor-1");
+
+        expect(NotificationService.sentEmails.length).toBe(1);
+        const email = NotificationService.sentEmails[0];
+        expect(email.to).toBe("adnan@somity.com");
+        expect(email.subject).toBe("ঋণ আবেদন অনুমোদিত ও বিতরণ সম্পন্ন");
+        expect(email.html).toContain("5000.00 BDT"); // 500000 Paisa / 100
+        expect(email.html).toContain("10.00%");
+      });
+
+      it("should trigger rejection email on loan rejection", async () => {
+        const mockLoan = {
+          id: "loan-1",
+          amount: 500000,
+          interestRate: 10,
+          durationMonths: 12,
+          emiAmount: 45000,
+          remarks: "Rejection test",
+          status: "PENDING",
+          member: {
+            id: "member-1",
+            name: "Adnan",
+            email: "adnan@somity.com",
+            userId: "user-1"
+          }
+        };
+
+        const { LoanService } = await import("../src/services/LoanService");
+        
+        (prisma.loan.findUnique as jest.Mock).mockResolvedValue(mockLoan);
+        (prisma.loan.update as jest.Mock).mockResolvedValue({
+          ...mockLoan,
+          status: "REJECTED"
+        });
+        (prisma.notification.create as jest.Mock).mockResolvedValue({ id: "notif-4" });
+        (prisma.notification.update as jest.Mock).mockResolvedValue({ id: "notif-4" });
+
+        await LoanService.approveLoan("loan-1", "REJECTED", "actor-1", { remarks: "Risk score too high" });
+
+        expect(NotificationService.sentEmails.length).toBe(1);
+        const email = NotificationService.sentEmails[0];
+        expect(email.to).toBe("adnan@somity.com");
+        expect(email.subject).toBe("ঋণ আবেদন প্রত্যাখ্যান নোটিশ");
+        expect(email.html).toContain("Risk score too high");
+      });
+    });
+
+    describe("Notification Queue & Retries", () => {
+      it("should fetch failed emails and retry sending", async () => {
+        (prisma.notification.findMany as jest.Mock).mockResolvedValue([
+          {
+            id: "failed-notif-1",
+            to: "failed-user@somity.com",
+            title: "Retry Subject",
+            htmlBody: "<p>Retry Body</p>",
+            retryCount: 1,
+            status: "FAILED"
+          }
+        ]);
+        (prisma.notification.update as jest.Mock).mockResolvedValue({ id: "failed-notif-1" });
+
+        await NotificationService.processQueue();
+
+        expect(prisma.notification.findMany).toHaveBeenCalledWith({
+          where: {
+            status: "FAILED",
+            retryCount: { lt: 3 }
+          },
+          take: 10
+        });
+
+        expect(prisma.notification.update).toHaveBeenCalledWith({
+          where: { id: "failed-notif-1" },
+          data: expect.objectContaining({
+            status: "SENT",
+            retryCount: 2,
+            errorMessage: null
+          })
+        });
+      });
+
+      it("should halt retrying after 3 failed attempts", async () => {
+        (prisma.notification.findMany as jest.Mock).mockResolvedValue([]);
+
+        await NotificationService.processQueue();
+
+        expect(prisma.notification.findMany).toHaveBeenCalledWith({
+          where: {
+            status: "FAILED",
+            retryCount: { lt: 3 }
+          },
+          take: 10
+        });
+        expect(prisma.notification.update).not.toHaveBeenCalled();
       });
     });
   });

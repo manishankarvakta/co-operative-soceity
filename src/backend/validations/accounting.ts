@@ -23,3 +23,10 @@ export const createProfitDistributionSchema = z.object({
   amount: z.number().int().positive("বন্টনযোগ্য লভ্যাংশের পরিমাণ পজিティブ হতে হবে।"),
   paymentMode: z.enum(["CASH", "BANK"])
 }).strict();
+
+export const createFiscalYearSchema = z.object({
+  name: z.string().min(3, "অর্থবছরের নাম দিন।"),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "সঠিক শুরুর তারিখ দিন (YYYY-MM-DD)।"),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "সঠিক শেষের তারিখ দিন (YYYY-MM-DD)।"),
+  isActive: z.boolean().optional()
+}).strict();

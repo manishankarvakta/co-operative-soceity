@@ -2,12 +2,28 @@ import { NextResponse } from "next/server";
 import { NomineeService } from "@/services/NomineeService";
 import { nomineeSchema } from "@/backend/validations/member";
 import { BaseError } from "@/backend/errors";
+import { auth } from "@/lib/auth";
+import { canAccess } from "@/lib/rbac";
 
 interface Context { params: Promise<{ id: string }> }
 
 export async function GET(request: Request, { params }: Context) {
   try {
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+
     const { id } = await params;
+
+    // A standard Member can only read their own nominee details
+    const isSelf = session.user.memberId && session.user.memberId === id;
+    const hasReadAccess = canAccess(session.user as any, "members", "read");
+
+    if (!isSelf && !hasReadAccess) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
     const nominee = await NomineeService.getNomineeByMemberId(id);
     return NextResponse.json(nominee);
   } catch (error) {
@@ -28,7 +44,21 @@ export async function GET(request: Request, { params }: Context) {
 
 export async function PUT(request: Request, { params }: Context) {
   try {
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 401 });
+    }
+
     const { id } = await params;
+
+    // A standard Member can only update their own nominee details
+    const isSelf = session.user.memberId && session.user.memberId === id;
+    const hasWriteAccess = canAccess(session.user as any, "members", "write");
+
+    if (!isSelf && !hasWriteAccess) {
+      return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
+    }
+
     const body = await request.json();
 
     // Validate nominee schema using Zod
@@ -61,3 +91,4 @@ export async function PUT(request: Request, { params }: Context) {
     );
   }
 }
+
