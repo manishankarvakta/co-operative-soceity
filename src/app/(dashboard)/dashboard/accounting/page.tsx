@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 
 export default function AccountingPage() {
   const [lang, setLang] = useState<"BN" | "EN">("BN");
@@ -12,6 +13,11 @@ export default function AccountingPage() {
   const [distAmountBdt, setDistAmountBdt] = useState("");
   const [distPaymentMode, setDistPaymentMode] = useState<"CASH" | "BANK">("CASH");
   const [submittingDist, setSubmittingDist] = useState(false);
+
+  // Modal & Toast
+  const { toast, showToast } = useToast();
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [pendingDistAmount, setPendingDistAmount] = useState(0);
 
   // Datasets
   const [accounts, setAccounts] = useState<any[]>([]);
@@ -103,37 +109,36 @@ export default function AccountingPage() {
     e.preventDefault();
     const bdtVal = parseFloat(distAmountBdt) || 0;
     if (bdtVal <= 0) {
-      alert(lang === "BN" ? "সঠিক লভ্যাংশের পরিমাণ লিখুন।" : "Please enter a valid amount.");
+      showToast("warning", lang === "BN" ? "অবৈধ পরিমাণ" : "Invalid Amount", lang === "BN" ? "সঠিক লভ্যাংশের পরিমাণ লিখুন।" : "Please enter a valid amount.");
       return;
     }
+    // Store amount and open confirm modal
+    setPendingDistAmount(bdtVal);
+    setConfirmModal(true);
+  };
 
-    const confirmDist = window.confirm(
-      lang === "BN"
-        ? `আপনি কি নিশ্চিতভাবে ${bdtVal.toLocaleString()} BDT লভ্যাংশ বন্টন ও রিজার্ভ ফান্ড স্থানান্তর সম্পন্ন করতে চান?`
-        : `Are you sure you want to execute profit distribution of ${bdtVal.toLocaleString()} BDT?`
-    );
-    if (!confirmDist) return;
-
+  const handleConfirmDistribution = async () => {
+    setConfirmModal(false);
     setSubmittingDist(true);
     try {
       const res = await fetch("/api/accounting/profit-distribution", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: Math.round(bdtVal * 100),
+          amount: Math.round(pendingDistAmount * 100),
           paymentMode: distPaymentMode
         })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.message || "লভ্যাংশ বন্টন ব্যর্থ হয়েছে।");
+        showToast("error", lang === "BN" ? "ব্যর্থ হয়েছে" : "Failed", data.message || (lang === "BN" ? "লভ্যাংশ বন্টন ব্যর্থ হয়েছে।" : "Distribution failed."));
       } else {
-        alert(lang === "BN" ? "বার্ষিক লভ্যাংশ বন্টন ও এফডি রিজার্ভ সফলভাবে সম্পন্ন হয়েছে!" : "Profit distribution successfully executed!");
+        showToast("success", lang === "BN" ? "সফলভাবে সম্পন্ন" : "Success", lang === "BN" ? "বার্ষিক লভ্যাংশ বন্টন ও এফডি রিজার্ভ সফলভাবে সম্পন্ন হয়েছে!" : "Profit distribution successfully executed!");
         setDistAmountBdt("");
         loadDistributionData();
       }
     } catch (err) {
-      alert("সার্ভারে সমস্যা হয়েছে।");
+      showToast("error", lang === "BN" ? "সার্ভার সমস্যা" : "Server Error", lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Something went wrong.");
     } finally {
       setSubmittingDist(false);
     }
@@ -162,16 +167,16 @@ export default function AccountingPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.message || "অ্যাকাউন্ট তৈরি ব্যর্থ হয়েছে।");
+        showToast("error", lang === "BN" ? "ব্যর্থ হয়েছে" : "Failed", data.message || (lang === "BN" ? "অ্যাকাউন্ট তৈরি ব্যর্থ হয়েছে।" : "Account creation failed."));
       } else {
-        alert(lang === "BN" ? "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।" : "Account created successfully.");
+        showToast("success", lang === "BN" ? "অ্যাকাউন্ট তৈরি হয়েছে" : "Account Created", lang === "BN" ? "নতুন লেজার হিসাব সফলভাবে তৈরি হয়েছে।" : "Account created successfully.");
         setNewAccCode("");
         setNewAccName("");
         setShowAccountForm(false);
         loadCOA();
       }
     } catch (err) {
-      alert("সার্ভারে সমস্যা হয়েছে।");
+      showToast("error", lang === "BN" ? "সার্ভার সমস্যা" : "Server Error", lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Something went wrong.");
     }
   };
 
@@ -219,9 +224,9 @@ export default function AccountingPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.message || "জার্নাল পোস্টিং ব্যর্থ হয়েছে।");
+        showToast("error", lang === "BN" ? "ব্যর্থ হয়েছে" : "Failed", data.message || (lang === "BN" ? "জার্নাল পোস্টিং ব্যর্থ হয়েছে।" : "Journal posting failed."));
       } else {
-        alert(lang === "BN" ? "জার্নাল সফলভাবে পোস্ট করা হয়েছে।" : "Journal posted successfully.");
+        showToast("success", lang === "BN" ? "জার্নাল পোস্ট হয়েছে" : "Journal Posted", lang === "BN" ? "জার্নাল সফলভাবে পোস্ট করা হয়েছে।" : "Journal posted successfully.");
         setJournalDesc("");
         setJournalRef("");
         setJournalLines([
@@ -287,7 +292,29 @@ export default function AccountingPage() {
 
   return (
     <div className="p-6 md:p-8 space-y-8">
+
+      {/* Confirm Modal — Profit Distribution */}
+      <ConfirmModal
+        open={confirmModal}
+        variant="warning"
+        title={lang === "BN" ? "লভ্যাংশ বন্টন নিশ্চিত করুন" : "Confirm Profit Distribution"}
+        message={
+          lang === "BN"
+            ? `আপনি কি নিশ্চিতভাবে ${pendingDistAmount.toLocaleString()} BDT লভ্যাংশ বন্টন ও রিজার্ভ ফান্ড স্থানান্তর সম্পন্ন করতে চান?`
+            : `Are you sure you want to execute profit distribution of ${pendingDistAmount.toLocaleString()} BDT?`
+        }
+        confirmText={lang === "BN" ? "হ্যাঁ, বন্টন করুন" : "Yes, Execute"}
+        cancelText={lang === "BN" ? "বাতিল করুন" : "Cancel"}
+        loading={submittingDist}
+        onConfirm={handleConfirmDistribution}
+        onCancel={() => setConfirmModal(false)}
+      />
+
+      {/* Toast Notifications */}
+      <Toast toast={toast} />
+
       {/* Header */}
+
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BankTransactionForm from "@/components/forms/BankTransactionForm";
+import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 
 export default function BankWorkspacePage() {
   const [lang, setLang] = useState<"BN" | "EN">("BN");
@@ -17,6 +18,12 @@ export default function BankWorkspacePage() {
   const [accName, setAccName] = useState("");
   const [accNumber, setAccNumber] = useState("");
   const [accBalance, setAccBalance] = useState("");
+
+  // Modal & Toast
+  const { toast, showToast } = useToast();
+  const [signModal, setSignModal] = useState(false);
+  const [pendingSign, setPendingSign] = useState<{ txId: string; role: string } | null>(null);
+  const [signLoading, setSignLoading] = useState(false);
 
   const loadBankData = async () => {
     setLoading(true);
@@ -57,9 +64,9 @@ export default function BankWorkspacePage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.message || "অ্যাকাউন্ট তৈরি করতে ব্যর্থ হয়েছে।");
+        showToast("error", lang === "BN" ? "ব্যর্থ হয়েছে" : "Failed", data.message || (lang === "BN" ? "অ্যাকাউন্ট তৈরি করতে ব্যর্থ হয়েছে।" : "Account creation failed."));
       } else {
-        alert(lang === "BN" ? "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।" : "Account created successfully.");
+        showToast("success", lang === "BN" ? "অ্যাকাউন্ট তৈরি হয়েছে" : "Account Created", lang === "BN" ? "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।" : "Account created successfully.");
         setAccName("");
         setAccNumber("");
         setAccBalance("");
@@ -67,31 +74,39 @@ export default function BankWorkspacePage() {
         loadBankData();
       }
     } catch (err) {
-      alert("সার্ভারে সমস্যা হয়েছে।");
+      showToast("error", lang === "BN" ? "সার্ভার সমস্যা" : "Server Error", lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Something went wrong.");
     }
   };
 
-  const handleSignOff = async (txId: string, role: string) => {
-    const confirmSign = window.confirm(
-      lang === "BN" ? `আপনি কি নিশ্চিতভাবে এই লেনদেনে ${role} হিসেবে স্বাক্ষর করতে চান?` : `Are you sure you want to sign off as ${role}?`
-    );
-    if (!confirmSign) return;
+  // Open sign-off confirm modal
+  const handleSignOff = (txId: string, role: string) => {
+    setPendingSign({ txId, role });
+    setSignModal(true);
+  };
 
+  // Execute sign-off after confirmation
+  const handleConfirmSignOff = async () => {
+    if (!pendingSign) return;
+    setSignLoading(true);
+    setSignModal(false);
     try {
-      const res = await fetch(`/api/bank/transactions/${txId}/sign`, {
+      const res = await fetch(`/api/bank/transactions/${pendingSign.txId}/sign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signatureType: role })
+        body: JSON.stringify({ signatureType: pendingSign.role })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.message || "স্বাক্ষর সম্পন্ন করতে ব্যর্থ হয়েছে।");
+        showToast("error", lang === "BN" ? "ব্যর্থ হয়েছে" : "Failed", data.message || (lang === "BN" ? "স্বাক্ষর সম্পন্ন করতে ব্যর্থ হয়েছে।" : "Sign-off failed."));
       } else {
-        alert(lang === "BN" ? "স্বাক্ষর সফলভাবে সম্পন্ন হয়েছে।" : "Signed off successfully.");
+        showToast("success", lang === "BN" ? "স্বাক্ষর সম্পন্ন" : "Signed Off", lang === "BN" ? "স্বাক্ষর সফলভাবে সম্পন্ন হয়েছে।" : "Signed off successfully.");
         loadBankData();
       }
     } catch (err) {
-      alert("সার্ভারে সমস্যা হয়েছে।");
+      showToast("error", lang === "BN" ? "সার্ভার সমস্যা" : "Server Error", lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Something went wrong.");
+    } finally {
+      setSignLoading(false);
+      setPendingSign(null);
     }
   };
 
@@ -105,7 +120,7 @@ export default function BankWorkspacePage() {
   const labels = {
     BN: {
       title: "ব্যাংক ও নগদ অ্যাকাউন্ট ব্যবস্থাপনা (Bank Workspace)",
-      subtitle: "সমিতির ব্যাংক হিসাবসমূহ, স্থানান্তর খতিয়ান এবং অফিসারদের স্বাক্ষর কনসোল।",
+      subtitle: "সমিতির ব্যাংক হিসাবসমূহ, স্থানান্তর খতিয়ান এবং অফিসারদের স্বাক্ষর কনসোল।",
       addAcc: "+ নতুন অ্যাকাউন্ট তৈরি",
       closeAcc: "ফর্ম বন্ধ করুন",
       addTx: "+ লেনদেন / স্থানান্তর এন্ট্রি",
@@ -113,7 +128,7 @@ export default function BankWorkspacePage() {
       accNumber: "অ্যাকাউন্ট নম্বর",
       accBalance: "প্রারম্ভিক ব্যালেন্স (BDT)",
       submitAcc: "অ্যাকাউন্ট তৈরি করুন",
-      accountsTitle: "সক্রিয় অ্যাকাউন্টসমূহ",
+      accountsTitle: "সক্রিয় অ্যাকাউন্টসমূহ",
       txTitle: "সাম্প্রতিক লেনদেন এবং স্বাক্ষর অনুমোদন অবস্থা",
       colAccName: "অ্যাকাউন্ট",
       colAccNum: "অ্যাকাউন্ট নম্বর",
@@ -161,6 +176,29 @@ export default function BankWorkspacePage() {
 
   return (
     <div className="p-6 md:p-8 space-y-8">
+
+      {/* Sign-off Confirm Modal */}
+      <ConfirmModal
+        open={signModal}
+        variant="info"
+        title={lang === "BN" ? "স্বাক্ষর নিশ্চিত করুন" : "Confirm Sign-off"}
+        message={
+          pendingSign
+            ? lang === "BN"
+              ? `আপনি কি নিশ্চিতভাবে এই লেনদেনে ${pendingSign.role} হিসেবে স্বাক্ষর করতে চান?`
+              : `Are you sure you want to sign off as ${pendingSign.role}?`
+            : ""
+        }
+        confirmText={lang === "BN" ? "হ্যাঁ, স্বাক্ষর করুন" : "Yes, Sign Off"}
+        cancelText={lang === "BN" ? "বাতিল করুন" : "Cancel"}
+        loading={signLoading}
+        onConfirm={handleConfirmSignOff}
+        onCancel={() => { setSignModal(false); setPendingSign(null); }}
+      />
+
+      {/* Toast */}
+      <Toast toast={toast} />
+
       {/* Header */}
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>

@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import { useCallback, useState } from "react";
 
 /* ─────────────────────────────────────────────
@@ -31,7 +33,7 @@ interface ToastState {
 /* ─────────────────────────────────────────────
    ICONS
 ───────────────────────────────────────────── */
-const icons: Record<ModalVariant, JSX.Element> = {
+const icons: Record<ModalVariant, React.ReactNode> = {
   approve: (
     <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8" stroke="currentColor" strokeWidth={1.8}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import MemberForm from "@/components/forms/MemberForm";
 import NomineeForm from "@/components/forms/NomineeForm";
+import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 
 interface ProfilePageProps {
   params: Promise<{
@@ -20,6 +21,10 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
   const [editMode, setEditMode] = useState(false);
   const [editNomineeMode, setEditNomineeMode] = useState(false);
 
+  // Modal & Toast
+  const { toast, showToast } = useToast();
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -28,12 +33,12 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
       const response = await fetch(`/api/members/${id}`);
       const data = await response.json();
       if (!response.ok) {
-        setError(data.message || "সদস্য তথ্য লোড করতে ব্যর্থ হয়েছে।");
+        setError(data.message || "সদস্য তথ্য লোড করতে ব্যর্থ হয়েছে।");
       } else {
         setMember(data);
       }
     } catch (err) {
-      setError("সার্ভারে সমস্যা হয়েছে।");
+      setError("সার্ভারে সমস্যা হয়েছে।");
     } finally {
       setLoading(false);
     }
@@ -43,24 +48,25 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
     fetchProfile();
   }, [id]);
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "আপনি কি নিশ্চিতভাবে এই সদস্য অ্যাকাউন্টটি ডিলিট করতে চান? (এটি সফট-ডিলিট হবে)"
-    );
-    if (!confirmDelete) return;
-
+  const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
+    setDeleteModal(false);
     try {
       const response = await fetch(`/api/members/${id}`, { method: "DELETE" });
       const result = await response.json();
       if (!response.ok || !result.success) {
-        alert(result.message || "মুছে ফেলতে ব্যর্থ হয়েছে।");
+        showToast("error", "মুছে ফেলতে ব্যর্থ", result.message || "সদস্য মুছে ফেলতে ব্যর্থ হয়েছে।");
       } else {
-        alert("সদস্য অ্যাকাউন্টটি মুছে ফেলা হয়েছে।");
-        router.push("/members");
-        router.refresh();
+        showToast("success", "সফলভাবে মুছে ফেলা হয়েছে", "সদস্য অ্যাকাউন্টটি মুছে ফেলা হয়েছে।");
+        setTimeout(() => {
+          router.push("/dashboard/members");
+          router.refresh();
+        }, 1200);
       }
     } catch (error) {
-      alert("সার্ভারে সমস্যা হয়েছে।");
+      showToast("error", "সার্ভার সমস্যা", "সার্ভারে সমস্যা হয়েছে।");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -71,7 +77,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
   if (error || !member) {
     return (
       <div className="p-8 text-center text-red-500 font-bold">
-        ⚠️ {error || "সদস্যের তথ্য পাওয়া যায়নি।"}
+        ⚠️ {error || "সদস্যের তথ্য পাওয়া যায়নি।"}
       </div>
     );
   }
@@ -97,6 +103,23 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
 
   return (
     <div className="p-6 md:p-8 space-y-8 max-w-5xl mx-auto relative">
+
+      {/* Delete Confirm Modal */}
+      <ConfirmModal
+        open={deleteModal}
+        variant="delete"
+        title="সদস্য ডিলিট করুন"
+        message="আপনি কি নিশ্চিতভাবে এই সদস্য অ্যাকাউন্টটি ডিলিট করতে চান? (এটি সফট-ডিলিট হবে)"
+        confirmText="হ্যাঁ, ডিলিট করুন"
+        cancelText="বাতিল করুন"
+        loading={deleteLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteModal(false)}
+      />
+
+      {/* Toast */}
+      <Toast toast={toast} />
+
       {/* Standalone Nominee Form Overlay */}
       {editNomineeMode && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -108,6 +131,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
           />
         </div>
       )}
+
       {/* Header with actions */}
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
@@ -126,7 +150,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
             সম্পাদনা (Edit)
           </button>
           <button
-            onClick={handleDelete}
+            onClick={() => setDeleteModal(true)}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-lg shadow-md transition-all duration-200"
           >
             ডিলিট করুন

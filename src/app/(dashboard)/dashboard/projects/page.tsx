@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ProjectForm from "@/components/forms/ProjectForm";
+import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 
 export default function ProjectsPage() {
   const [lang, setLang] = useState<"BN" | "EN">("BN");
@@ -17,6 +18,11 @@ export default function ProjectsPage() {
   // Profit distribution input
   const [distributeAmount, setDistributeAmount] = useState("");
   const [distributing, setDistributing] = useState(false);
+
+  // Modal & Toast
+  const { toast, showToast } = useToast();
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [pendingAmount, setPendingAmount] = useState(0);
 
   const loadProjects = async () => {
     setLoading(true);
@@ -49,25 +55,26 @@ export default function ProjectsPage() {
     }
   };
 
+  // Step 1: validate then open confirm modal
   const handleDistributeProfit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProject) return;
 
     const bdtVal = parseFloat(distributeAmount);
     if (isNaN(bdtVal) || bdtVal <= 0) {
-      alert(lang === "BN" ? "সঠিক লভ্যাংশের পরিমাণ লিখুন।" : "Please enter a valid amount.");
+      showToast("warning", lang === "BN" ? "অবৈধ পরিমাণ" : "Invalid Amount", lang === "BN" ? "সঠিক লভ্যাংশের পরিমাণ লিখুন।" : "Please enter a valid amount.");
       return;
     }
 
-    const confirmDist = window.confirm(
-      lang === "BN"
-        ? `আপনি কি নিশ্চিতভাবে এই প্রজেক্টের লভ্যাংশ হিসেবে ${bdtVal.toLocaleString()} BDT বন্টন করতে চান?`
-        : `Are you sure you want to distribute ${bdtVal.toLocaleString()} BDT profit for this project?`
-    );
-    if (!confirmDist) return;
+    setPendingAmount(bdtVal);
+    setConfirmModal(true);
+  };
 
+  // Step 2: execute after confirmation
+  const handleConfirmDistribution = async () => {
+    setConfirmModal(false);
     setDistributing(true);
-    const paisaVal = Math.round(bdtVal * 100);
+    const paisaVal = Math.round(pendingAmount * 100);
 
     try {
       const res = await fetch(`/api/projects/${selectedProject.id}/roi`, {
@@ -77,16 +84,16 @@ export default function ProjectsPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.message || "লভ্যাংশ বন্টন ব্যর্থ হয়েছে।");
+        showToast("error", lang === "BN" ? "বন্টন ব্যর্থ" : "Distribution Failed", data.message || (lang === "BN" ? "লভ্যাংশ বন্টন ব্যর্থ হয়েছে।" : "Distribution failed."));
       } else {
-        alert(lang === "BN" ? "লভ্যাংশ বন্টন সফলভাবে সম্পন্ন হয়েছে!" : "Profit distributed successfully!");
+        showToast("success", lang === "BN" ? "সফলভাবে বন্টন হয়েছে" : "Distribution Complete", lang === "BN" ? "লভ্যাংশ বন্টন সফলভাবে সম্পন্ন হয়েছে!" : "Profit distributed successfully!");
         setDistributeAmount("");
         setSelectedProject(null);
         setRoiData(null);
         loadProjects();
       }
     } catch (err) {
-      alert("সার্ভারে সমস্যা হয়েছে।");
+      showToast("error", lang === "BN" ? "সার্ভার সমস্যা" : "Server Error", lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Something went wrong.");
     } finally {
       setDistributing(false);
     }
@@ -109,7 +116,7 @@ export default function ProjectsPage() {
 
   const labels = {
     BN: {
-      title: "প্রজেক্ট এবং সদস্য বিনিয়োগ ব্যবস্থাপনা (Projects Workspace)",
+      title: "প্রজেক্ট এবং সদস্য বিনিয়োগ ব্যবস্থাপনা (Projects Workspace)",
       subtitle: "নতুন প্রজেক্ট তৈরি, মূলধন সংগ্রহ পর্যবেক্ষণ এবং লভ্যাংশ (ROI) বন্টন ড্যাশবোর্ড।",
       addBtn: "+ নতুন এন্ট্রি ফর্ম",
       closeBtn: "ফর্ম বন্ধ করুন",
@@ -117,9 +124,9 @@ export default function ProjectsPage() {
       collected: "সংগৃহীত মূলধন",
       status: "অবস্থা",
       roiBtn: "ROI ও লভ্যাংশ হিসাব",
-      investorName: "বিনিয়োগকারী",
+      investorName: "বিনিয়োগকারী",
       investorCode: "মেম্বার কোড",
-      investorAmt: "বিনিয়োগ (BDT)",
+      investorAmt: "বিনিয়োগ (BDT)",
       investorRatio: "মূলধন অনুপাত",
       distTitle: "লভ্যাংশ (Dividend) বন্টন প্যানেল",
       distAmt: "বন্টনযোগ্য নিট মুনাফা (BDT)",
@@ -150,6 +157,27 @@ export default function ProjectsPage() {
 
   return (
     <div className="p-6 md:p-8 space-y-6">
+
+      {/* Confirm Modal — Profit Distribution */}
+      <ConfirmModal
+        open={confirmModal}
+        variant="warning"
+        title={lang === "BN" ? "লভ্যাংশ বন্টন নিশ্চিত করুন" : "Confirm Profit Distribution"}
+        message={
+          lang === "BN"
+            ? `আপনি কি নিশ্চিতভাবে "${selectedProject?.name}" প্রজেক্টের লভ্যাংশ হিসেবে ${pendingAmount.toLocaleString()} BDT বন্টন করতে চান?`
+            : `Are you sure you want to distribute ${pendingAmount.toLocaleString()} BDT profit for "${selectedProject?.name}"?`
+        }
+        confirmText={lang === "BN" ? "হ্যাঁ, বন্টন করুন" : "Yes, Distribute"}
+        cancelText={lang === "BN" ? "বাতিল করুন" : "Cancel"}
+        loading={distributing}
+        onConfirm={handleConfirmDistribution}
+        onCancel={() => setConfirmModal(false)}
+      />
+
+      {/* Toast */}
+      <Toast toast={toast} />
+
       {/* Title block */}
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
@@ -189,7 +217,7 @@ export default function ProjectsPage() {
           {loading ? (
             <p className="text-sm text-gray-500">{labels[lang].loading}</p>
           ) : projects.length === 0 ? (
-            <p className="text-sm text-gray-500">কোনো প্রজেক্টের তথ্য পাওয়া যায়নি।</p>
+            <p className="text-sm text-gray-500">কোনো প্রজেক্টের তথ্য পাওয়া যায়নি।</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {projects.map((proj) => {
@@ -249,7 +277,7 @@ export default function ProjectsPage() {
                 {loadingRoi ? (
                   <p className="text-xs text-gray-400">{labels[lang].loading}</p>
                 ) : !roiData || roiData.ratios.length === 0 ? (
-                  <p className="text-xs text-gray-400">কোনো বিনিয়োগকারী যুক্ত হয়নি।</p>
+                  <p className="text-xs text-gray-400">কোনো বিনিয়োগকারী যুক্ত হয়নি।</p>
                 ) : (
                   <div className="space-y-3 max-h-48 overflow-y-auto pr-1 text-xs">
                     {roiData.ratios.map((r: any) => (
@@ -297,7 +325,7 @@ export default function ProjectsPage() {
             </div>
           ) : (
             <div className="p-8 border border-dashed border-gray-300 dark:border-zinc-700 rounded-xl text-center text-sm text-gray-500 bg-gray-50/50 dark:bg-zinc-900/50">
-              প্রজেক্টের লভ্যাংশ বন্টন ও মূলধন অনুপাত দেখতে যেকোনো প্রজেক্টের নিচে "ROI ও লভ্যাংশ হিসাব" বাটনে ক্লিক করুন।
+              প্রজেক্টের লভ্যাংশ বন্টন ও মূলধন অনুপাত দেখতে যেকোনো প্রজেক্টের নিচে &quot;ROI ও লভ্যাংশ হিসাব&quot; বাটনে ক্লিক করুন।
             </div>
           )}
         </div>
