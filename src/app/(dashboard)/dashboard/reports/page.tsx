@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
 
 export default function ReportsPage() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [reportType, setReportType] = useState<
     "COLLECTION" | "EXPENSE" | "MEMBER" | "BANK" | "BALANCE_SHEET" | "PROFIT_LOSS"
   >("COLLECTION");
