@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 export default function ShareWorkspacePage() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [activeTab, setActiveTab] = useState<"ledger" | "reports">("ledger");
 
   // Ledger state
@@ -134,13 +135,6 @@ export default function ShareWorkspacePage() {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-          className="px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
-        >
-          {lang === "BN" ? "English" : "বাংলা"}
-        </button>
       </div>
 
       {/* Navigation Tabs */}
