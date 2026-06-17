@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import BankTransactionForm from "@/components/forms/BankTransactionForm";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 import { useLanguage } from "@/providers/LanguageProvider";
@@ -13,12 +14,6 @@ export default function BankWorkspacePage() {
 
   // Modals / Toggles
   const [showTxForm, setShowTxForm] = useState(false);
-  const [showAccountForm, setShowAccountForm] = useState(false);
-
-  // Account Form states
-  const [accName, setAccName] = useState("");
-  const [accNumber, setAccNumber] = useState("");
-  const [accBalance, setAccBalance] = useState("");
 
   // Modal & Toast
   const { toast, showToast } = useToast();
@@ -48,36 +43,6 @@ export default function BankWorkspacePage() {
     loadBankData();
   }, []);
 
-  const handleCreateAccount = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const initBal = parseFloat(accBalance) || 0;
-    const payload = {
-      name: accName,
-      accountNumber: accNumber,
-      initialBalance: Math.round(initBal * 100)
-    };
-
-    try {
-      const res = await fetch("/api/bank/accounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        showToast("error", lang === "BN" ? "ব্যর্থ হয়েছে" : "Failed", data.message || (lang === "BN" ? "অ্যাকাউন্ট তৈরি করতে ব্যর্থ হয়েছে।" : "Account creation failed."));
-      } else {
-        showToast("success", lang === "BN" ? "অ্যাকাউন্ট তৈরি হয়েছে" : "Account Created", lang === "BN" ? "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।" : "Account created successfully.");
-        setAccName("");
-        setAccNumber("");
-        setAccBalance("");
-        setShowAccountForm(false);
-        loadBankData();
-      }
-    } catch (err) {
-      showToast("error", lang === "BN" ? "সার্ভার সমস্যা" : "Server Error", lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Something went wrong.");
-    }
-  };
 
   // Open sign-off confirm modal
   const handleSignOff = (txId: string, role: string) => {
@@ -207,15 +172,12 @@ export default function BankWorkspacePage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setShowAccountForm(!showAccountForm);
-              setShowTxForm(false);
-            }}
-            className="px-4 py-2 bg-gray-150 hover:bg-gray-250 border border-gray-200 dark:bg-zinc-800 text-gray-850 dark:text-white font-bold text-sm rounded-lg shadow transition"
+          <Link
+            href="/dashboard/bank/new"
+            className="px-4 py-2 bg-gray-150 hover:bg-gray-250 border border-gray-200 dark:bg-zinc-800 text-gray-850 dark:text-white font-bold text-sm rounded-lg shadow transition text-center"
           >
-            {showAccountForm ? labels[lang].closeAcc : labels[lang].addAcc}
-          </button>
+            {labels[lang].addAcc}
+          </Link>
           <button
             onClick={() => {
               setShowTxForm(!showTxForm);
@@ -228,49 +190,6 @@ export default function BankWorkspacePage() {
         </div>
       </div>
 
-      {/* Dynamic forms popup display */}
-      {showAccountForm && (
-        <div className="flex justify-center transition-all">
-          <form onSubmit={handleCreateAccount} className="w-full max-w-md bg-white dark:bg-zinc-900 p-6 rounded-xl border border-black/5 shadow-md space-y-4">
-            <h3 className="font-bold text-gray-800 dark:text-white">{labels[lang].addAcc}</h3>
-            <div>
-              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">{labels[lang].accName}</label>
-              <input
-                type="text"
-                required
-                value={accName}
-                onChange={(e) => setAccName(e.target.value)}
-                placeholder="যেমন: Cash on Hand, Sonali Bank"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">{labels[lang].accNumber}</label>
-              <input
-                type="text"
-                required
-                value={accNumber}
-                onChange={(e) => setAccNumber(e.target.value)}
-                placeholder="যেমন: CASH_BOX, 100234892348"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">{labels[lang].accBalance}</label>
-              <input
-                type="number"
-                value={accBalance}
-                onChange={(e) => setAccBalance(e.target.value)}
-                placeholder="0.00"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
-              />
-            </div>
-            <button type="submit" className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow transition">
-              {labels[lang].submitAcc}
-            </button>
-          </form>
-        </div>
-      )}
 
       {showTxForm && (
         <div className="flex justify-center transition-all">

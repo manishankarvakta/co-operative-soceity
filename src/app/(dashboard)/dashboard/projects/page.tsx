@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProjectForm from "@/components/forms/ProjectForm";
+import Link from "next/link";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 import { useLanguage } from "@/providers/LanguageProvider";
 
@@ -9,8 +9,6 @@ export default function ProjectsPage() {
   const { lang } = useLanguage();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-
   // Selected project for ROI details & distribution
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [roiData, setRoiData] = useState<any>(null);
@@ -186,23 +184,15 @@ export default function ProjectsPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => setShowForm(!showForm)}
+          <Link
+            href="/dashboard/projects/new"
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
-            {showForm ? labels[lang].closeBtn : labels[lang].addBtn}
-          </button>
+            {labels[lang].addBtn}
+          </Link>
         </div>
       </div>
 
-      {showForm && (
-        <div className="flex justify-center transition-all">
-          <ProjectForm onSuccess={() => {
-            setShowForm(false);
-            loadProjects();
-          }} />
-        </div>
-      )}
 
       {/* Main Grid display */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

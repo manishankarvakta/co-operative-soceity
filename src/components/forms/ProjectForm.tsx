@@ -173,9 +173,9 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+    <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
       {/* Tab Switcher */}
-      <div className="flex gap-4 border-b pb-2 mb-6 border-gray-200 dark:border-zinc-800">
+      <div className="flex gap-6 border-b border-gray-100 dark:border-zinc-800/50 pb-0 mb-8">
         <button
           type="button"
           onClick={() => {
@@ -204,8 +204,8 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
         </button>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-base font-bold text-gray-800 dark:text-white">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-extrabold text-gray-800 dark:text-white">
           {mode === "project" ? labels[lang].titleProj : labels[lang].titleInv}
         </h2>
         <button
@@ -229,7 +229,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
         </div>
       )}
 
-      <div className="space-y-4 text-sm">
+      <div className="space-y-5 text-sm">
         {mode === "project" ? (
           <>
             <div>
@@ -242,7 +242,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="যেমন: তুষভাণ্ডার বাজার ভূমি প্রকল্প"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none"
               />
             </div>
 
@@ -256,7 +256,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="যেমন: তুষভাণ্ডার, হাতীবান্ধা"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none"
               />
             </div>
 
@@ -270,14 +270,14 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 value={targetCapital}
                 onChange={(e) => setTargetCapital(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow transition disabled:opacity-50"
+              className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/20 transition-all duration-300 disabled:opacity-50 disabled:shadow-none tracking-wide"
             >
               {loading ? labels[lang].submitting : labels[lang].submitProj}
             </button>
@@ -292,7 +292,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 required
                 value={selectedProjectId}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none appearance-none"
               >
                 <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Project"} --</option>
                 {projects.map((p) => (
@@ -309,7 +309,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 required
                 value={selectedMemberId}
                 onChange={(e) => setSelectedMemberId(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none appearance-none"
               >
                 <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Member"} --</option>
                 {members.map((m) => (
@@ -331,7 +331,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                   value={investmentAmount}
                   onChange={(e) => setInvestmentAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none"
                 />
               </div>
 
@@ -342,7 +342,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 <select
                   value={paymentMode}
                   onChange={(e) => setPaymentMode(e.target.value as any)}
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-transparent rounded-xl focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 dark:text-white transition-all outline-none appearance-none"
                 >
                   <option value="CASH">{labels[lang].cash}</option>
                   <option value="BANK">{labels[lang].bank}</option>
@@ -353,7 +353,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow transition disabled:opacity-50"
+              className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/20 transition-all duration-300 disabled:opacity-50 disabled:shadow-none tracking-wide"
             >
               {loading ? labels[lang].submitting : labels[lang].submitInv}
             </button>
