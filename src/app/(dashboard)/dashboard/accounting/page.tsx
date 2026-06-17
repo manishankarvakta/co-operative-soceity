@@ -16,11 +16,11 @@ export default function AccountingPage() {
   // Datasets
   const [accounts, setAccounts] = useState<any[]>([]);
   const [journalEntries, setJournalEntries] = useState<any[]>([]);
-  
+
   // Reports
   const [reportType, setReportType] = useState<"TRIAL_BALANCE" | "BALANCE_SHEET" | "PROFIT_LOSS">("TRIAL_BALANCE");
   const [reportData, setReportData] = useState<any>(null);
-  
+
   // Modals & Form states
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [newAccCode, setNewAccCode] = useState("");
@@ -308,33 +308,29 @@ export default function AccountingPage() {
       <div className="flex gap-6 border-b border-gray-200 dark:border-zinc-800">
         <button
           onClick={() => setActiveTab("coa")}
-          className={`pb-3 text-sm font-bold border-b-2 transition-all ${
-            activeTab === "coa" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
+          className={`pb-3 text-sm font-bold border-b-2 transition-all ${activeTab === "coa" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
         >
           {labels[lang].tabCOA}
         </button>
         <button
           onClick={() => setActiveTab("journal")}
-          className={`pb-3 text-sm font-bold border-b-2 transition-all ${
-            activeTab === "journal" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
+          className={`pb-3 text-sm font-bold border-b-2 transition-all ${activeTab === "journal" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
         >
           {labels[lang].tabJournal}
         </button>
         <button
           onClick={() => setActiveTab("reports")}
-          className={`pb-3 text-sm font-bold border-b-2 transition-all ${
-            activeTab === "reports" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
+          className={`pb-3 text-sm font-bold border-b-2 transition-all ${activeTab === "reports" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
         >
           {labels[lang].tabReports}
         </button>
         <button
           onClick={() => setActiveTab("distribution")}
-          className={`pb-3 text-sm font-bold border-b-2 transition-all ${
-            activeTab === "distribution" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
+          className={`pb-3 text-sm font-bold border-b-2 transition-all ${activeTab === "distribution" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
         >
           {lang === "BN" ? "লভ্যাংশ বন্টন (Profit Distribution)" : "Profit Distribution"}
         </button>
@@ -347,7 +343,7 @@ export default function AccountingPage() {
             <h3 className="font-bold text-gray-800 dark:text-white">Chart of Accounts Ledger Registry</h3>
             <button
               onClick={() => setShowAccountForm(!showAccountForm)}
-              className="px-3 py-1.5 bg-emerald-650 text-white font-bold text-sm rounded shadow hover:bg-emerald-700 transition"
+              className="px-3 py-1.5 bg-emerald-600 text-white font-bold text-sm rounded shadow hover:bg-emerald-700 transition"
             >
               {showAccountForm ? "ফর্ম বন্ধ করুন" : labels[lang].addAcc}
             </button>
@@ -444,7 +440,7 @@ export default function AccountingPage() {
             <h3 className="font-bold text-gray-800 dark:text-white">Double Entry Journal Logs Registry</h3>
             <button
               onClick={() => setShowJournalForm(!showJournalForm)}
-              className="px-3 py-1.5 bg-emerald-650 text-white font-bold text-sm rounded shadow hover:bg-emerald-700 transition"
+              className="px-3 py-1.5 bg-emerald-600 text-white font-bold text-sm rounded shadow hover:bg-emerald-700 transition"
             >
               {showJournalForm ? "পোস্টিং বন্ধ করুন" : labels[lang].addJournal}
             </button>

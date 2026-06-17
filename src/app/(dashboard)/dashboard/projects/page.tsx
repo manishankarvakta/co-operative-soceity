@@ -13,7 +13,7 @@ export default function ProjectsPage() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [roiData, setRoiData] = useState<any>(null);
   const [loadingRoi, setLoadingRoi] = useState(false);
-  
+
   // Profit distribution input
   const [distributeAmount, setDistributeAmount] = useState("");
   const [distributing, setDistributing] = useState(false);
@@ -159,7 +159,7 @@ export default function ProjectsPage() {
         <div className="flex gap-3">
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
             {showForm ? labels[lang].closeBtn : labels[lang].addBtn}
           </button>

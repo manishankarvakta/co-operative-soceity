@@ -8,11 +8,11 @@ export default function BankWorkspacePage() {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modals / Toggles
   const [showTxForm, setShowTxForm] = useState(false);
   const [showAccountForm, setShowAccountForm] = useState(false);
-  
+
   // Account Form states
   const [accName, setAccName] = useState("");
   const [accNumber, setAccNumber] = useState("");
@@ -182,7 +182,7 @@ export default function BankWorkspacePage() {
               setShowTxForm(!showTxForm);
               setShowAccountForm(false);
             }}
-            className="px-4 py-2 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
             {showTxForm ? "ফর্ম বন্ধ করুন" : labels[lang].addTx}
           </button>

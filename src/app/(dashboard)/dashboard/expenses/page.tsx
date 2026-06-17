@@ -170,7 +170,7 @@ export default function ExpensesPage() {
         <div className="flex gap-3">
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
             {showForm ? labels[lang].closeBtn : labels[lang].addBtn}
           </button>
