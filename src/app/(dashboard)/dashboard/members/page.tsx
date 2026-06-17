@@ -72,7 +72,7 @@ export default function MembersListPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">সমিতির নিবন্ধিত সকল সদস্যদের তালিকা এবং তথ্য নিয়ন্ত্রণ প্যানেল।</p>
         </div>
         <Link
-          href="/members/new"
+          href="/dashboard/members/new"
           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-md transition-all duration-200"
         >
           + নতুন সদস্য ভর্তি
@@ -134,7 +134,7 @@ export default function MembersListPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <Link
-                        href={`/members/${member.id}`}
+                        href={`/dashboard/members/${member.id}`}
                         className="px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-250 dark:border-emerald-800 rounded-md transition-all"
                       >
                         প্রোফাইল দেখুন

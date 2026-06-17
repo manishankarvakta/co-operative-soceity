@@ -113,7 +113,7 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       if (!response.ok || !result.success) {
         setError(result.message || (lang === "BN" ? "সংরক্ষণ করতে ব্যর্থ হয়েছে।" : "Save failed."));
       } else {
-        router.push(isEditMode ? `/members/${memberId}` : "/members");
+        router.push(isEditMode ? `/dashboard/members/${memberId}` : "/dashboard/members");
         router.refresh();
       }
     } catch (err) {
