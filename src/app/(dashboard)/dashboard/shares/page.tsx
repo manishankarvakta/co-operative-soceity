@@ -177,10 +177,10 @@ export default function ShareWorkspacePage() {
           </div>
 
           {/* Ledger table */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-150 dark:border-zinc-800">
+                <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
                   <tr>
                     <th className="px-6 py-4">{labels[lang].memberCode}</th>
                     <th className="px-6 py-4">{labels[lang].name}</th>
@@ -244,7 +244,7 @@ export default function ShareWorkspacePage() {
 
             {/* Pagination console */}
             {ledgerPagination.totalPages > 1 && (
-              <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-gray-150 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+              <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                 <span>
                   {lang === "BN"
                     ? `মোট শেয়ার হোল্ডার: ${ledgerPagination.totalItems} জন`
@@ -286,7 +286,7 @@ export default function ShareWorkspacePage() {
             <>
               {/* Summary stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md flex flex-col">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md flex flex-col">
                   <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">
                     {labels[lang].totalOutstanding}
                   </span>
@@ -295,7 +295,7 @@ export default function ShareWorkspacePage() {
                   </span>
                 </div>
 
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md flex flex-col">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md flex flex-col">
                   <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">
                     {labels[lang].totalCapital}
                   </span>
@@ -304,7 +304,7 @@ export default function ShareWorkspacePage() {
                   </span>
                 </div>
 
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md flex flex-col">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md flex flex-col">
                   <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">
                     {labels[lang].activeShareholders}
                   </span>
@@ -316,7 +316,7 @@ export default function ShareWorkspacePage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Distribution bracket list */}
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
                   <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b pb-2">
                     {labels[lang].distributionTitle}
                   </h3>
@@ -333,7 +333,7 @@ export default function ShareWorkspacePage() {
                 </div>
 
                 {/* Recent share log history */}
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
                   <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b pb-2">
                     {labels[lang].recentTitle}
                   </h3>

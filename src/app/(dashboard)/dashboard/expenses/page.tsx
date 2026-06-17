@@ -154,7 +154,7 @@ export default function ExpensesPage() {
       )}
 
       {/* Filters */}
-      <div className="flex gap-2 p-2 rounded-lg max-w-lg border border-gray-150 dark:border-zinc-800 text-xs font-semibold">
+      <div className="flex gap-2 p-2 rounded-lg max-w-lg border border-black/5 dark:border-zinc-800 text-xs font-semibold">
         {(["", "PENDING", "APPROVED", "REJECTED"] as const).map((s) => (
           <button key={s} onClick={() => setFilterStatus(s)}
             className={`px-3 py-1.5 rounded-md transition ${filterStatus === s ? "bg-white dark:bg-zinc-800 shadow" : "text-gray-500 hover:text-gray-700"}`}>
@@ -164,10 +164,10 @@ export default function ExpensesPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-150 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.category}</th>
                 <th className="px-6 py-4">{L.amount}</th>
@@ -218,7 +218,7 @@ export default function ExpensesPage() {
         </div>
 
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-gray-150 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>মোট খরচ এন্ট্রি: {pagination.totalItems} টি</span>
             <div className="flex gap-2">
               <button disabled={pagination.currentPage === 1} onClick={() => fetchExpenses(pagination.currentPage - 1)}

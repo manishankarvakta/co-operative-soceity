@@ -231,7 +231,7 @@ export default function BankWorkspacePage() {
       {/* Dynamic forms popup display */}
       {showAccountForm && (
         <div className="flex justify-center transition-all">
-          <form onSubmit={handleCreateAccount} className="w-full max-w-md bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 shadow-md space-y-4">
+          <form onSubmit={handleCreateAccount} className="w-full max-w-md bg-white dark:bg-zinc-900 p-6 rounded-xl border border-black/5 shadow-md space-y-4">
             <h3 className="font-bold text-gray-800 dark:text-white">{labels[lang].addAcc}</h3>
             <div>
               <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">{labels[lang].accName}</label>
@@ -291,7 +291,7 @@ export default function BankWorkspacePage() {
           ) : (
             <div className="space-y-4">
               {accounts.map((acc) => (
-                <div key={acc.id} className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow flex justify-between items-center transition hover:shadow-md">
+                <div key={acc.id} className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow flex justify-between items-center transition hover:shadow-md">
                   <div>
                     <h4 className="font-bold text-gray-850 dark:text-white">{acc.name}</h4>
                     <span className="text-xs text-gray-400 font-mono select-all">{acc.accountNumber}</span>
@@ -308,7 +308,7 @@ export default function BankWorkspacePage() {
         {/* Transactions list & Sign off tracking */}
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-lg font-bold text-gray-800 dark:text-white">{labels[lang].txTitle}</h2>
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow overflow-hidden">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow overflow-hidden">
             <div className="overflow-x-auto text-sm">
               <table className="w-full text-left">
                 <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800">

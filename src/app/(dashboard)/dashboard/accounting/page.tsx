@@ -417,7 +417,7 @@ export default function AccountingPage() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md overflow-hidden">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden">
             <div className="overflow-x-auto text-sm">
               <table className="w-full text-left">
                 <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800">
@@ -574,7 +574,7 @@ export default function AccountingPage() {
               <p className="text-sm text-gray-500">{labels[lang].loading}</p>
             ) : (
               journalEntries.map((entry) => (
-                <div key={entry.id} className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow overflow-hidden">
+                <div key={entry.id} className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow overflow-hidden">
                   <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-b dark:border-zinc-800 flex justify-between items-center text-xs text-gray-500">
                     <div>
                       <strong className="text-gray-800 dark:text-white text-sm block mb-1">{entry.description}</strong>
@@ -620,7 +620,7 @@ export default function AccountingPage() {
       {/* Tab 3: Reports Statements */}
       {activeTab === "reports" && (
         <div className="space-y-6">
-          <div className="flex gap-2 p-1.5 bg-gray-55 dark:bg-zinc-850 rounded-lg max-w-md border border-gray-150 text-xs font-semibold">
+          <div className="flex gap-2 p-1.5 bg-gray-55 dark:bg-zinc-850 rounded-lg max-w-md border border-black/5 text-xs font-semibold">
             <button
               onClick={() => setReportType("TRIAL_BALANCE")}
               className={`px-3 py-1.5 rounded-md transition ${reportType === "TRIAL_BALANCE" ? "bg-white dark:bg-zinc-800 shadow" : "text-gray-500"}`}
@@ -793,7 +793,7 @@ export default function AccountingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-sm">
           {/* Left panel: Available Net Profit and Execution */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md space-y-6">
+            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md space-y-6">
               <div>
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">available net profit</span>
                 <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
@@ -877,7 +877,7 @@ export default function AccountingPage() {
 
           {/* Right panel: History of distributions */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
               <h3 className="font-bold text-gray-800 dark:text-white mb-4">
                 {lang === "BN" ? "পূর্ববর্তী লভ্যাংশ বন্টন ও স্থানান্তর ইতিহাস" : "Previous Distributions & Transfers History"}
               </h3>

@@ -239,7 +239,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Dynamic Filter Console */}
-      <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow no-print space-y-4">
+      <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow no-print space-y-4">
         <h4 className="font-bold text-sm text-gray-800 dark:text-white uppercase tracking-wider">
           {lang === "BN" ? "রিপোর্ট ফিল্টারিং অপশন" : "Statement Filter Parameters"}
         </h4>
@@ -389,7 +389,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Print Render Content Container */}
-          <div className="p-8 bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800 rounded-xl shadow-md print-area">
+          <div className="p-8 bg-white dark:bg-zinc-900 border border-black/5 dark:border-zinc-800 rounded-xl shadow-md print-area">
             {/* Header branding for print/reports */}
             <div className="text-center mb-6 border-b pb-4 dark:border-zinc-800">
               <h2 className="text-xl font-black text-gray-800 dark:text-white">উত্থান বহুমুখী সমবায় সমিতি লিমিটেড</h2>
@@ -529,7 +529,7 @@ export default function ReportsPage() {
 
                 {/* Nominee details if present */}
                 {reportData.memberInfo.nominee && (
-                  <div className="p-4 bg-gray-50 dark:bg-zinc-850 rounded border border-gray-150 text-xs">
+                  <div className="p-4 bg-gray-50 dark:bg-zinc-850 rounded border border-black/5 text-xs">
                     <span className="block font-bold text-[10px] text-gray-400 uppercase tracking-widest mb-1">nominee details</span>
                     <div className="grid grid-cols-3 gap-2">
                       <div>Name: <strong>{reportData.memberInfo.nominee.name}</strong></div>

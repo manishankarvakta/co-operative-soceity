@@ -217,7 +217,7 @@ export default function ProjectsPage() {
               {projects.map((proj) => {
                 const percentage = proj.targetCapital > 0 ? (proj.currentCapital / proj.targetCapital) * 100 : 0;
                 return (
-                  <div key={proj.id} className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow hover:shadow-md transition flex flex-col justify-between">
+                  <div key={proj.id} className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow hover:shadow-md transition flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start mb-3">
                         <h4 className="font-bold text-gray-800 dark:text-white text-base">{proj.name}</h4>
@@ -259,7 +259,7 @@ export default function ProjectsPage() {
         {/* ROI and distribution console panel */}
         <div className="lg:col-span-1">
           {selectedProject ? (
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md space-y-6 sticky top-6">
+            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md space-y-6 sticky top-6">
               <div className="border-b pb-3 dark:border-zinc-800">
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">selected project</span>
                 <h3 className="font-bold text-gray-850 dark:text-white text-base">{selectedProject.name}</h3>

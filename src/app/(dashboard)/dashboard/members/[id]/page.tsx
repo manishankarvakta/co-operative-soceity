@@ -160,7 +160,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Member Profile Card */}
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
           <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 border-b pb-2 mb-4">
             সদস্যের বিবরণ (Profile Summary)
           </h2>
@@ -194,7 +194,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
 
         {/* Nominee Profile Card */}
         {member.nominee && (
-          <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+          <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
             <div className="flex justify-between items-center border-b pb-2 mb-4">
               <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                 নমিনী বিবরণ (Nominee Summary)

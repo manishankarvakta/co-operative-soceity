@@ -37,8 +37,6 @@ services:
       dockerfile: Dockerfile
     container_name: erp-web
     restart: always
-    ports:
-      - "3001:3000"
     environment:
       DATABASE_URL: postgresql://erp_user:erp_secure_password@postgres:5432/cooperative_db?schema=public
       REDIS_URL: redis://redis:6379

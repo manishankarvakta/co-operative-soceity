@@ -270,7 +270,7 @@ export default function ExecutiveDashboard() {
         {kpis.map((kpi, idx) => (
           <div
             key={idx}
-            className="relative bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:scale-[1.01] transition-all duration-300 overflow-hidden group"
+            className="relative bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:scale-[1.01] transition-all duration-300 overflow-hidden group"
           >
             {/* Glossy hover decorative gradient */}
             <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
@@ -299,7 +299,7 @@ export default function ExecutiveDashboard() {
       </div>
 
       {/* Comparison Analytics Chart Section */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md p-6 md:p-8 space-y-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md p-6 md:p-8 space-y-6">
         <div>
           <h2 className="text-xl font-bold text-gray-800 dark:text-white leading-snug">
             {labels[lang].chartTitle}

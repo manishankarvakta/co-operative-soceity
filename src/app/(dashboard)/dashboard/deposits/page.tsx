@@ -123,10 +123,10 @@ export default function DepositsListPage() {
       </div>
 
       {/* Tables Grid */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-150 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{labels[lang].colReceipt}</th>
                 <th className="px-6 py-4">{labels[lang].colName}</th>
@@ -191,7 +191,7 @@ export default function DepositsListPage() {
 
         {/* Pagination Console */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-gray-150 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>{labels[lang].totalRecords}: {pagination.totalItems} {labels[lang].unit}</span>
             <div className="flex gap-2">
               <button

@@ -114,7 +114,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
       {/* Shareholder Header Profile Card */}
       {member && (
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <span className="text-xs text-gray-500 uppercase font-bold tracking-wider block mb-1">
@@ -133,7 +133,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
       )}
 
       {/* History table list */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
         <div className="p-4 border-b dark:border-zinc-800 bg-gray-50 dark:bg-zinc-850">
           <h1 className="text-lg font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
@@ -141,7 +141,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-150 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4 w-16 text-center">{labels[lang].sl}</th>
                 <th className="px-6 py-4">{labels[lang].date}</th>
@@ -200,7 +200,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
         {/* Pagination Console */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-gray-150 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>
               {labels[lang].totalItems}: {pagination.totalItems}
             </span>
