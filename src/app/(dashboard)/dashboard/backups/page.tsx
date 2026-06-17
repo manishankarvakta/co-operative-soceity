@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
 
 interface BackupRecord {
@@ -23,6 +23,43 @@ export default function BackupsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<BackupRecord | null>(null);
   const [confirmText, setConfirmText] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [alertModal, setAlertModal] = useState<{ show: boolean, type: "success" | "error" | "warning", message: string }>({ show: false, type: "success", message: "" });
+  const showAlert = (type: "success" | "error" | "warning", message: string) => {
+    setAlertModal({ show: true, type, message });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setActionLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/backups/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showAlert("success", lang === "BN" ? "ব্যাকআপ ফাইল সফলভাবে আপলোড করা হয়েছে।" : "Backup file uploaded successfully.");
+        fetchBackups();
+      } else {
+        showAlert("error", data.message || (lang === "BN" ? "আপলোড করতে ব্যর্থ হয়েছে।" : "Failed to upload."));
+      }
+    } catch (err) {
+      showAlert("error", lang === "BN" ? "আপলোড প্রক্রিয়ায় ত্রুটি ঘটেছে।" : "Error during upload.");
+    } finally {
+      setActionLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
   const fetchBackups = async () => {
     setLoading(true);
@@ -51,13 +88,13 @@ export default function BackupsPage() {
       const res = await fetch("/api/backups", { method: "POST" });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert(lang === "BN" ? "ব্যাকআপ সফলভাবে তৈরি করা হয়েছে।" : "Backup created successfully.");
+        showAlert("success", lang === "BN" ? "ব্যাকআপ সফলভাবে তৈরি করা হয়েছে।" : "Backup created successfully.");
         fetchBackups();
       } else {
-        alert(data.message || (lang === "BN" ? "ব্যাকআপ তৈরি করতে ব্যর্থ হয়েছে।" : "Failed to create backup."));
+        showAlert("error", data.message || (lang === "BN" ? "ব্যাকআপ তৈরি করতে ব্যর্থ হয়েছে।" : "Failed to create backup."));
       }
     } catch (err) {
-      alert(lang === "BN" ? "ব্যাকআপ প্রক্রিয়ায় সমস্যা হয়েছে।" : "An error occurred during backup process.");
+      showAlert("error", lang === "BN" ? "ব্যাকআপ প্রক্রিয়ায় সমস্যা হয়েছে।" : "An error occurred during backup process.");
     } finally {
       setActionLoading(false);
     }
@@ -68,7 +105,7 @@ export default function BackupsPage() {
     
     // Safety check: require user to type "RESTORE" to prevent accidental clicks
     if (confirmText !== "RESTORE") {
-      alert(lang === "BN" ? "দয়া করে নিশ্চিতকরণ শব্দ 'RESTORE' সঠিকভাবে টাইপ করুন।" : "Please type the confirmation word 'RESTORE' correctly.");
+      showAlert("warning", lang === "BN" ? "দয়া করে নিশ্চিতকরণ শব্দ 'RESTORE' সঠিকভাবে টাইপ করুন।" : "Please type the confirmation word 'RESTORE' correctly.");
       return;
     }
 
@@ -82,13 +119,13 @@ export default function BackupsPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert(lang === "BN" ? "ডাটাবেজ সফলভাবে রিস্টোর করা হয়েছে!" : "Database restored successfully!");
+        showAlert("success", lang === "BN" ? "ডাটাবেজ সফলভাবে রিস্টোর করা হয়েছে!" : "Database restored successfully!");
         fetchBackups();
       } else {
-        alert(data.message || (lang === "BN" ? "রিস্টোর করতে ব্যর্থ হয়েছে।" : "Failed to restore database."));
+        showAlert("error", data.message || (lang === "BN" ? "রিস্টোর করতে ব্যর্থ হয়েছে।" : "Failed to restore database."));
       }
     } catch (err) {
-      alert(lang === "BN" ? "ডাটাবেজ রিস্টোর করার সময় ত্রুটি ঘটেছে।" : "An error occurred during database restoration.");
+      showAlert("error", lang === "BN" ? "ডাটাবেজ রিস্টোর করার সময় ত্রুটি ঘটেছে।" : "An error occurred during database restoration.");
     } finally {
       setActionLoading(false);
       setSelectedBackup(null);
@@ -107,13 +144,13 @@ export default function BackupsPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert(lang === "BN" ? "ব্যাকআপ ফাইলটি মুছে ফেলা হয়েছে।" : "Backup file deleted successfully.");
+        showAlert("success", lang === "BN" ? "ব্যাকআপ ফাইলটি মুছে ফেলা হয়েছে।" : "Backup file deleted successfully.");
         fetchBackups();
       } else {
-        alert(data.message || (lang === "BN" ? "ব্যাকআপ ফাইলটি মুছতে ব্যর্থ হয়েছে।" : "Failed to delete backup file."));
+        showAlert("error", data.message || (lang === "BN" ? "ব্যাকআপ ফাইলটি মুছতে ব্যর্থ হয়েছে।" : "Failed to delete backup file."));
       }
     } catch (err) {
-      alert(lang === "BN" ? "ফাইলটি মুছার সময় ত্রুটি ঘটেছে।" : "An error occurred during file deletion.");
+      showAlert("error", lang === "BN" ? "ফাইলটি মুছার সময় ত্রুটি ঘটেছে।" : "An error occurred during file deletion.");
     } finally {
       setActionLoading(false);
       setSelectedBackup(null);
@@ -219,6 +256,20 @@ export default function BackupsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-start">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileUpload} 
+            className="hidden" 
+            accept=".zip,.sql,.json,.gz"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={actionLoading}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-md transition-all"
+          >
+            {lang === "BN" ? "⬆️ আপলোড" : "⬆️ Upload Backup"}
+          </button>
           <button
             onClick={handleCreateBackup}
             disabled={actionLoading}
@@ -288,15 +339,23 @@ export default function BackupsPage() {
                     </td>
                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
                       {backup.status === "SUCCESS" && (
-                        <button
-                          onClick={() => {
-                            setSelectedBackup(backup);
-                            setShowRestoreModal(true);
-                          }}
-                          className="px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-900/40 rounded-md transition"
-                        >
-                          🔄 {labels[lang].restoreBtn}
-                        </button>
+                        <>
+                          <button
+                            onClick={() => window.location.href = `/api/backups/download?id=${backup.id}`}
+                            className="px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100 border border-blue-200 dark:border-blue-900/40 rounded-md transition"
+                          >
+                            ⬇️ {lang === "BN" ? "ডাউনলোড" : "Download"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedBackup(backup);
+                              setShowRestoreModal(true);
+                            }}
+                            className="px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-900/40 rounded-md transition"
+                          >
+                            🔄 {labels[lang].restoreBtn}
+                          </button>
+                        </>
                       )}
                       <button
                         onClick={() => {
@@ -390,6 +449,37 @@ export default function BackupsPage() {
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg shadow transition"
               >
                 {lang === "BN" ? "হ্যাঁ, ডিলিট করুন" : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Alert Modal */}
+      {alertModal.show && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4 animate-in fade-in zoom-in duration-200">
+            <h3 className={`text-lg font-black flex items-center gap-2 ${
+              alertModal.type === "success" ? "text-emerald-600 dark:text-emerald-400" :
+              alertModal.type === "warning" ? "text-amber-600 dark:text-amber-400" :
+              "text-rose-600 dark:text-rose-400"
+            }`}>
+              {alertModal.type === "success" && "✅ "}
+              {alertModal.type === "warning" && "⚠️ "}
+              {alertModal.type === "error" && "❌ "}
+              {alertModal.type === "success" ? (lang === "BN" ? "সফল" : "Success") :
+               alertModal.type === "warning" ? (lang === "BN" ? "সতর্কতা" : "Warning") :
+               (lang === "BN" ? "ত্রুটি" : "Error")}
+            </h3>
+            <p className="text-sm text-gray-650 dark:text-gray-300 leading-relaxed">
+              {alertModal.message}
+            </p>
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setAlertModal({ ...alertModal, show: false })}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-800 dark:text-white font-bold text-xs rounded-lg shadow-sm transition"
+              >
+                {lang === "BN" ? "ঠিক আছে" : "OK"}
               </button>
             </div>
           </div>
