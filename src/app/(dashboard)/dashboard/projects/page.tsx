@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import ProjectForm from "@/components/forms/ProjectForm";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 export default function ProjectsPage() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -190,13 +191,6 @@ export default function ProjectsPage() {
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
             {showForm ? labels[lang].closeBtn : labels[lang].addBtn}
-          </button>
-          <button
-            type="button"
-            onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-            className="px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg hover:bg-emerald-100"
-          >
-            {lang === "BN" ? "English" : "বাংলা"}
           </button>
         </div>
       </div>

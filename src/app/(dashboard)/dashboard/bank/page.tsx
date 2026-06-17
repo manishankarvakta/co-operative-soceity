@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import BankTransactionForm from "@/components/forms/BankTransactionForm";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 export default function BankWorkspacePage() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [accounts, setAccounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -223,13 +224,6 @@ export default function BankWorkspacePage() {
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
             {showTxForm ? "ফর্ম বন্ধ করুন" : labels[lang].addTx}
-          </button>
-          <button
-            type="button"
-            onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-            className="px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg hover:bg-emerald-100"
-          >
-            {lang === "BN" ? "English" : "বাংলা"}
           </button>
         </div>
       </div>

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 export default function AccountingPage() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [activeTab, setActiveTab] = useState<"coa" | "journal" | "reports" | "distribution">("coa");
 
   // Profit Distribution states
@@ -319,15 +320,6 @@ export default function AccountingPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
-        </div>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-            className="px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg hover:bg-emerald-100"
-          >
-            {lang === "BN" ? "English" : "বাংলা"}
-          </button>
         </div>
       </div>
 

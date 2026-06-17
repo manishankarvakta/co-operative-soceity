@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface ChartDataItem {
   monthBN: string;
@@ -19,7 +20,7 @@ interface StatsData {
 }
 
 export default function ExecutiveDashboard() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [data, setData] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<"LIVE" | "POLLING" | "ERROR">("LIVE");
@@ -261,13 +262,6 @@ export default function ExecutiveDashboard() {
         </div>
         <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-start">
           {getStatusBadge()}
-          <button
-            type="button"
-            onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-            className="px-4 py-2 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-450 border border-emerald-250 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all shadow-sm"
-          >
-            {lang === "BN" ? "English" : "বাংলা"}
-          </button>
         </div>
       </div>
 
