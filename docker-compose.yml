@@ -38,13 +38,13 @@ services:
     container_name: erp-web
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       DATABASE_URL: postgresql://erp_user:erp_secure_password@postgres:5432/cooperative_db?schema=public
       REDIS_URL: redis://redis:6379
       AUTH_SECRET: erp_production_auth_secret_change_me
       AUTH_TRUST_HOST: "true"
-      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3001
       BACKUP_DIR: /app/backups
       BACKUP_CRON_HOUR: "0" # Daily automated backup at 00:00 midnight
       BACKUP_CRON_MINUTE: "0"
