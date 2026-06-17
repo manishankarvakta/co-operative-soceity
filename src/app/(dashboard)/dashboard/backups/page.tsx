@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface BackupRecord {
   id: string;
@@ -12,7 +13,7 @@ interface BackupRecord {
 }
 
 export default function BackupsPage() {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [backups, setBackups] = useState<BackupRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -218,13 +219,6 @@ export default function BackupsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-start">
-          <button
-            type="button"
-            onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-            className="px-4 py-2 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition shadow-sm"
-          >
-            {lang === "BN" ? "English" : "বাংলা"}
-          </button>
           <button
             onClick={handleCreateBackup}
             disabled={actionLoading}
