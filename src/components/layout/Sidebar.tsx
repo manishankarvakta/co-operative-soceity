@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: "home" },
+  { name: "Dashboard", href: "/dashboard", icon: "home" },
   { name: "Members", href: "/dashboard/members", icon: "users" },
   { name: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
   { name: "Shares", href: "/dashboard/shares", icon: "pie-chart" },
@@ -12,8 +12,8 @@ const navigation = [
   { name: "Accounting", href: "/dashboard/accounting", icon: "book-open" },
   { name: "Bank", href: "/dashboard/bank", icon: "building" },
   { name: "Projects", href: "/dashboard/projects", icon: "briefcase" },
-  { name: "Reports", href: "/reports", icon: "file-text" },
-  { name: "Backups", href: "/backups", icon: "database" },
+  { name: "Reports", href: "/dashboard/reports", icon: "file-text" },
+  { name: "Backups", href: "/dashboard/backups", icon: "database" },
 ];
 
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
