@@ -115,7 +115,7 @@ export default function DepositForm() {
         setError(result.message || (lang === "BN" ? "জমা করতে ব্যর্থ হয়েছে।" : "Transaction failed."));
       } else {
         // Redirect directly to printable money receipt
-        router.push(`/deposits/${result.depositId}/receipt`);
+        router.push(`/dashboard/deposits/${result.depositId}/receipt`);
         router.refresh();
       }
     } catch (err) {
