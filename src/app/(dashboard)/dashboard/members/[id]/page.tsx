@@ -160,75 +160,87 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Member Profile Card */}
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
-          <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 border-b pb-2 mb-4">
-            সদস্যের বিবরণ (Profile Summary)
-          </h2>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-              <span className="text-gray-500">মোবাইল নম্বর</span>
-              <span className="font-bold text-gray-800 dark:text-white">{member.phone}</span>
-            </div>
-            <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-              <span className="text-gray-500">ইমেইল</span>
-              <span className="font-semibold text-gray-800 dark:text-white">{member.email || "—"}</span>
-            </div>
-            <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-              <span className="text-gray-500">যোগদানের তারিখ</span>
-              <span className="font-semibold text-gray-800 dark:text-white">
-                {new Date(member.joinDate).toLocaleDateString("bn-BD")}
-              </span>
-            </div>
-            <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-              <span className="text-gray-500">সদস্যপদ স্ট্যাটাস</span>
-              <span className="font-bold uppercase text-emerald-600">{member.status}</span>
-            </div>
-            <div className="pt-2">
-              <span className="text-gray-500 block mb-1">বর্তমান ঠিকানা</span>
-              <p className="text-gray-800 dark:text-zinc-350 bg-gray-50 dark:bg-zinc-850 p-3 rounded-lg border border-gray-100 dark:border-zinc-800">
-                {member.address}
-              </p>
-            </div>
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+            <h2 className="text-lg font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              সদস্যের বিবরণ (Profile Summary)
+            </h2>
+          </div>
+          <div className="px-6 py-2">
+            <dl className="divide-y divide-gray-100 dark:divide-zinc-800 text-sm">
+              <div className="py-4 flex justify-between items-center">
+                <dt className="text-gray-500 dark:text-gray-400 font-medium">মোবাইল নম্বর</dt>
+                <dd className="font-bold font-mono text-gray-900 dark:text-white">{member.phone}</dd>
+              </div>
+              <div className="py-4 flex justify-between items-center">
+                <dt className="text-gray-500 dark:text-gray-400 font-medium">ইমেইল</dt>
+                <dd className="font-semibold text-gray-900 dark:text-white">{member.email || "—"}</dd>
+              </div>
+              <div className="py-4 flex justify-between items-center">
+                <dt className="text-gray-500 dark:text-gray-400 font-medium">যোগদানের তারিখ</dt>
+                <dd className="font-semibold text-gray-900 dark:text-white font-mono">
+                  {new Date(member.joinDate).toLocaleDateString("bn-BD")}
+                </dd>
+              </div>
+              <div className="py-4 flex justify-between items-center">
+                <dt className="text-gray-500 dark:text-gray-400 font-medium">সদস্যপদ স্ট্যাটাস</dt>
+                <dd>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    {member.status}
+                  </span>
+                </dd>
+              </div>
+              <div className="py-4">
+                <dt className="text-gray-500 dark:text-gray-400 font-medium mb-2">বর্তমান ঠিকানা</dt>
+                <dd className="bg-gray-50 dark:bg-zinc-850/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
+                  {member.address}
+                </dd>
+              </div>
+            </dl>
           </div>
         </div>
 
         {/* Nominee Profile Card */}
         {member.nominee && (
-          <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
-            <div className="flex justify-between items-center border-b pb-2 mb-4">
-              <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden h-fit">
+            <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 নমিনী বিবরণ (Nominee Summary)
               </h2>
               <button
                 onClick={() => setEditNomineeMode(true)}
-                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                className="text-xs font-bold px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 ring-1 ring-gray-200 dark:ring-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
               >
-                নমিনী এডিট করুন
+                এডিট করুন
               </button>
             </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-                <span className="text-gray-500">নমিনীর নাম</span>
-                <span className="font-bold text-gray-800 dark:text-white">{member.nominee.name}</span>
-              </div>
-              <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-                <span className="text-gray-500">সম্পর্ক</span>
-                <span className="font-semibold text-gray-800 dark:text-white">{member.nominee.relationship}</span>
-              </div>
-              <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-                <span className="text-gray-500">মোবাইল নম্বর</span>
-                <span className="font-semibold text-gray-800 dark:text-white">{member.nominee.phone}</span>
-              </div>
-              <div className="flex justify-between border-b pb-2 dark:border-zinc-800">
-                <span className="text-gray-500">জরুরি যোগাযোগের নম্বর</span>
-                <span className="font-bold text-red-600 dark:text-red-400">{member.nominee.emergencyContact}</span>
-              </div>
-              <div className="pt-2">
-                <span className="text-gray-500 block mb-1">ঠিকানা</span>
-                <p className="text-gray-800 dark:text-zinc-350 bg-gray-50 dark:bg-zinc-850 p-3 rounded-lg border border-gray-100 dark:border-zinc-800">
-                  {member.nominee.address}
-                </p>
-              </div>
+            <div className="px-6 py-2">
+              <dl className="divide-y divide-gray-100 dark:divide-zinc-800 text-sm">
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">নমিনীর নাম</dt>
+                  <dd className="font-bold text-gray-900 dark:text-white">{member.nominee.name}</dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">সম্পর্ক</dt>
+                  <dd className="font-semibold text-gray-900 dark:text-white px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-zinc-800">{member.nominee.relationship}</dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">মোবাইল নম্বর</dt>
+                  <dd className="font-bold font-mono text-gray-900 dark:text-white">{member.nominee.phone}</dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">জরুরি যোগাযোগ</dt>
+                  <dd className="font-bold font-mono text-rose-600 dark:text-rose-400">{member.nominee.emergencyContact}</dd>
+                </div>
+                <div className="py-4">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium mb-2">ঠিকানা</dt>
+                  <dd className="bg-gray-50 dark:bg-zinc-850/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
+                    {member.nominee.address}
+                  </dd>
+                </div>
+              </dl>
             </div>
           </div>
         )}

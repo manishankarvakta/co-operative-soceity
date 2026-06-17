@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 export default function DepositForm() {
   const router = useRouter();
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -157,18 +158,12 @@ export default function DepositForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-4xl bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-zinc-800 transition-all">
-      <div className="flex justify-between items-center mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+    <form onSubmit={handleSubmit} className="w-full max-w-4xl bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 transition-all">
+      <div className="flex justify-between items-center mb-8 border-b pb-5 border-gray-100 dark:border-zinc-800">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
           {labels[lang].title}
         </h2>
-        <button
-          type="button"
-          onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-          className="px-3 py-1 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 rounded-full border border-emerald-250 dark:border-emerald-800 hover:bg-emerald-100"
-        >
-          {lang === "BN" ? "English" : "বাংলা"}
-        </button>
       </div>
 
       {error && (
@@ -179,14 +174,14 @@ export default function DepositForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div>
-          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-            {labels[lang].member} <span className="text-red-500">*</span>
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+            {labels[lang].member} <span className="text-rose-500">*</span>
           </label>
           <select
             required
             value={selectedMemberId}
             onChange={(e) => setSelectedMemberId(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           >
             <option value="">-- মেম্বার সিলেক্ট করুন --</option>
             {members.map((m) => (
@@ -198,13 +193,13 @@ export default function DepositForm() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
             {labels[lang].paymentMode}
           </label>
           <select
             value={paymentMode}
             onChange={(e) => setPaymentMode(e.target.value as any)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           >
             <option value="CASH">Cash (ক্যাশ বক্স)</option>
             <option value="BANK">Bank Account (ব্যাংক অ্যাকাউন্ট)</option>
@@ -212,41 +207,41 @@ export default function DepositForm() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
             {labels[lang].receipt}
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
-            className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+            className="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-colors shadow-sm"
           />
         </div>
       </div>
 
       {/* Bulk checkboxes table list */}
-      <div className="border rounded-xl border-gray-200 dark:border-zinc-850 overflow-hidden mb-6">
+      <div className="rounded-xl overflow-hidden mb-8 ring-1 ring-gray-200 dark:ring-zinc-800 shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 dark:bg-zinc-850 font-bold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-zinc-800">
+          <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-zinc-800">
             <tr>
-              <th className="px-4 py-3 w-16">সিলেক্ট</th>
-              <th className="px-4 py-3">{labels[lang].type}</th>
-              <th className="px-4 py-3">{labels[lang].amount}</th>
-              <th className="px-4 py-3">{labels[lang].period}</th>
+              <th className="px-5 py-4 w-16 text-center">সিলেক্ট</th>
+              <th className="px-5 py-4">{labels[lang].type}</th>
+              <th className="px-5 py-4">{labels[lang].amount}</th>
+              <th className="px-5 py-4">{labels[lang].period}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-150 dark:divide-zinc-800">
+          <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
             {Object.entries(bills).map(([type, b]) => (
-              <tr key={type} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/30">
-                <td className="px-4 py-3 text-center">
+              <tr key={type} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/30 transition-colors">
+                <td className="px-5 py-4 text-center">
                   <input
                     type="checkbox"
                     checked={b.checked}
                     onChange={() => handleCheckboxChange(type as any)}
-                    className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
+                    className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-zinc-800 focus:ring-2 dark:bg-zinc-700 dark:border-zinc-600 cursor-pointer"
                   />
                 </td>
-                <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white">
+                <td className="px-5 py-4 font-bold text-gray-800 dark:text-gray-200">
                   {type === "WEEKLY_SUBSCRIPTION"
                     ? "সাপ্তাহিক চাঁদা (Weekly)"
                     : type === "ADMISSION_FEE"
@@ -255,23 +250,23 @@ export default function DepositForm() {
                     ? "জরিমানা (Penalty)"
                     : "অন্যান্য (Other)"}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-4">
                   <input
                     type="number"
                     disabled={!b.checked}
                     value={b.amount}
                     onChange={(e) => handleAmountChange(type as any, e.target.value)}
-                    className="w-32 px-2 py-1 text-sm border rounded focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 disabled:opacity-50"
+                    className="w-32 px-3 py-2 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-40 font-mono"
                   />
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-4">
                   <input
                     type="text"
                     disabled={!b.checked}
                     value={b.period}
                     onChange={(e) => handlePeriodChange(type as any, e.target.value)}
                     placeholder="যেমন: Week 12, June"
-                    className="w-48 px-2 py-1 text-sm border rounded focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 disabled:opacity-50"
+                    className="w-full max-w-xs px-3 py-2 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-40"
                   />
                 </td>
               </tr>
@@ -280,22 +275,22 @@ export default function DepositForm() {
         </table>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center border-t pt-6 border-gray-100 dark:border-zinc-850">
-        <div className="flex gap-8 text-sm font-semibold">
-          <div className="p-3 bg-gray-50 dark:bg-zinc-850 rounded-lg border flex flex-col min-w-32">
-            <span className="text-xs text-gray-500 mb-1">{labels[lang].total}</span>
-            <span className="text-lg font-bold text-gray-800 dark:text-white">{totalBdt.toLocaleString()} BDT</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start border-t pt-8 border-gray-100 dark:border-zinc-800">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="p-5 bg-gray-50 dark:bg-zinc-850/50 rounded-xl ring-1 ring-gray-900/5 dark:ring-white/5 flex flex-col flex-1">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-gray-500 mb-1">{labels[lang].total}</span>
+            <span className="text-2xl font-black text-gray-800 dark:text-white font-mono">{totalBdt.toLocaleString()} BDT</span>
           </div>
 
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-150 flex flex-col min-w-32">
-            <span className="text-xs text-emerald-600 mb-1">{labels[lang].shares}</span>
-            <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">{calculatedShares} Shares</span>
+          <div className="p-5 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl ring-1 ring-emerald-200 dark:ring-emerald-900/30 flex flex-col flex-1">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-600 mb-1">{labels[lang].shares}</span>
+            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono">{calculatedShares} <span className="text-sm font-bold">Shares</span></span>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
               {labels[lang].remarks}
             </label>
             <input
@@ -303,15 +298,15 @@ export default function DepositForm() {
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="ব্যাংক ট্রানজেকশন আইডি বা অন্য মন্তব্য..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition-all duration-200 disabled:opacity-50"
+              className="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:hover:shadow-md"
             >
               {loading ? labels[lang].submitting : labels[lang].submit}
             </button>

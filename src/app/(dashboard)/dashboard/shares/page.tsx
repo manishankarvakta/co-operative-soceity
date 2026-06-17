@@ -165,22 +165,26 @@ export default function ShareWorkspacePage() {
       {activeTab === "ledger" ? (
         <div className="space-y-6">
           {/* Search bar input */}
-          <div className="relative max-w-md">
+          <div className="relative max-w-md group">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 group-focus-within:text-emerald-500 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={labels[lang].searchPlaceholder}
-              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             />
-            <div className="absolute left-3 top-2.5 text-gray-400">🔍</div>
           </div>
 
           {/* Ledger table */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden transition-all duration-300">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
+                <thead className="bg-gray-50/80 dark:bg-zinc-850/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
                   <tr>
                     <th className="px-6 py-4">{labels[lang].memberCode}</th>
                     <th className="px-6 py-4">{labels[lang].name}</th>
@@ -244,7 +248,7 @@ export default function ShareWorkspacePage() {
 
             {/* Pagination console */}
             {ledgerPagination.totalPages > 1 && (
-              <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+              <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                 <span>
                   {lang === "BN"
                     ? `মোট শেয়ার হোল্ডার: ${ledgerPagination.totalItems} জন`
@@ -286,29 +290,32 @@ export default function ShareWorkspacePage() {
             <>
               {/* Summary stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md flex flex-col">
-                  <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 flex flex-col relative overflow-hidden group hover:shadow-md transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 z-10">
                     {labels[lang].totalOutstanding}
                   </span>
-                  <span className="text-2xl font-black text-gray-800 dark:text-white font-mono">
+                  <span className="text-2xl font-black text-gray-800 dark:text-white font-mono z-10">
                     {reports.summary.totalSharesIssued.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")} Shares
                   </span>
                 </div>
 
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md flex flex-col">
-                  <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 flex flex-col relative overflow-hidden group hover:shadow-md transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 z-10">
                     {labels[lang].totalCapital}
                   </span>
-                  <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono">
+                  <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono z-10">
                     {reports.summary.totalCapitalizationBdt.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
                   </span>
                 </div>
 
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md flex flex-col">
-                  <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 flex flex-col relative overflow-hidden group hover:shadow-md transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 z-10">
                     {labels[lang].activeShareholders}
                   </span>
-                  <span className="text-2xl font-black text-gray-800 dark:text-white font-mono">
+                  <span className="text-2xl font-black text-gray-800 dark:text-white font-mono z-10">
                     {reports.summary.activeShareholders.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")} {lang === "BN" ? "জন" : "Members"}
                   </span>
                 </div>
@@ -316,61 +323,59 @@ export default function ShareWorkspacePage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Distribution bracket list */}
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
-                  <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b pb-2">
-                    {labels[lang].distributionTitle}
-                  </h3>
-                  <div className="space-y-3">
-                    {Object.entries(reports.distribution).map(([bracket, count]) => (
-                      <div key={bracket} className="flex justify-between items-center text-sm border-b pb-2 dark:border-zinc-800">
-                        <span className="text-gray-600 dark:text-zinc-350">{bracket}</span>
-                        <strong className="text-gray-800 dark:text-white font-mono text-base">
-                          {Number(count).toLocaleString(lang === "BN" ? "bn-BD" : "en-US")} {lang === "BN" ? "জন" : "Shareholders"}
-                        </strong>
-                      </div>
-                    ))}
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
+                  <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                      {labels[lang].distributionTitle}
+                    </h3>
+                  </div>
+                  <div className="px-6 py-2">
+                    <dl className="divide-y divide-gray-100 dark:divide-zinc-800">
+                      {Object.entries(reports.distribution).map(([bracket, count]) => (
+                        <div key={bracket} className="py-4 flex justify-between items-center text-sm">
+                          <dt className="text-gray-600 dark:text-zinc-350">{bracket}</dt>
+                          <dd className="text-gray-900 dark:text-white font-mono font-bold">
+                            {Number(count).toLocaleString(lang === "BN" ? "bn-BD" : "en-US")} {lang === "BN" ? "জন" : "Shareholders"}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </div>
                 </div>
 
                 {/* Recent share log history */}
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
-                  <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b pb-2">
-                    {labels[lang].recentTitle}
-                  </h3>
-                  <div className="overflow-x-auto text-xs">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="text-gray-550 border-b dark:border-zinc-800 font-bold">
-                          <th className="pb-2">{labels[lang].recentMember}</th>
-                          <th className="pb-2 text-center">{labels[lang].recentShares}</th>
-                          <th className="pb-2 text-right">{labels[lang].recentValue}</th>
-                          <th className="pb-2 text-right">{labels[lang].recentReceipt}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100 dark:divide-zinc-850">
-                        {reports.recentLogs.map((log: any) => (
-                          <tr key={log.id} className="text-gray-700 dark:text-zinc-300">
-                            <td className="py-2.5">
-                              <span className="font-bold">{log.memberName}</span>
-                              <span className="block text-[10px] text-gray-500 font-mono">{log.memberCode}</span>
-                            </td>
-                            <td className="py-2.5 text-center font-bold font-mono">
-                              +{log.count}
-                            </td>
-                            <td className="py-2.5 text-right font-mono">
-                              {log.value.toLocaleString()}
-                            </td>
-                            <td className="py-2.5 text-right font-mono text-emerald-600 dark:text-emerald-400">
-                              {log.receiptCode !== "N/A" ? (
-                                <span className="underline select-all">{log.receiptCode}</span>
-                              ) : (
-                                "—"
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
+                  <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      {labels[lang].recentTitle}
+                    </h3>
+                  </div>
+                  <div className="px-6 py-2">
+                    <div className="divide-y divide-gray-100 dark:divide-zinc-800">
+                      {reports.recentLogs.map((log: any) => (
+                        <div key={log.id} className="py-4 flex justify-between items-center text-sm">
+                          <div>
+                            <span className="font-bold text-gray-900 dark:text-white block">{log.memberName}</span>
+                            <div className="flex gap-2 items-center mt-1">
+                              <span className="text-xs text-gray-500 font-mono bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{log.memberCode}</span>
+                              {log.receiptCode !== "N/A" && (
+                                <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 px-1.5 py-0.5 rounded">
+                                  #{log.receiptCode}
+                                </span>
                               )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono block">+{log.count} <span className="text-[10px] font-bold text-emerald-700/50 dark:text-emerald-400/50 uppercase tracking-wider">Shares</span></span>
+                            <span className="text-xs text-gray-500 font-mono mt-1 block font-semibold">
+                              {log.value.toLocaleString()} BDT
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

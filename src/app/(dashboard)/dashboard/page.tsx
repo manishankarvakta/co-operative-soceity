@@ -249,7 +249,7 @@ export default function ExecutiveDashboard() {
   ];
 
   return (
-    <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto transition-all">
+    <div className="p-6 md:p-8 space-y-8  transition-all">
       {/* Upper header segment */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-4 border-gray-200 dark:border-zinc-800">
         <div>
