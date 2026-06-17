@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface HistoryPageProps {
   params: Promise<{
@@ -11,7 +12,7 @@ interface HistoryPageProps {
 
 export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
   const { memberId } = use(params);
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [history, setHistory] = useState<any[]>([]);
   const [member, setMember] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -89,21 +90,14 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-5xl mx-auto">
-      {/* Back button & Lang switch */}
+      {/* Back button */}
       <div className="flex justify-between items-center">
         <Link
-          href="/shares"
-          className="px-4 py-2 bg-gray-150 hover:bg-gray-250 text-gray-800 font-bold text-sm rounded-lg border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 transition-all"
+          href="/dashboard/shares"
+          className="px-4 py-2 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-bold text-sm rounded-lg shadow-sm ring-1 ring-gray-200 dark:ring-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all"
         >
           {labels[lang].backBtn}
         </Link>
-        <button
-          type="button"
-          onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-          className="px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
-        >
-          {lang === "BN" ? "English" : "বাংলা"}
-        </button>
       </div>
 
       {error && (
@@ -114,7 +108,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
       {/* Shareholder Header Profile Card */}
       {member && (
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md">
+        <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <span className="text-xs text-gray-500 uppercase font-bold tracking-wider block mb-1">
@@ -133,15 +127,18 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
       )}
 
       {/* History table list */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
-        <div className="p-4 border-b dark:border-zinc-800 bg-gray-50 dark:bg-zinc-850">
-          <h1 className="text-lg font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden transition-all duration-300">
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+          <h1 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {labels[lang].title}
+          </h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{labels[lang].subtitle}</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
+            <thead className="bg-white dark:bg-zinc-900 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4 w-16 text-center">{labels[lang].sl}</th>
                 <th className="px-6 py-4">{labels[lang].date}</th>
@@ -200,7 +197,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
         {/* Pagination Console */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>
               {labels[lang].totalItems}: {pagination.totalItems}
             </span>

@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface ExpenseFormProps {
   onSuccess?: () => void;
 }
 
 export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const router = useRouter();
+  const { lang } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -79,7 +82,12 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
         setLocation("");
         setRemarks("");
         setProjectId("");
-        if (onSuccess) onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push("/dashboard/expenses");
+          router.refresh();
+        }
       }
     } catch (err) {
       setError(lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Internal Server Error");
@@ -130,16 +138,12 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
-      <div className="flex justify-between items-center mb-6 border-b pb-3 dark:border-zinc-800">
-        <h2 className="text-lg font-bold text-gray-800 dark:text-white">{labels[lang].title}</h2>
-        <button
-          type="button"
-          onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-          className="px-2.5 py-1 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 rounded-md hover:bg-emerald-100"
-        >
-          {lang === "BN" ? "English" : "বাংলা"}
-        </button>
+    <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10">
+      <div className="flex justify-between items-center mb-8 border-b pb-5 dark:border-zinc-800">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          {labels[lang].title}
+        </h2>
       </div>
 
       {error && (
@@ -154,15 +158,15 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
         </div>
       )}
 
-      <div className="space-y-4 text-sm">
+      <div className="space-y-6 text-sm">
         <div>
-          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
             {labels[lang].category}
           </label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           >
             <option value="OFFICE_RENT">{labels[lang].rent}</option>
             <option value="TRANSPORT">{labels[lang].transport}</option>
@@ -172,10 +176,10 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
           </select>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].amount} <span className="text-red-500">*</span>
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+              {labels[lang].amount} <span className="text-rose-500">*</span>
             </label>
             <input
               type="number"
@@ -183,12 +187,12 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
               {labels[lang].date}
             </label>
             <input
@@ -196,20 +200,20 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
               {labels[lang].paymentMode}
             </label>
             <select
               value={paymentMode}
               onChange={(e) => setPaymentMode(e.target.value as any)}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             >
               <option value="CASH">{labels[lang].cash}</option>
               <option value="BANK">{labels[lang].bank}</option>
@@ -217,13 +221,13 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
               {labels[lang].project}
             </label>
             <select
               value={projectId}
               onChange={(e) => setProjectId(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             >
               <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Project"} --</option>
               {projects.map((p) => (
@@ -234,8 +238,8 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-            {labels[lang].location} <span className="text-red-500">*</span>
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+            {labels[lang].location} <span className="text-rose-500">*</span>
           </label>
           <input
             type="text"
@@ -243,12 +247,12 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder={lang === "BN" ? "যেমন: ঢাকা অফিস, রংপুর প্রজেক্ট এলাকা" : "e.g. Dhaka office"}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
             {labels[lang].remarks}
           </label>
           <input
@@ -256,17 +260,19 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
             placeholder={lang === "BN" ? "বিশেষ কোনো বিবরণ বা নোট..." : "Add descriptions or notes..."}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow transition disabled:opacity-50"
-        >
-          {loading ? labels[lang].submitting : labels[lang].submit}
-        </button>
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:hover:shadow-md"
+          >
+            {loading ? labels[lang].submitting : labels[lang].submit}
+          </button>
+        </div>
       </div>
     </form>
   );

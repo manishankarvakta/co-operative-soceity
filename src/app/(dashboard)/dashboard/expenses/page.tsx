@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ExpenseForm from "@/components/forms/ExpenseForm";
+import Link from "next/link";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 import { useLanguage } from "@/providers/LanguageProvider";
 
@@ -11,7 +11,6 @@ export default function ExpensesPage() {
   const { lang } = useLanguage();
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalItems: 0 });
 
@@ -140,21 +139,14 @@ export default function ExpensesPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">{L.subtitle}</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition">
-            {showForm ? L.closeBtn : L.addBtn}
-          </button>
+          <Link href="/dashboard/expenses/new" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-sm hover:shadow-md transition">
+            {L.addBtn}
+          </Link>
         </div>
       </div>
 
-      {/* Expense Form */}
-      {showForm && (
-        <div className="flex justify-center transition-all">
-          <ExpenseForm onSuccess={() => { setShowForm(false); fetchExpenses(1); }} />
-        </div>
-      )}
-
       {/* Filters */}
-      <div className="flex gap-2 p-2 rounded-lg max-w-lg border border-black/5 dark:border-zinc-800 text-xs font-semibold">
+      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-850/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
         {(["", "PENDING", "APPROVED", "REJECTED"] as const).map((s) => (
           <button key={s} onClick={() => setFilterStatus(s)}
             className={`px-3 py-1.5 rounded-md transition ${filterStatus === s ? "bg-white dark:bg-zinc-800 shadow" : "text-gray-500 hover:text-gray-700"}`}>
@@ -164,10 +156,10 @@ export default function ExpensesPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
+            <thead className="bg-gray-50/80 dark:bg-zinc-850/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.category}</th>
                 <th className="px-6 py-4">{L.amount}</th>
@@ -218,14 +210,14 @@ export default function ExpensesPage() {
         </div>
 
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
-            <span>মোট খরচ এন্ট্রি: {pagination.totalItems} টি</span>
+          <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+            <span>{lang === "BN" ? "মোট খরচ এন্ট্রি" : "Total Entries"}: {pagination.totalItems} {lang === "BN" ? "টি" : ""}</span>
             <div className="flex gap-2">
               <button disabled={pagination.currentPage === 1} onClick={() => fetchExpenses(pagination.currentPage - 1)}
-                className="px-3 py-1 bg-white dark:bg-zinc-800 border rounded-md disabled:opacity-50 transition">পূর্ববর্তী</button>
-              <span className="py-1">পৃষ্ঠা {pagination.currentPage} / {pagination.totalPages}</span>
+                className="px-3 py-1 bg-white dark:bg-zinc-800 border dark:border-zinc-700 rounded-md disabled:opacity-50 transition">{lang === "BN" ? "পূর্ববর্তী" : "Previous"}</button>
+              <span className="py-1">{lang === "BN" ? "পৃষ্ঠা" : "Page"} {pagination.currentPage} / {pagination.totalPages}</span>
               <button disabled={pagination.currentPage === pagination.totalPages} onClick={() => fetchExpenses(pagination.currentPage + 1)}
-                className="px-3 py-1 bg-white dark:bg-zinc-800 border rounded-md disabled:opacity-50 transition">পরবর্তী</button>
+                className="px-3 py-1 bg-white dark:bg-zinc-800 border dark:border-zinc-700 rounded-md disabled:opacity-50 transition">{lang === "BN" ? "পরবর্তী" : "Next"}</button>
             </div>
           </div>
         )}
