@@ -179,10 +179,7 @@ export default function BankWorkspacePage() {
             {labels[lang].addAcc}
           </Link>
           <button
-            onClick={() => {
-              setShowTxForm(!showTxForm);
-              setShowAccountForm(false);
-            }}
+            onClick={() => setShowTxForm(!showTxForm)}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
           >
             {showTxForm ? "ফর্ম বন্ধ করুন" : labels[lang].addTx}
