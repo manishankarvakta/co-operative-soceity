@@ -181,7 +181,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
                     </td>
                     <td className="px-6 py-4 text-right font-mono text-emerald-600 dark:text-emerald-400">
                       {row.receiptCode !== "N/A" ? (
-                        <Link href={`/deposits/${row.transactionId}/receipt`} className="underline">
+                        <Link href={`/dashboard/deposits/${row.transactionId}/receipt`} className="underline">
                           {row.receiptCode}
                         </Link>
                       ) : (
