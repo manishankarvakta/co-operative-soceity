@@ -14,6 +14,10 @@ export default function DepositForm() {
   const [members, setMembers] = useState<any[]>([]);
   const [selectedMemberId, setSelectedMemberId] = useState("");
   
+  // Bank accounts
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [bankAccountId, setBankAccountId] = useState("");
+  
   // Form input parameters
   const [paymentMode, setPaymentMode] = useState<"CASH" | "BANK">("CASH");
   const [remarks, setRemarks] = useState("");
@@ -38,7 +42,22 @@ export default function DepositForm() {
         console.error(err);
       }
     };
+
+    // Fetch bank accounts
+    const loadBanks = async () => {
+      try {
+        const res = await fetch("/api/bank/accounts");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setBankAccounts(data.filter((acc) => acc.accountNumber !== "CASH-001" && acc.name !== "Cash on Hand"));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     loadMembers();
+    loadBanks();
   }, []);
 
   const handleCheckboxChange = (type: keyof typeof bills) => {
@@ -97,9 +116,16 @@ export default function DepositForm() {
       return;
     }
 
+    if (paymentMode === "BANK" && !bankAccountId) {
+      setError(lang === "BN" ? "দয়া করে ব্যাংক অ্যাকাউন্ট নির্বাচন করুন।" : "Please select a bank account.");
+      setLoading(false);
+      return;
+    }
+
     const payload = {
       memberId: selectedMemberId,
       paymentMode,
+      bankAccountId: paymentMode === "BANK" ? bankAccountId : undefined,
       remarks,
       items: activeItems
     };
@@ -131,6 +157,7 @@ export default function DepositForm() {
       title: "ওয়ান-টাইম মাল্টিপল বিল রেকর্ড Form",
       member: "সদস্য সিলেক্ট করুন",
       paymentMode: "জমার খাত (Payment Mode)",
+      selectBank: "ব্যাংক অ্যাকাউন্ট সিলেক্ট করুন",
       remarks: "বিশেষ মন্তব্য বা নোট",
       type: "খাত",
       amount: "টাকার অংক (BDT)",
@@ -145,6 +172,7 @@ export default function DepositForm() {
       title: "One-Time Bulk Deposit Entry",
       member: "Select Member Profile",
       paymentMode: "Payment Method",
+      selectBank: "Select Bank Account",
       remarks: "Remarks / Notes",
       type: "Bill Type",
       amount: "Amount (BDT)",
@@ -196,14 +224,32 @@ export default function DepositForm() {
           <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
             {labels[lang].paymentMode}
           </label>
-          <select
-            value={paymentMode}
-            onChange={(e) => setPaymentMode(e.target.value as any)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
-          >
-            <option value="CASH">Cash (ক্যাশ বক্স)</option>
-            <option value="BANK">Bank Account (ব্যাংক অ্যাকাউন্ট)</option>
-          </select>
+          <div className="flex gap-2">
+            <select
+              value={paymentMode}
+              onChange={(e) => setPaymentMode(e.target.value as any)}
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+            >
+              <option value="CASH">Cash (ক্যাশ বক্স)</option>
+              <option value="BANK">Bank Account (ব্যাংক)</option>
+            </select>
+
+            {paymentMode === "BANK" && (
+              <select
+                required
+                value={bankAccountId}
+                onChange={(e) => setBankAccountId(e.target.value)}
+                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+              >
+                <option value="">-- {labels[lang].selectBank} --</option>
+                {bankAccounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.name} ({acc.accountNumber})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
         <div>
