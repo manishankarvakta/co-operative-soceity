@@ -2,19 +2,74 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface MemberFormProps {
   initialData?: any;
   memberId?: string;
 }
 
+// Per-field error state shape
+interface FieldErrors {
+  name?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  joinDate?: string;
+  nomineeName?: string;
+  nomineeRelationship?: string;
+  nomineePhone?: string;
+  nomineeAddress?: string;
+  nomineeEmergency?: string;
+}
+
+const bdPhoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
+
+// ── Stable module-level components (must NOT be inside MemberForm) ──────────
+// If defined inside the parent, React recreates them every render and
+// unmounts/remounts the input, losing focus after each keystroke.
+function Field({
+  label,
+  required,
+  error,
+  children
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {children}
+      {error && (
+        <p className="mt-1 text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+          <span>⚠</span> {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function inputClass(hasError?: string) {
+  return `w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:text-white transition-colors ${
+    hasError
+      ? "border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-950/20"
+      : "border-gray-300 dark:border-zinc-700"
+  }`;
+}
+
 export default function MemberForm({ initialData, memberId }: MemberFormProps) {
   const router = useRouter();
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  // Form states matching schemas
+  // Form states
   const [name, setName] = useState(initialData?.name || "");
   const [phone, setPhone] = useState(initialData?.phone || "");
   const [email, setEmail] = useState(initialData?.email || "");
@@ -35,6 +90,8 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
 
   const labels = {
     BN: {
+      formTitle: "নতুন সদস্য ভর্তি ফর্ম",
+      editTitle: "সদস্য তথ্য আপডেট করুন",
       memberHeader: "সদস্য তথ্য (Member Info)",
       nomineeHeader: "নমিনী তথ্য (Nominee Info)",
       name: "সদস্যের নাম",
@@ -50,12 +107,26 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       nomineeAddress: "ঠিকানা",
       nomineeEmergency: "জরুরি যোগাযোগের নম্বর",
       submitCreate: "সদস্য নিবন্ধন সম্পন্ন করুন",
-      submitEdit: "সদস্য তথ্য আপডেট করুন",
-      saving: "সংরক্ষণ করা হচ্ছে...",
-      successCreate: "সদস্য সফলভাবে নিবন্ধিত হয়েছে!",
-      successEdit: "তথ্য সফলভাবে আপডেট করা হয়েছে!"
+      submitEdit: "তথ্য আপডেট করুন",
+      saving: "সংরক্ষণ হচ্ছে...",
+      // Validation messages
+      nameRequired: "সদস্যের নাম কমপক্ষে ২ অক্ষরের হতে হবে।",
+      phoneRequired: "সঠিক ১১ ডিজিটের মোবাইল নম্বর লিখুন (01xxxxxxxxx)।",
+      phoneConflict: "এই মোবাইল নম্বরটি দিয়ে ইতিমধ্যে সদস্য নিবন্ধিত আছে।",
+      emailInvalid: "সঠিক ইমেইল ঠিকানা লিখুন।",
+      emailConflict: "এই ইমেইলটি ইতিমধ্যে ব্যবহার হয়েছে।",
+      addressRequired: "বর্তমান ঠিকানা কমপক্ষে ৫ অক্ষরের হতে হবে।",
+      joinDateRequired: "ভর্তির তারিখ উল্লেখ করুন।",
+      nomineeNameRequired: "নমিনীর নাম কমপক্ষে ২ অক্ষরের হতে হবে।",
+      nomineeRelRequired: "সম্পর্ক উল্লেখ করুন।",
+      nomineePhoneRequired: "নমিনীর সঠিক ১১ ডিজিটের মোবাইল নম্বর লিখুন।",
+      nomineeAddressRequired: "নমিনীর ঠিকানা কমপক্ষে ৫ অক্ষরের হতে হবে।",
+      nomineeEmergencyRequired: "জরুরি যোগাযোগের নম্বর বা বিবরণ দিন।",
+      serverError: "সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।",
     },
     EN: {
+      formTitle: "New Member Registration Form",
+      editTitle: "Update Member Details",
       memberHeader: "Member Details",
       nomineeHeader: "Nominee Details",
       name: "Member Name",
@@ -73,29 +144,84 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       submitCreate: "Complete Member Registration",
       submitEdit: "Update Member Details",
       saving: "Saving...",
-      successCreate: "Member successfully registered!",
-      successEdit: "Details successfully updated!"
+      // Validation messages
+      nameRequired: "Member name must be at least 2 characters.",
+      phoneRequired: "Enter a valid 11-digit phone number (01xxxxxxxxx).",
+      phoneConflict: "A member with this phone number already exists.",
+      emailInvalid: "Enter a valid email address.",
+      emailConflict: "This email address is already in use.",
+      addressRequired: "Address must be at least 5 characters.",
+      joinDateRequired: "Please enter the joining date.",
+      nomineeNameRequired: "Nominee name must be at least 2 characters.",
+      nomineeRelRequired: "Please specify the relationship.",
+      nomineePhoneRequired: "Enter a valid 11-digit nominee phone number.",
+      nomineeAddressRequired: "Nominee address must be at least 5 characters.",
+      nomineeEmergencyRequired: "Emergency contact info is required.",
+      serverError: "Server error. Please try again.",
     }
+  };
+
+  const L = labels[lang];
+
+  // ── Client-side validation ──────────────────────────────────────────────────
+  const validate = (): boolean => {
+    const errors: FieldErrors = {};
+
+    if (!name || name.trim().length < 2) errors.name = L.nameRequired;
+    if (!bdPhoneRegex.test(phone)) errors.phone = L.phoneRequired;
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = L.emailInvalid;
+    if (!address || address.trim().length < 5) errors.address = L.addressRequired;
+    if (!joinDate) errors.joinDate = L.joinDateRequired;
+
+    if (!nomineeName || nomineeName.trim().length < 2) errors.nomineeName = L.nomineeNameRequired;
+    if (!nomineeRelationship || nomineeRelationship.trim().length < 2) errors.nomineeRelationship = L.nomineeRelRequired;
+    if (!bdPhoneRegex.test(nomineePhone)) errors.nomineePhone = L.nomineePhoneRequired;
+    if (!nomineeAddress || nomineeAddress.trim().length < 5) errors.nomineeAddress = L.nomineeAddressRequired;
+    if (!nomineeEmergency || nomineeEmergency.trim().length < 5) errors.nomineeEmergency = L.nomineeEmergencyRequired;
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // ── Map server error codes → field-level messages ───────────────────────────
+  const handleServerError = (code: string, message: string) => {
+    // Specific conflict errors → highlight the right field
+    if (code === "CONFLICT_ERROR") {
+      if (message.toLowerCase().includes("মোবাইল") || message.toLowerCase().includes("phone")) {
+        setFieldErrors({ phone: L.phoneConflict });
+        return;
+      }
+      if (message.toLowerCase().includes("ইমেইল") || message.toLowerCase().includes("email")) {
+        setFieldErrors({ email: L.emailConflict });
+        return;
+      }
+    }
+    // Zod validation from server → show as top-level banner (already translated by schema)
+    setServerError(message);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
+    setFieldErrors({});
+
+    if (!validate()) return; // Stop if client errors found
+
     setLoading(true);
-    setError(null);
 
     const payload = {
-      name,
+      name: name.trim(),
       phone,
       email: email || undefined,
-      address,
+      address: address.trim(),
       joinDate,
       status,
       nominee: {
-        name: nomineeName,
-        relationship: nomineeRelationship,
+        name: nomineeName.trim(),
+        relationship: nomineeRelationship.trim(),
         phone: nomineePhone,
-        address: nomineeAddress,
-        emergencyContact: nomineeEmergency
+        address: nomineeAddress.trim(),
+        emergencyContact: nomineeEmergency.trim()
       }
     };
 
@@ -111,218 +237,178 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        setError(result.message || (lang === "BN" ? "সংরক্ষণ করতে ব্যর্থ হয়েছে।" : "Save failed."));
+        handleServerError(result.code || "", result.message || L.serverError);
       } else {
         router.push(isEditMode ? `/dashboard/members/${memberId}` : "/dashboard/members");
         router.refresh();
       }
-    } catch (err) {
-      setError(lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Internal Server Error");
+    } catch {
+      setServerError(L.serverError);
     } finally {
       setLoading(false);
     }
   };
 
+
+
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-4xl bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-zinc-800 transition-all">
-      {/* Header Language switch */}
-      <div className="flex justify-between items-center mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800">
+      {/* Header */}
+      <div className="mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-          {isEditMode ? labels[lang].submitEdit : "নতুন সদস্য ভর্তি ফর্ম"}
+          {isEditMode ? L.editTitle : L.formTitle}
         </h2>
-        <button
-          type="button"
-          onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-          className="px-3 py-1 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 rounded-full border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
-        >
-          {lang === "BN" ? "English" : "বাংলা"}
-        </button>
       </div>
 
-      {error && (
-        <div className="p-3 mb-6 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/50">
-          ⚠️ {error}
+      {/* Server-level error banner */}
+      {serverError && (
+        <div className="p-3 mb-6 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/50 flex items-start gap-2">
+          <span className="mt-0.5">⚠️</span>
+          <span>{serverError}</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Member details column */}
+        {/* ── Member Details ── */}
         <div className="space-y-4">
           <h3 className="text-md font-bold text-emerald-600 dark:text-emerald-400 border-b pb-2 border-emerald-100 dark:border-emerald-900/30">
-            {labels[lang].memberHeader}
+            {L.memberHeader}
           </h3>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].name} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.name} required error={fieldErrors.name}>
             <input
               type="text"
-              required
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              onChange={(e) => { setName(e.target.value); setFieldErrors(f => ({ ...f, name: undefined })); }}
+              className={inputClass(fieldErrors.name)}
+              placeholder={lang === "BN" ? "সম্পূর্ণ নাম লিখুন" : "Full name"}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].phone} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.phone} required error={fieldErrors.phone}>
             <input
               type="text"
-              required
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => { setPhone(e.target.value); setFieldErrors(f => ({ ...f, phone: undefined })); }}
               placeholder="01xxxxxxxxx"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className={inputClass(fieldErrors.phone)}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].email}
-            </label>
+          <Field label={L.email} error={fieldErrors.email}>
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              onChange={(e) => { setEmail(e.target.value); setFieldErrors(f => ({ ...f, email: undefined })); }}
+              placeholder={lang === "BN" ? "name@example.com (ঐচ্ছিক)" : "name@example.com (optional)"}
+              className={inputClass(fieldErrors.email)}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].address} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.address} required error={fieldErrors.address}>
             <textarea
-              required
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white h-20"
+              onChange={(e) => { setAddress(e.target.value); setFieldErrors(f => ({ ...f, address: undefined })); }}
+              className={`${inputClass(fieldErrors.address)} h-20 resize-none`}
+              placeholder={lang === "BN" ? "বিস্তারিত ঠিকানা লিখুন" : "Full mailing address"}
             />
-          </div>
+          </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-                {labels[lang].joinDate} <span className="text-red-500">*</span>
-              </label>
+            <Field label={L.joinDate} required error={fieldErrors.joinDate}>
               <input
                 type="date"
-                required
                 value={joinDate}
-                onChange={(e) => setJoinDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                onChange={(e) => { setJoinDate(e.target.value); setFieldErrors(f => ({ ...f, joinDate: undefined })); }}
+                className={inputClass(fieldErrors.joinDate)}
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-                {labels[lang].status}
-              </label>
+            </Field>
+            <Field label={L.status}>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className={inputClass()}
               >
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-                <option value="SUSPENDED">Suspended</option>
+                <option value="ACTIVE">{lang === "BN" ? "সক্রিয়" : "Active"}</option>
+                <option value="INACTIVE">{lang === "BN" ? "নিষ্ক্রিয়" : "Inactive"}</option>
+                <option value="SUSPENDED">{lang === "BN" ? "স্থগিত" : "Suspended"}</option>
               </select>
-            </div>
+            </Field>
           </div>
 
           {!isEditMode && (
             <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg flex justify-between items-center text-sm font-semibold text-emerald-800 dark:text-emerald-300">
-              <span>{labels[lang].admissionFee}</span>
+              <span>{L.admissionFee}</span>
               <span>৫,০০০ BDT</span>
             </div>
           )}
         </div>
 
-        {/* Nominee details column */}
+        {/* ── Nominee Details ── */}
         <div className="space-y-4">
           <h3 className="text-md font-bold text-emerald-600 dark:text-emerald-400 border-b pb-2 border-emerald-100 dark:border-emerald-900/30">
-            {labels[lang].nomineeHeader}
+            {L.nomineeHeader}
           </h3>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].nomineeName} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.nomineeName} required error={fieldErrors.nomineeName}>
             <input
               type="text"
-              required
               value={nomineeName}
-              onChange={(e) => setNomineeName(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              onChange={(e) => { setNomineeName(e.target.value); setFieldErrors(f => ({ ...f, nomineeName: undefined })); }}
+              className={inputClass(fieldErrors.nomineeName)}
+              placeholder={lang === "BN" ? "নমিনীর সম্পূর্ণ নাম" : "Full nominee name"}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].nomineeRel} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.nomineeRel} required error={fieldErrors.nomineeRelationship}>
             <input
               type="text"
-              required
               value={nomineeRelationship}
-              onChange={(e) => setNomineeRelationship(e.target.value)}
-              placeholder="যেমন: স্ত্রী, পুত্র, ভাই"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              onChange={(e) => { setNomineeRelationship(e.target.value); setFieldErrors(f => ({ ...f, nomineeRelationship: undefined })); }}
+              placeholder={lang === "BN" ? "যেমন: স্ত্রী, পুত্র, ভাই" : "e.g. Wife, Son, Brother"}
+              className={inputClass(fieldErrors.nomineeRelationship)}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].nomineePhone} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.nomineePhone} required error={fieldErrors.nomineePhone}>
             <input
               type="text"
-              required
               value={nomineePhone}
-              onChange={(e) => setNomineePhone(e.target.value)}
+              onChange={(e) => { setNomineePhone(e.target.value); setFieldErrors(f => ({ ...f, nomineePhone: undefined })); }}
               placeholder="01xxxxxxxxx"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className={inputClass(fieldErrors.nomineePhone)}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].nomineeAddress} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.nomineeAddress} required error={fieldErrors.nomineeAddress}>
             <textarea
-              required
               value={nomineeAddress}
-              onChange={(e) => setNomineeAddress(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white h-16"
+              onChange={(e) => { setNomineeAddress(e.target.value); setFieldErrors(f => ({ ...f, nomineeAddress: undefined })); }}
+              className={`${inputClass(fieldErrors.nomineeAddress)} h-16 resize-none`}
+              placeholder={lang === "BN" ? "নমিনীর বিস্তারিত ঠিকানা" : "Nominee's full address"}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-              {labels[lang].nomineeEmergency} <span className="text-red-500">*</span>
-            </label>
+          <Field label={L.nomineeEmergency} required error={fieldErrors.nomineeEmergency}>
             <input
               type="text"
-              required
               value={nomineeEmergency}
-              onChange={(e) => setNomineeEmergency(e.target.value)}
-              placeholder="জরুরি ফোন নম্বর"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              onChange={(e) => { setNomineeEmergency(e.target.value); setFieldErrors(f => ({ ...f, nomineeEmergency: undefined })); }}
+              placeholder={lang === "BN" ? "জরুরি ফোন নম্বর বা যোগাযোগের তথ্য" : "Emergency phone or contact details"}
+              className={inputClass(fieldErrors.nomineeEmergency)}
             />
-          </div>
+          </Field>
         </div>
       </div>
 
+      {/* Submit */}
       <div className="mt-8 pt-4 border-t border-gray-100 dark:border-zinc-800 flex justify-end">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition-all duration-200 disabled:opacity-50"
+          className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? labels[lang].saving : (isEditMode ? labels[lang].submitEdit : labels[lang].submitCreate)}
+          {loading ? L.saving : (isEditMode ? L.submitEdit : L.submitCreate)}
         </button>
       </div>
     </form>
