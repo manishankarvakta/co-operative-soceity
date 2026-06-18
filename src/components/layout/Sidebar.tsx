@@ -2,19 +2,53 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: "home" },
-  { name: "Members", href: "/dashboard/members", icon: "users" },
-  { name: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
-  { name: "Shares", href: "/dashboard/shares", icon: "pie-chart" },
-  { name: "Expenses", href: "/dashboard/expenses", icon: "credit-card" },
-  { name: "Accounting", href: "/dashboard/accounting", icon: "book-open" },
-  { name: "Bank", href: "/dashboard/bank", icon: "building" },
-  { name: "Projects", href: "/dashboard/projects", icon: "briefcase" },
-  { name: "Reports", href: "/dashboard/reports", icon: "file-text" },
-  { name: "Backups", href: "/dashboard/backups", icon: "database" },
+  { key: "Dashboard", href: "/dashboard", icon: "home" },
+  { key: "Members", href: "/dashboard/members", icon: "users" },
+  { key: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
+  { key: "Shares", href: "/dashboard/shares", icon: "pie-chart" },
+  { key: "Expenses", href: "/dashboard/expenses", icon: "credit-card" },
+  { key: "Accounting", href: "/dashboard/accounting", icon: "book-open" },
+  { key: "Bank", href: "/dashboard/bank", icon: "building" },
+  { key: "Projects", href: "/dashboard/projects", icon: "briefcase" },
+  { key: "Reports", href: "/dashboard/reports", icon: "file-text" },
+  { key: "Backups", href: "/dashboard/backups", icon: "database" },
 ];
+
+const translations: Record<"BN" | "EN", Record<string, string>> = {
+  BN: {
+    Dashboard: "ড্যাশবোর্ড",
+    Members: "সদস্যবৃন্দ",
+    Deposits: "আমানত/জমা",
+    Shares: "শেয়ার",
+    Expenses: "খরচসমূহ",
+    Accounting: "হিসাবরক্ষণ",
+    Bank: "ব্যাংক হিসাব",
+    Projects: "প্রজেক্টসমূহ",
+    Reports: "রিপোর্ট ও বিবরণী",
+    Backups: "ব্যাকআপ ফাইল",
+    logout: "লগ আউট",
+    activeUser: "সক্রিয় ব্যবহারকারী",
+    signedIn: "লগইন করা আছে"
+  },
+  EN: {
+    Dashboard: "Dashboard",
+    Members: "Members",
+    Deposits: "Deposits",
+    Shares: "Shares",
+    Expenses: "Expenses",
+    Accounting: "Accounting",
+    Bank: "Bank",
+    Projects: "Projects",
+    Reports: "Reports",
+    Backups: "Backups",
+    logout: "Log out",
+    activeUser: "Active User",
+    signedIn: "Signed in"
+  }
+};
 
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 
@@ -89,6 +123,7 @@ const getIcon = (iconName: string) => {
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { lang } = useLanguage();
 
   const user = session?.user;
   const userInitials = user?.name
@@ -96,6 +131,8 @@ export default function Sidebar() {
     : user?.email
       ? user.email.substring(0, 2).toUpperCase()
       : "US";
+
+  const t = translations[lang];
 
   return (
     <div className="flex h-screen w-64 flex-col bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 shadow-sm fixed z-40 overflow-y-auto">
@@ -114,9 +151,10 @@ export default function Sidebar() {
       <nav className="flex flex-1 flex-col px-4 py-6 space-y-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
+          const displayName = t[item.key] || item.key;
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all duration-200 ${isActive
                   ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 shadow-sm"
@@ -124,7 +162,7 @@ export default function Sidebar() {
                 }`}
             >
               {getIcon(item.icon)}
-              {item.name}
+              {displayName}
             </Link>
           );
         })}
@@ -139,17 +177,17 @@ export default function Sidebar() {
             </div>
             <div className="truncate min-w-0">
               <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                {user?.name || "Active User"}
+                {user?.name || t.activeUser}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {user?.email || "Signed in"}
+                {user?.email || t.signedIn}
               </p>
             </div>
           </div>
           <button
             onClick={() => nextAuthSignOut({ callbackUrl: "/login" })}
             className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-900 shrink-0 transition-colors"
-            title="Log out"
+            title={t.logout}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
