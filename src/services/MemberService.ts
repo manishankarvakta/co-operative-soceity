@@ -48,6 +48,8 @@ export class MemberService {
         emergencyContact: string;
       };
       password?: string;
+      paymentMode?: "CASH" | "BANK";
+      bankAccountId?: string;
     },
     actorId?: string | null
   ) {
@@ -131,7 +133,8 @@ export class MemberService {
             actorId || user.id,
             {
               memberId: member.id,
-              paymentMode: "CASH",
+              paymentMode: (data.paymentMode as any) || "CASH",
+              bankAccountId: data.bankAccountId,
               remarks: "স্বয়ংক্রিয় ভর্তি ফি জমাকরণ",
               items: [
                 {

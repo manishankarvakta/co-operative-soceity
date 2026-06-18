@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/providers/LanguageProvider";
 
@@ -21,6 +21,7 @@ interface FieldErrors {
   nomineePhone?: string;
   nomineeAddress?: string;
   nomineeEmergency?: string;
+  bankAccount?: string;
 }
 
 const bdPhoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
@@ -86,7 +87,26 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
   const [nomineeAddress, setNomineeAddress] = useState(initialData?.nominee?.address || "");
   const [nomineeEmergency, setNomineeEmergency] = useState(initialData?.nominee?.emergencyContact || "");
 
+  // Payment states (Only for New Member)
+  const [paymentMode, setPaymentMode] = useState<"CASH" | "BANK">("CASH");
+  const [bankAccountId, setBankAccountId] = useState("");
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+
   const isEditMode = !!initialData;
+
+  useEffect(() => {
+    if (!isEditMode) {
+      fetch("/api/bank/accounts")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            // Filter out Cash on Hand from bank accounts dropdown
+            setBankAccounts(data.filter((acc) => acc.accountNumber !== "CASH-001" && acc.name !== "Cash on Hand"));
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isEditMode]);
 
   const labels = {
     BN: {
@@ -109,6 +129,10 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       submitCreate: "সদস্য নিবন্ধন সম্পন্ন করুন",
       submitEdit: "তথ্য আপডেট করুন",
       saving: "সংরক্ষণ হচ্ছে...",
+      paymentMode: "পেমেন্টের মাধ্যম",
+      cash: "ক্যাশ",
+      bank: "ব্যাংক",
+      selectBank: "ব্যাংক অ্যাকাউন্ট নির্বাচন করুন",
       // Validation messages
       nameRequired: "সদস্যের নাম কমপক্ষে ২ অক্ষরের হতে হবে।",
       phoneRequired: "সঠিক ১১ ডিজিটের মোবাইল নম্বর লিখুন (01xxxxxxxxx)।",
@@ -144,6 +168,10 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       submitCreate: "Complete Member Registration",
       submitEdit: "Update Member Details",
       saving: "Saving...",
+      paymentMode: "Payment Mode",
+      cash: "Cash",
+      bank: "Bank",
+      selectBank: "Select Bank Account",
       // Validation messages
       nameRequired: "Member name must be at least 2 characters.",
       phoneRequired: "Enter a valid 11-digit phone number (01xxxxxxxxx).",
@@ -178,6 +206,10 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
     if (!bdPhoneRegex.test(nomineePhone)) errors.nomineePhone = L.nomineePhoneRequired;
     if (!nomineeAddress || nomineeAddress.trim().length < 5) errors.nomineeAddress = L.nomineeAddressRequired;
     if (!nomineeEmergency || nomineeEmergency.trim().length < 5) errors.nomineeEmergency = L.nomineeEmergencyRequired;
+
+    if (!isEditMode && paymentMode === "BANK" && !bankAccountId) {
+      errors.bankAccount = lang === "BN" ? "দয়া করে ব্যাংক অ্যাকাউন্ট নির্বাচন করুন।" : "Please select a bank account.";
+    }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -222,7 +254,11 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
         phone: nomineePhone,
         address: nomineeAddress.trim(),
         emergencyContact: nomineeEmergency.trim()
-      }
+      },
+      ...(!isEditMode && {
+        paymentMode,
+        bankAccountId: paymentMode === "BANK" ? bankAccountId : undefined
+      })
     };
 
     try {
@@ -337,9 +373,47 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
           </div>
 
           {!isEditMode && (
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg flex justify-between items-center text-sm font-semibold text-emerald-800 dark:text-emerald-300">
-              <span>{L.admissionFee}</span>
-              <span>৫,০০০ BDT</span>
+            <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg space-y-4">
+              <div className="flex justify-between items-center text-sm font-semibold text-emerald-800 dark:text-emerald-300 border-b border-emerald-200/50 pb-2">
+                <span>{L.admissionFee}</span>
+                <span>৫,০০০ BDT</span>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field label={L.paymentMode}>
+                  <select
+                    value={paymentMode}
+                    onChange={(e) => {
+                      setPaymentMode(e.target.value as "CASH" | "BANK");
+                      setFieldErrors(f => ({ ...f, bankAccount: undefined }));
+                    }}
+                    className={inputClass()}
+                  >
+                    <option value="CASH">{L.cash}</option>
+                    <option value="BANK">{L.bank}</option>
+                  </select>
+                </Field>
+
+                {paymentMode === "BANK" && (
+                  <Field label={L.selectBank} required error={fieldErrors.bankAccount}>
+                    <select
+                      value={bankAccountId}
+                      onChange={(e) => {
+                        setBankAccountId(e.target.value);
+                        setFieldErrors(f => ({ ...f, bankAccount: undefined }));
+                      }}
+                      className={inputClass(fieldErrors.bankAccount)}
+                    >
+                      <option value="">{lang === "BN" ? "নির্বাচন করুন..." : "Select..."}</option>
+                      {bankAccounts.map((acc) => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name} ({acc.accountNumber})
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                )}
+              </div>
             </div>
           )}
         </div>

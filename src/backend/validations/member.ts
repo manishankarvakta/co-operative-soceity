@@ -18,7 +18,9 @@ export const createMemberSchema = z.object({
   joinDate: z.string().refine((val) => !isNaN(Date.parse(val)), "ভর্তির সঠিক তারিখ উল্লেখ করুন।"),
   status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).default("ACTIVE"),
   nominee: nomineeSchema,
-  password: z.string().min(6, "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।").optional()
+  password: z.string().min(6, "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।").optional(),
+  paymentMode: z.enum(["CASH", "BANK"]).optional(),
+  bankAccountId: z.string().optional()
 }).strict();
 
 export const updateMemberSchema = z.object({

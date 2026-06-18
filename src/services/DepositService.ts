@@ -41,6 +41,7 @@ export class DepositService {
     data: {
       memberId: string;
       paymentMode: PaymentMode;
+      bankAccountId?: string;
       receiptId?: string | null;
       remarks?: string | null;
       items: Array<{
@@ -129,10 +130,13 @@ export class DepositService {
           }
         });
       } else {
-        // Increment the first non-cash bank account balance.
-        const bankAccount = await transactionClient.bankAccount.findFirst({
-          where: { NOT: { name: "Cash on Hand" }, deletedAt: null }
-        });
+        // Increment the specific bank account if provided, else the first non-cash account.
+        const bankAccount = data.bankAccountId
+          ? await transactionClient.bankAccount.findUnique({ where: { id: data.bankAccountId } })
+          : await transactionClient.bankAccount.findFirst({
+              where: { NOT: { name: "Cash on Hand" }, deletedAt: null }
+            });
+        
         if (bankAccount) {
           await transactionClient.bankAccount.update({
             where: { id: bankAccount.id },
