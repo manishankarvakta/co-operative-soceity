@@ -111,12 +111,12 @@ export class DashboardService {
     const totalDepositsPaisa = depositAggregate._sum.amount || 0;
     const totalExpensesPaisa = expenseAggregate._sum.amount || 0;
 
-    const cashAccount = bankAccountBalances.find((acc) => acc.name === "Cash on Hand");
+    const cashAccount = bankAccountBalances.find((acc) => acc.accountNumber === "CASH-001" || acc.name === "Cash on Hand");
     const cashBalancePaisa = cashAccount ? cashAccount.balance : 0;
 
     // Bank accounts excluding the cash on hand
     const bankBalancePaisa = bankAccountBalances
-      .filter((acc) => acc.name !== "Cash on Hand")
+      .filter((acc) => acc.accountNumber !== "CASH-001" && acc.name !== "Cash on Hand")
       .reduce((sum, acc) => sum + acc.balance, 0);
 
     const stats = {

@@ -42,7 +42,7 @@ export class BankService {
 
       // Post initial balance journal entries if initialBalance > 0
       if (data.initialBalance > 0) {
-        const isCash = data.name === "Cash on Hand";
+        const isCash = data.accountNumber === "CASH-001" || data.name === "Cash on Hand";
         const assetCode = isCash ? "1000" : "1010";
 
         await AccountingService.postJournalEntry(tx, {
@@ -243,7 +243,7 @@ export class BankService {
         });
 
         // 2. Auto-post balanced double entry journal lines
-        const isCash = updatedTx.bankAccount.name === "Cash on Hand";
+        const isCash = updatedTx.bankAccount.accountNumber === "CASH-001" || updatedTx.bankAccount.name === "Cash on Hand";
         const assetCode = isCash ? "1000" : "1010";
 
         if (updatedTx.type === TransactionType.CREDIT) {
@@ -291,7 +291,7 @@ export class BankService {
                 data: { balance: { increment: sisterTx.amount } }
               });
 
-              const destIsCash = sisterTx.bankAccount.name === "Cash on Hand";
+              const destIsCash = sisterTx.bankAccount.accountNumber === "CASH-001" || sisterTx.bankAccount.name === "Cash on Hand";
               const destAssetCode = destIsCash ? "1000" : "1010";
 
               // Post double entry transfer journal

@@ -100,11 +100,11 @@ export class ExpenseService {
       let bankAccount = null;
       if (paymentMode === "CASH") {
         bankAccount = await tx.bankAccount.findFirst({
-          where: { name: "Cash on Hand" }
+          where: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }
         });
       } else {
         bankAccount = await tx.bankAccount.findFirst({
-          where: { NOT: { name: "Cash on Hand" } }
+          where: { NOT: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }, deletedAt: null }
         });
       }
 

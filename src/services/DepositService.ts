@@ -117,23 +117,22 @@ export class DepositService {
 
       // 3. Update Balance Ledgers
       if (data.paymentMode === "CASH") {
-        // Increment primary Cash balance account (represented as BankAccount with name 'Cash on Hand')
-        const cashAccount = await transactionClient.bankAccount.findFirst({
-          where: { name: "Cash on Hand" }
+        // Auto-create "Cash on Hand" account if it doesn't exist, then increment balance.
+        // Uses accountNumber as the unique key (accountNumber has @unique in schema).
+        await transactionClient.bankAccount.upsert({
+          where: { accountNumber: "CASH-001" },
+          update: { balance: { increment: totalPaisa } },
+          create: {
+            name: "Cash on Hand",
+            accountNumber: "CASH-001",
+            balance: totalPaisa
+          }
         });
-
-        if (cashAccount) {
-          await transactionClient.bankAccount.update({
-            where: { id: cashAccount.id },
-            data: { balance: { increment: totalPaisa } }
-          });
-        }
       } else {
-        // Increment Bank balance
+        // Increment the first non-cash bank account balance.
         const bankAccount = await transactionClient.bankAccount.findFirst({
-          where: { NOT: { name: "Cash on Hand" } }
+          where: { NOT: { name: "Cash on Hand" }, deletedAt: null }
         });
-
         if (bankAccount) {
           await transactionClient.bankAccount.update({
             where: { id: bankAccount.id },
