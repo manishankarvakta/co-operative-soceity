@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import DepositReceipt from "@/components/widgets/DepositReceipt";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface DepositReceiptPageProps {
   params: Promise<{
@@ -11,9 +12,25 @@ interface DepositReceiptPageProps {
 
 export default function DepositReceiptPage({ params }: DepositReceiptPageProps) {
   const { id } = use(params);
+  const { lang } = useLanguage();
   const [deposit, setDeposit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const messages = {
+    BN: {
+      loading: "লোডিং হচ্ছে...",
+      notFound: "জমার বিবরণী পাওয়া যায়নি।",
+      fetchError: "জমার তথ্য লোড করতে ব্যর্থ হয়েছে।",
+      serverError: "সার্ভারে সমস্যা হয়েছে।"
+    },
+    EN: {
+      loading: "Loading...",
+      notFound: "Deposit receipt not found.",
+      fetchError: "Failed to load deposit information.",
+      serverError: "A server error occurred."
+    }
+  };
 
   useEffect(() => {
     const fetchDeposit = async () => {
@@ -23,12 +40,12 @@ export default function DepositReceiptPage({ params }: DepositReceiptPageProps) 
         const response = await fetch(`/api/deposits/${id}`);
         const data = await response.json();
         if (!response.ok || (data.success === false)) {
-          setError(data.message || "জমার তথ্য লোড করতে ব্যর্থ হয়েছে।");
+          setError(data.message || messages[lang].fetchError);
         } else {
           setDeposit(data);
         }
       } catch (err) {
-        setError("সার্ভারে সমস্যা হয়েছে।");
+        setError(messages[lang].serverError);
       } finally {
         setLoading(false);
       }
@@ -40,7 +57,7 @@ export default function DepositReceiptPage({ params }: DepositReceiptPageProps) 
   if (loading) {
     return (
       <div className="p-8 text-center text-gray-500 font-semibold dark:text-gray-400">
-        লোডিং হচ্ছে (Loading)...
+        {messages[lang].loading}
       </div>
     );
   }
@@ -48,7 +65,7 @@ export default function DepositReceiptPage({ params }: DepositReceiptPageProps) 
   if (error || !deposit) {
     return (
       <div className="p-8 text-center text-red-500 font-bold">
-        ⚠️ {error || "জমার বিবরণী পাওয়া যায়নি।"}
+        ⚠️ {error || messages[lang].notFound}
       </div>
     );
   }

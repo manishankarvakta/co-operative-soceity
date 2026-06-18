@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface DepositReceiptProps {
   deposit: {
@@ -28,7 +28,7 @@ interface DepositReceiptProps {
 }
 
 export default function DepositReceipt({ deposit }: DepositReceiptProps) {
-  const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const { lang } = useLanguage();
 
   // Parse receipt code and actual remarks
   const remarksString = deposit.remarks || "";
@@ -57,7 +57,7 @@ export default function DepositReceipt({ deposit }: DepositReceiptProps) {
 
   const labels = {
     BN: {
-      societyName: "উত্থান বহুমুখী সমবায় সমিতি লিমিটেড",
+      societyName: "উত্থান বহুমুখী সমবায় সমিতি লিমিটেড",
       societyAddress: "ঢাকা, বাংলাদেশ",
       receiptTitle: "অর্থ প্রাপ্তি রসিদ (অফিস কপি)",
       receiptNo: "রসিদ নং",
@@ -70,15 +70,14 @@ export default function DepositReceipt({ deposit }: DepositReceiptProps) {
       sl: "ক্রমিক",
       depositType: "জমার খাত",
       period: "মাস / সপ্তাহ",
-      shares: "শেয়ার সংখ্যা",
+      shares: "শেয়ার সংখ্যা",
       amount: "পরিমাণ (BDT)",
       total: "সর্বমোট পরিমাণ",
-      totalShares: "মোট শেয়ার অর্জিত",
+      totalShares: "মোট শেয়ার অর্জিত",
       remarks: "বিশেষ মন্তব্য",
-      officerSig: "আদায়কারী কর্মকর্তার স্বাক্ষর",
+      officerSig: "আদায়কারী কর্মকর্তার স্বাক্ষর",
       memberSig: "গ্রাহকের স্বাক্ষর",
       printBtn: "রসিদ প্রিন্ট করুন",
-      backBtn: "তালিকায় ফিরে যান",
       cash: "ক্যাশ",
       bank: "ব্যাংক"
     },
@@ -104,169 +103,155 @@ export default function DepositReceipt({ deposit }: DepositReceiptProps) {
       officerSig: "Authorized Signature",
       memberSig: "Member Signature",
       printBtn: "Print Receipt",
-      backBtn: "Back to List",
       cash: "Cash",
       bank: "Bank"
     }
   };
 
-  return (
-    <div className="w-full max-w-3xl mx-auto p-6 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-md transition-all print:border-0 print:shadow-none print:p-0">
-      {/* Control Actions (Hidden on Print) */}
-      <div className="flex justify-between items-center mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800 print:hidden">
-        <button
-          type="button"
-          onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-          className="px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
-        >
-          {lang === "BN" ? "Switch to English" : "বাংলায় দেখুন"}
-        </button>
-        <div className="flex gap-2">
-          <button
-            onClick={handlePrint}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
-          >
-            🖨️ {labels[lang].printBtn}
-          </button>
+  const L = labels[lang];
+
+  // Inline styles for the print portal (no Tailwind classes available inside portal)
+  const receiptHtml = (
+    <div
+      id="receipt-printable"
+      style={{
+        fontFamily: "'Segoe UI', Arial, sans-serif",
+        color: "#111",
+        background: "#fff",
+        padding: "24px",
+        maxWidth: "700px",
+        margin: "0 auto"
+      }}
+    >
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <h1 style={{ fontSize: "20px", fontWeight: 900, margin: "0 0 4px" }}>{L.societyName}</h1>
+        <p style={{ fontSize: "11px", color: "#666", textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 8px" }}>
+          {L.societyAddress}
+        </p>
+        <div style={{ display: "inline-block", border: "1px solid #ddd", borderRadius: "20px", padding: "4px 16px", background: "#f5f5f5" }}>
+          <span style={{ fontSize: "13px", fontWeight: 700 }}>{L.receiptTitle}</span>
         </div>
       </div>
 
-      {/* Printable Area Starts Here */}
-      <div className="p-8 border-4 border-double border-gray-300 rounded-lg dark:border-zinc-700 bg-white dark:bg-zinc-900 print:border-0 print:p-0">
-        {/* Header Block */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-black text-gray-800 dark:text-white mb-1 tracking-tight">
-            {labels[lang].societyName}
-          </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 uppercase font-semibold tracking-wider">
-            {labels[lang].societyAddress}
-          </p>
-          <div className="inline-block px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full border border-gray-200 dark:border-zinc-700">
-            <span className="text-sm font-bold text-gray-700 dark:text-zinc-300">
-              {labels[lang].receiptTitle}
-            </span>
-          </div>
-        </div>
+      {/* Divider */}
+      <hr style={{ borderTop: "2px solid #222", marginBottom: "12px" }} />
 
-        {/* Info Rows */}
-        <div className="grid grid-cols-2 gap-4 mb-6 text-sm border-b pb-4 border-gray-150 dark:border-zinc-800">
-          <div className="space-y-1">
-            <div>
-              <span className="font-semibold text-gray-500 dark:text-gray-400">{labels[lang].receiptNo}:</span>{" "}
-              <strong className="font-mono text-emerald-700 dark:text-emerald-400">{receiptCode}</strong>
-            </div>
-            <div>
-              <span className="font-semibold text-gray-500 dark:text-gray-400">{labels[lang].date}:</span>{" "}
-              <strong className="text-gray-800 dark:text-white">
-                {new Date(deposit.createdAt).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric"
-                })}
-              </strong>
-            </div>
-            <div>
-              <span className="font-semibold text-gray-500 dark:text-gray-400">{labels[lang].paymentMode}:</span>{" "}
-              <strong className="text-gray-850 dark:text-zinc-200">
-                {deposit.paymentMode === "CASH" ? labels[lang].cash : labels[lang].bank}
-              </strong>
-            </div>
-          </div>
-          <div className="space-y-1 text-right">
-            <div>
-              <span className="font-semibold text-gray-500 dark:text-gray-400">{labels[lang].memberName}:</span>{" "}
-              <strong className="text-gray-850 dark:text-zinc-200">{deposit.member.name}</strong>
-            </div>
-            <div>
-              <span className="font-semibold text-gray-500 dark:text-gray-400">{labels[lang].memberCode}:</span>{" "}
-              <strong className="font-mono text-gray-850 dark:text-zinc-200">{deposit.member.memberCode}</strong>
-            </div>
-            <div>
-              <span className="font-semibold text-gray-500 dark:text-gray-400">{labels[lang].phone}:</span>{" "}
-              <span className="text-gray-800 dark:text-white font-mono">{deposit.member.phone}</span>
-            </div>
-          </div>
+      {/* Info Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "13px", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #ddd" }}>
+        <div>
+          <span style={{ color: "#555" }}>{L.receiptNo}: </span>
+          <strong style={{ color: "#059669", fontFamily: "monospace" }}>{receiptCode}</strong>
         </div>
+        <div style={{ textAlign: "right" }}>
+          <span style={{ color: "#555" }}>{L.memberName}: </span>
+          <strong>{deposit.member.name}</strong>
+        </div>
+        <div>
+          <span style={{ color: "#555" }}>{L.date}: </span>
+          <strong>
+            {new Date(deposit.createdAt).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US", {
+              year: "numeric", month: "long", day: "numeric"
+            })}
+          </strong>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <span style={{ color: "#555" }}>{L.memberCode}: </span>
+          <strong style={{ fontFamily: "monospace" }}>{deposit.member.memberCode}</strong>
+        </div>
+        <div>
+          <span style={{ color: "#555" }}>{L.paymentMode}: </span>
+          <strong>{deposit.paymentMode === "CASH" ? L.cash : L.bank}</strong>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <span style={{ color: "#555" }}>{L.phone}: </span>
+          <strong style={{ fontFamily: "monospace" }}>{deposit.member.phone}</strong>
+        </div>
+      </div>
 
-        {/* Items Breakdown Table */}
-        <table className="w-full text-left text-sm mb-6 border border-gray-300 dark:border-zinc-700 border-collapse">
-          <thead>
-            <tr className="bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border-b border-gray-300 dark:border-zinc-700 font-bold">
-              <th className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 w-12 text-center">{labels[lang].sl}</th>
-              <th className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700">{labels[lang].depositType}</th>
-              <th className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700">{labels[lang].period}</th>
-              <th className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 text-center">{labels[lang].shares}</th>
-              <th className="px-3 py-2 text-right">{labels[lang].amount}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-zinc-700">
-            {deposit.items.map((item, index) => (
-              <tr key={item.id} className="text-gray-700 dark:text-zinc-300">
-                <td className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 text-center font-mono">
-                  {lang === "BN" ? (index + 1).toLocaleString("bn-BD") : index + 1}
-                </td>
-                <td className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 font-semibold">
-                  {getDepositTypeName(item.type, lang)}
-                </td>
-                <td className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 text-gray-600 dark:text-zinc-400">
-                  {item.periodDetails}
-                </td>
-                <td className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 text-center font-mono">
-                  {parseFloat(item.sharesCount) > 0 ? (lang === "BN" ? parseFloat(item.sharesCount).toLocaleString("bn-BD") : parseFloat(item.sharesCount)) : "-"}
-                </td>
-                <td className="px-3 py-2 text-right font-mono font-semibold">
-                  {(item.amount / 100).toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="bg-gray-50 dark:bg-zinc-800 border-t border-gray-300 dark:border-zinc-700 font-bold text-gray-800 dark:text-white">
-              <td colSpan={3} className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 text-right">
-                {labels[lang].total}:
+      {/* Items Table */}
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", marginBottom: "12px" }}>
+        <thead>
+          <tr style={{ background: "#f0f0f0", fontWeight: 700, borderBottom: "2px solid #333" }}>
+            <th style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "center", width: "40px" }}>{L.sl}</th>
+            <th style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "left" }}>{L.depositType}</th>
+            <th style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "left" }}>{L.period}</th>
+            <th style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "center" }}>{L.shares}</th>
+            <th style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "right" }}>{L.amount}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {deposit.items.map((item, index) => (
+            <tr key={item.id} style={{ borderBottom: "1px solid #e0e0e0" }}>
+              <td style={{ padding: "6px 8px", border: "1px solid #ccc", textAlign: "center", fontFamily: "monospace" }}>
+                {lang === "BN" ? (index + 1).toLocaleString("bn-BD") : index + 1}
               </td>
-              <td className="px-3 py-2 border-r border-gray-300 dark:border-zinc-700 text-center font-mono text-emerald-700 dark:text-emerald-400">
-                {totalShares > 0 ? (lang === "BN" ? totalShares.toLocaleString("bn-BD") : totalShares) : "-"}
+              <td style={{ padding: "6px 8px", border: "1px solid #ccc", fontWeight: 600 }}>
+                {getDepositTypeName(item.type, lang)}
               </td>
-              <td className="px-3 py-2 text-right font-mono text-emerald-700 dark:text-emerald-400">
-                {totalBdt.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
+              <td style={{ padding: "6px 8px", border: "1px solid #ccc", color: "#555" }}>
+                {item.periodDetails}
+              </td>
+              <td style={{ padding: "6px 8px", border: "1px solid #ccc", textAlign: "center", fontFamily: "monospace" }}>
+                {parseFloat(item.sharesCount) > 0
+                  ? (lang === "BN" ? parseFloat(item.sharesCount).toLocaleString("bn-BD") : parseFloat(item.sharesCount))
+                  : "-"}
+              </td>
+              <td style={{ padding: "6px 8px", border: "1px solid #ccc", textAlign: "right", fontFamily: "monospace", fontWeight: 600 }}>
+                {(item.amount / 100).toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })}
               </td>
             </tr>
-          </tfoot>
-        </table>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr style={{ background: "#f0f0f0", fontWeight: 700, borderTop: "2px solid #333" }}>
+            <td colSpan={3} style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "right" }}>
+              {L.total}:
+            </td>
+            <td style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "center", fontFamily: "monospace", color: "#059669" }}>
+              {totalShares > 0 ? (lang === "BN" ? totalShares.toLocaleString("bn-BD") : totalShares) : "-"}
+            </td>
+            <td style={{ padding: "7px 8px", border: "1px solid #ccc", textAlign: "right", fontFamily: "monospace", color: "#059669" }}>
+              {totalBdt.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
+            </td>
+          </tr>
+        </tfoot>
+      </table>
 
-        {/* Remarks Column */}
-        {actualRemarks && (
-          <div className="mb-8 p-3 bg-gray-50 dark:bg-zinc-850 rounded border text-xs text-gray-650 dark:text-zinc-300">
-            <strong>{labels[lang].remarks}:</strong> {actualRemarks}
-          </div>
-        )}
-
-        {/* Payment Slip Attachment Display if any */}
-        {deposit.receipt && (
-          <div className="mb-8 p-3 border rounded border-gray-250 dark:border-zinc-700 print:hidden">
-            <span className="block text-xs font-bold text-gray-500 mb-2 uppercase">Payment Slip Attachment</span>
-            <img
-              src={deposit.receipt.imageUrl}
-              alt="Payment Slip"
-              className="max-h-48 object-contain rounded border border-gray-200 bg-gray-50"
-            />
-          </div>
-        )}
-
-        {/* Footer / Signatures */}
-        <div className="mt-16 grid grid-cols-2 gap-8 text-center text-sm font-semibold">
-          <div className="flex flex-col items-center">
-            <div className="w-48 border-t border-gray-400 dark:border-zinc-650 pt-2 text-gray-600 dark:text-zinc-400">
-              {labels[lang].memberSig}
-            </div>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-48 border-t border-gray-400 dark:border-zinc-650 pt-2 text-gray-600 dark:text-zinc-400">
-              {labels[lang].officerSig}
-            </div>
-          </div>
+      {/* Remarks */}
+      {actualRemarks && (
+        <div style={{ marginBottom: "24px", padding: "8px 12px", background: "#f9f9f9", border: "1px solid #e0e0e0", borderRadius: "6px", fontSize: "12px" }}>
+          <strong>{L.remarks}:</strong> {actualRemarks}
         </div>
+      )}
+
+      {/* Signatures */}
+      <div style={{ marginTop: "60px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px", textAlign: "center", fontSize: "12px", fontWeight: 600 }}>
+        <div>
+          <div style={{ borderTop: "1px solid #555", paddingTop: "8px", color: "#444" }}>{L.memberSig}</div>
+        </div>
+        <div>
+          <div style={{ borderTop: "1px solid #555", paddingTop: "8px", color: "#444" }}>{L.officerSig}</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full max-w-3xl mx-auto">
+      {/* Screen-only controls */}
+      <div className="flex justify-end items-center mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800">
+        <button
+          onClick={handlePrint}
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
+        >
+          🖨️ {L.printBtn}
+        </button>
+      </div>
+
+      {/* Screen preview of the receipt */}
+      <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
+        {receiptHtml}
       </div>
     </div>
   );
