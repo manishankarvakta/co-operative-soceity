@@ -41,7 +41,7 @@ export class DepositService {
     data: {
       memberId: string;
       paymentMode: PaymentMode;
-      bankAccountId?: string;
+      bankAccountId?: string | null;
       receiptId?: string | null;
       remarks?: string | null;
       items: Array<{

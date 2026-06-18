@@ -49,7 +49,7 @@ export class MemberService {
       };
       password?: string;
       paymentMode?: "CASH" | "BANK";
-      bankAccountId?: string;
+      bankAccountId?: string | null;
     },
     actorId?: string | null
   ) {

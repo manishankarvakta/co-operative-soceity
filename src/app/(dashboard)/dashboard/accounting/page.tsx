@@ -622,19 +622,19 @@ export default function AccountingPage() {
         <div className="space-y-6">
           <div className="flex gap-2 p-1.5 bg-gray-55 dark:bg-zinc-850 rounded-lg max-w-md border border-black/5 text-xs font-semibold">
             <button
-              onClick={() => setReportType("TRIAL_BALANCE")}
+              onClick={() => { setReportData(null); setReportType("TRIAL_BALANCE"); }}
               className={`px-3 py-1.5 rounded-md transition ${reportType === "TRIAL_BALANCE" ? "bg-white dark:bg-zinc-800 shadow" : "text-gray-500"}`}
             >
               Trial Balance
             </button>
             <button
-              onClick={() => setReportType("BALANCE_SHEET")}
+              onClick={() => { setReportData(null); setReportType("BALANCE_SHEET"); }}
               className={`px-3 py-1.5 rounded-md transition ${reportType === "BALANCE_SHEET" ? "bg-white dark:bg-zinc-800 shadow" : "text-gray-500"}`}
             >
               Balance Sheet
             </button>
             <button
-              onClick={() => setReportType("PROFIT_LOSS")}
+              onClick={() => { setReportData(null); setReportType("PROFIT_LOSS"); }}
               className={`px-3 py-1.5 rounded-md transition ${reportType === "PROFIT_LOSS" ? "bg-white dark:bg-zinc-800 shadow" : "text-gray-500"}`}
             >
               Profit & Loss
@@ -666,7 +666,7 @@ export default function AccountingPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-zinc-800">
-                    {reportData.rows.map((row: any) => (
+                    {reportData.rows?.map((row: any) => (
                       <tr key={row.code} className="text-gray-700 dark:text-zinc-300">
                         <td className="px-4 py-2.5 border-r border-gray-300 dark:border-zinc-800">
                           {row.code} - {row.name}
@@ -684,10 +684,10 @@ export default function AccountingPage() {
                     <tr className="bg-gray-50 dark:bg-zinc-850 text-gray-800 dark:text-white font-bold border-t-2 border-gray-350 dark:border-zinc-700 text-base">
                       <td className="px-4 py-2 border-r border-gray-300 dark:border-zinc-800 text-right">{labels[lang].total}:</td>
                       <td className="px-4 py-2 border-r border-gray-300 dark:border-zinc-800 text-right font-mono text-emerald-700 dark:text-emerald-400">
-                        {reportData.totals.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {reportData.totals?.totalDebit?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"}
                       </td>
                       <td className="px-4 py-2 text-right font-mono text-emerald-700 dark:text-emerald-400">
-                        {reportData.totals.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {reportData.totals?.totalCredit?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"}
                       </td>
                     </tr>
                   </tfoot>
@@ -701,7 +701,7 @@ export default function AccountingPage() {
                   <div>
                     <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">assets (সম্পদসমূহ)</h4>
                     <div className="space-y-2">
-                      {reportData.assets.map((item: any) => (
+                      {reportData.assets?.map((item: any) => (
                         <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
                           <span>{item.name}</span>
                           <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -710,7 +710,7 @@ export default function AccountingPage() {
                     </div>
                     <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
                       <span>Total Assets:</span>
-                      <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals.totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
+                      <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals?.totalAssets?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"} BDT</span>
                     </div>
                   </div>
 
@@ -718,13 +718,13 @@ export default function AccountingPage() {
                   <div className="pt-4">
                     <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">liabilities & equity (দায় ও মূলধন)</h4>
                     <div className="space-y-2">
-                      {reportData.liabilities.map((item: any) => (
+                      {reportData.liabilities?.map((item: any) => (
                         <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
                           <span>{item.name}</span>
                           <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                         </div>
                       ))}
-                      {reportData.equity.map((item: any) => (
+                      {reportData.equity?.map((item: any) => (
                         <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
                           <span>{item.name}</span>
                           <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -733,7 +733,7 @@ export default function AccountingPage() {
                     </div>
                     <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
                       <span>Total Liabilities & Equity:</span>
-                      <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals.totalLiabilitiesAndEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
+                      <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals?.totalLiabilitiesAndEquity?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"} BDT</span>
                     </div>
                   </div>
                 </div>
@@ -746,7 +746,7 @@ export default function AccountingPage() {
                   <div>
                     <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">Revenue (আয়সমূহ)</h4>
                     <div className="space-y-2">
-                      {reportData.revenue.map((item: any) => (
+                      {reportData.revenue?.map((item: any) => (
                         <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
                           <span>{item.name}</span>
                           <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -755,7 +755,7 @@ export default function AccountingPage() {
                     </div>
                     <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
                       <span>Total Revenue:</span>
-                      <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
+                      <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals?.totalRevenue?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"} BDT</span>
                     </div>
                   </div>
 
@@ -763,7 +763,7 @@ export default function AccountingPage() {
                   <div>
                     <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">Expenses (ব্যয়সমূহ)</h4>
                     <div className="space-y-2">
-                      {reportData.expenses.map((item: any) => (
+                      {reportData.expenses?.map((item: any) => (
                         <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
                           <span>{item.name}</span>
                           <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -772,14 +772,14 @@ export default function AccountingPage() {
                     </div>
                     <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
                       <span>Total Expenses:</span>
-                      <span className="font-mono text-amber-700 dark:text-amber-400">{reportData.totals.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
+                      <span className="font-mono text-amber-700 dark:text-amber-400">{reportData.totals?.totalExpenses?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"} BDT</span>
                     </div>
                   </div>
 
                   {/* Net Profit indicator */}
                   <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 rounded-xl flex justify-between items-center text-lg font-black">
                     <span className="text-emerald-800 dark:text-emerald-400">Net Profit (নিট মুনাফা):</span>
-                    <span className="font-mono text-emerald-800 dark:text-emerald-400">{reportData.totals.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
+                    <span className="font-mono text-emerald-800 dark:text-emerald-400">{reportData.totals?.netProfit?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"} BDT</span>
                   </div>
                 </div>
               )}
