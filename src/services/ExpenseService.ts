@@ -31,6 +31,7 @@ export class ExpenseService {
       location?: string | null;
       receiptId?: string | null;
       projectName?: string | null;
+      bankAccountId?: string | null;
     }
   ) {
     const combinedBalance = await this.getCombinedBalance(prisma);
@@ -38,8 +39,9 @@ export class ExpenseService {
       throw new ValidationError("পর্যাপ্ত ব্যালেন্স নেই।");
     }
 
-    // Include payment mode label in location/remarks
-    const formattedLocation = `[${data.paymentMode}] ${data.location || ""}`.trim();
+    // Include payment mode and optional bank ID in location/remarks
+    const bankSuffix = data.bankAccountId ? `:${data.bankAccountId}` : "";
+    const formattedLocation = `[${data.paymentMode}${bankSuffix}] ${data.location || ""}`.trim();
 
     const expense = await prisma.expense.create({
       data: {
@@ -93,8 +95,17 @@ export class ExpenseService {
       }
 
       // Determine payment mode from the location prefix
-      const isCash = expense.location?.startsWith("[CASH]") ?? true;
+      const isCash = expense.location?.startsWith("[CASH");
       const paymentMode = isCash ? "CASH" : "BANK";
+
+      // Extract optional bank ID if present: e.g. "[BANK:1234-5678] location text"
+      let specificBankId = null;
+      if (paymentMode === "BANK" && expense.location?.startsWith("[BANK:")) {
+        const endBracketIndex = expense.location.indexOf("]");
+        if (endBracketIndex > 6) {
+          specificBankId = expense.location.substring(6, endBracketIndex);
+        }
+      }
 
       // 1. Validate and update specific cash/bank account balance
       let bankAccount = null;
@@ -103,9 +114,15 @@ export class ExpenseService {
           where: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }
         });
       } else {
-        bankAccount = await tx.bankAccount.findFirst({
-          where: { NOT: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }, deletedAt: null }
-        });
+        if (specificBankId) {
+          bankAccount = await tx.bankAccount.findUnique({
+            where: { id: specificBankId }
+          });
+        } else {
+          bankAccount = await tx.bankAccount.findFirst({
+            where: { NOT: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }, deletedAt: null }
+          });
+        }
       }
 
       if (!bankAccount || bankAccount.balance < expense.amount) {

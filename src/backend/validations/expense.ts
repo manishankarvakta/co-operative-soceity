@@ -8,5 +8,6 @@ export const createExpenseSchema = z.object({
   location: z.string().min(2, "খরচের স্থান বা বিবরণ দিন।").optional().nullable(),
   receiptId: z.string().uuid("রসিদ আপলোড আইডি সঠিক নয়।").optional().nullable(),
   paymentMode: z.enum(["CASH", "BANK"]),
+  bankAccountId: z.string().uuid("সঠিক ব্যাংক আইডি দিন।").optional().nullable(),
   projectName: z.string().optional().nullable()
 }).strict();
