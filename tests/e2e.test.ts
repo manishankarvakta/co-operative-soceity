@@ -32,7 +32,8 @@ jest.mock("../src/lib/db", () => ({
     },
     deposit: {
       count: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
+      findMany: jest.fn()
     },
     depositItem: {
       create: jest.fn()
@@ -44,12 +45,17 @@ jest.mock("../src/lib/db", () => ({
       findFirst: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
+      upsert: jest.fn()
+    },
+    userRole: {
+      findMany: jest.fn().mockResolvedValue([{ role: { name: "SUPER_ADMIN" } }])
     },
     loan: {
       findUnique: jest.fn(),
       create: jest.fn(),
-      update: jest.fn()
+      update: jest.fn(),
+      findFirst: jest.fn()
     },
     loanSchedule: {
       createMany: jest.fn(),
@@ -307,15 +313,37 @@ describe("ERP System E2E Integration Route Tests", () => {
     it("should allow a member to apply for a loan", async () => {
       mockSession = memberSession;
 
-      (prisma.member.findUnique as jest.Mock).mockResolvedValue({
-        id: "11111111-1111-1111-1111-111111111111",
-        name: "Sakib",
-        deletedAt: null
+      (prisma.member.findUnique as jest.Mock).mockImplementation((args: any) => {
+        if (args.where.id === "11111111-1111-1111-1111-111111111111") {
+          return Promise.resolve({
+            id: "11111111-1111-1111-1111-111111111111",
+            name: "Sakib",
+            deletedAt: null
+          });
+        }
+        if (args.where.id === "33333333-3333-3333-3333-333333333333") {
+          return Promise.resolve({
+            id: "33333333-3333-3333-3333-333333333333",
+            name: "Guarantor A",
+            deletedAt: null
+          });
+        }
+        return Promise.resolve(null);
       });
+
+      (prisma.loan.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.deposit.findMany as jest.Mock).mockResolvedValue([
+        {
+          items: [
+            { type: "WEEKLY_SUBSCRIPTION", amount: 2000000, deletedAt: null }
+          ]
+        }
+      ]);
+
       (prisma.loan.create as jest.Mock).mockResolvedValue({
         id: "22222222-2222-2222-2222-222222222222",
         status: LoanStatus.PENDING,
-        emiAmount: 88849
+        emiAmount: 93333
       });
 
       const req = new Request("http://localhost/api/loans/apply", {
@@ -325,6 +353,9 @@ describe("ERP System E2E Integration Route Tests", () => {
           amount: 1000000,
           interestRate: 12,
           durationMonths: 12,
+          durationValue: 12,
+          durationType: "MONTHLY",
+          guarantor1Id: "33333333-3333-3333-3333-333333333333",
           remarks: "Need business capital"
         })
       });
@@ -344,15 +375,37 @@ describe("ERP System E2E Integration Route Tests", () => {
         amount: 1000000,
         interestRate: 12,
         durationMonths: 12,
+        durationValue: 12,
+        durationType: "MONTHLY",
+        presidentApproved: true,
+        secretaryApproved: true,
+        treasurerApproved: false,
         status: LoanStatus.PENDING,
         deletedAt: null,
         member: { id: "11111111-1111-1111-1111-111111111111", name: "Sakib", memberCode: "SOM-001" }
       };
 
       (prisma.loan.findUnique as jest.Mock).mockResolvedValue(mockLoan);
-      (prisma.loan.update as jest.Mock).mockResolvedValue({
-        ...mockLoan,
-        status: LoanStatus.ACTIVE
+      (prisma.userRole.findMany as jest.Mock).mockResolvedValue([
+        { role: { name: "TREASURER" } }
+      ]);
+      (prisma.loan.update as jest.Mock).mockImplementation(({ where, data }) => {
+        if (data.status === LoanStatus.ACTIVE) {
+          return Promise.resolve({
+            ...mockLoan,
+            presidentApproved: true,
+            secretaryApproved: true,
+            treasurerApproved: true,
+            status: LoanStatus.ACTIVE,
+            disbursedAt: new Date()
+          });
+        }
+        return Promise.resolve({
+          ...mockLoan,
+          presidentApproved: true,
+          secretaryApproved: true,
+          treasurerApproved: true
+        });
       });
       (prisma.loanSchedule.createMany as jest.Mock).mockResolvedValue({ count: 12 });
 
@@ -363,6 +416,7 @@ describe("ERP System E2E Integration Route Tests", () => {
           loanId: "22222222-2222-2222-2222-222222222222",
           status: "APPROVED",
           paymentMode: "CASH",
+          approveAsRole: "TREASURER",
           remarks: "Loan approved by audit"
         })
       });

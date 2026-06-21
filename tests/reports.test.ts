@@ -22,6 +22,9 @@ jest.mock("../src/lib/db", () => ({
     },
     bankTransaction: {
       findMany: jest.fn()
+    },
+    loan: {
+      findMany: jest.fn()
     }
   }
 }));
@@ -125,6 +128,8 @@ describe("ReportService Math & Filters", () => {
       (prisma.shareRecord.findMany as jest.Mock).mockResolvedValue([
         { id: "s1", count: 1.5 }
       ]);
+
+      (prisma.loan.findMany as jest.Mock).mockResolvedValue([]);
 
       const res = await ReportService.getMemberStatement("m1");
       expect(res.totals.totalShares).toBe(1.5);

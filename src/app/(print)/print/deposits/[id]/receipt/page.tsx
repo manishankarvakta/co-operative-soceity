@@ -100,7 +100,8 @@ export default function PrintDepositReceiptPage({ params }: PrintReceiptPageProp
       WEEKLY_SUBSCRIPTION: { BN: "সাপ্তাহিক চাঁদা", EN: "Weekly Subscription" },
       ADMISSION_FEE: { BN: "ভর্তি ফি", EN: "Admission Fee" },
       PENALTY: { BN: "জরিমানা (Penalty)", EN: "Penalty" },
-      OTHER: { BN: "অন্যান্য", EN: "Other" }
+      OTHER: { BN: "অন্যান্য", EN: "Other" },
+      LOAN_REPAYMENT: { BN: "লোন কিস্তি বাবদ জমা", EN: "Loan Repayment" }
     };
     return names[type]?.[lang] || type;
   };

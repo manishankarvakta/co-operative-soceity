@@ -10,71 +10,94 @@ export class LoanService {
   /**
    * Calculates the monthly EMI using the standard reducing balance method (PMT formula).
    */
-  static calculateEmi(principal: number, annualRate: number, durationMonths: number): number {
-    if (annualRate === 0) {
-      return Math.round(principal / durationMonths);
-    }
-    const r = annualRate / 12 / 100;
-    const emi = (principal * r * Math.pow(1 + r, durationMonths)) / (Math.pow(1 + r, durationMonths) - 1);
-    return Math.round(emi);
+  /**
+   * Calculates the monthly/weekly flat EMI.
+   */
+  static calculateEmi(principal: number, annualRate: number, durationValue: number): number {
+    const totalInterest = Math.round(principal * (annualRate / 100));
+    const totalPayable = principal + totalInterest;
+    return Math.round(totalPayable / durationValue);
   }
 
   /**
-   * Generates the amortization schedule installments.
-   * Ensures the remaining principal drops to exactly zero at the last month.
+   * Generates the flat-rate amortization schedule installments.
+   * Spacings: WEEKLY (7 days) or MONTHLY (1 month).
+   * Ensures the remaining principal/interest drops to exactly zero at the last period.
    */
   static generateAmortizationSchedule(
     principal: number,
-    annualRate: number,
-    durationMonths: number,
+    interestRatePercent: number,
+    durationValue: number,
+    durationType: string,
     startDate: Date
   ) {
+    const totalInterest = Math.round(principal * (interestRatePercent / 100));
+    const totalPayable = principal + totalInterest;
+    
+    const emiTotal = Math.round(totalPayable / durationValue);
+    const emiPrincipal = Math.round(principal / durationValue);
+    const emiInterest = emiTotal - emiPrincipal;
+
     const schedule = [];
     let remainingPrincipal = principal;
-    const r = annualRate / 12 / 100;
-    const emi = this.calculateEmi(principal, annualRate, durationMonths);
+    let remainingInterest = totalInterest;
 
-    for (let i = 1; i <= durationMonths; i++) {
+    for (let i = 1; i <= durationValue; i++) {
       const dueDate = new Date(startDate);
-      dueDate.setMonth(startDate.getMonth() + i);
-
-      const interestAmount = annualRate === 0 ? 0 : Math.round(remainingPrincipal * r);
-      let principalAmount: number;
-      let totalAmount: number;
-
-      if (i === durationMonths) {
-        principalAmount = remainingPrincipal;
-        totalAmount = principalAmount + interestAmount;
+      if (durationType === "WEEKLY") {
+        dueDate.setDate(startDate.getDate() + (i * 7));
       } else {
-        principalAmount = emi - interestAmount;
-        if (principalAmount > remainingPrincipal) {
-          principalAmount = remainingPrincipal;
-        }
-        totalAmount = principalAmount + interestAmount;
+        dueDate.setMonth(startDate.getMonth() + i);
       }
 
-      remainingPrincipal -= principalAmount;
+      let instPrincipal = emiPrincipal;
+      let instInterest = emiInterest;
+      
+      if (i === durationValue) {
+        // Last installment gets the remaining balance to avoid rounding errors
+        instPrincipal = remainingPrincipal;
+        instInterest = remainingInterest;
+      } else {
+        if (instPrincipal > remainingPrincipal) {
+          instPrincipal = remainingPrincipal;
+        }
+        if (instInterest > remainingInterest) {
+          instInterest = remainingInterest;
+        }
+      }
+
+      remainingPrincipal -= instPrincipal;
+      remainingInterest -= instInterest;
 
       schedule.push({
         emiNumber: i,
         dueDate,
-        principalAmount,
-        interestAmount,
-        totalAmount
+        principalAmount: instPrincipal,
+        interestAmount: instInterest,
+        totalAmount: instPrincipal + instInterest
       });
     }
 
-    return schedule;
+    return {
+      schedule,
+      emiAmount: emiTotal,
+      totalPayable,
+      totalInterest
+    };
   }
 
   /**
-   * Allows a member to apply for a loan. Calculates draft EMI.
+   * Allows a member to apply for a loan. Enforces single active loan lock and 80% savings limit.
    */
   static async applyLoan(
     memberId: string,
     amount: number,
     interestRate: number,
-    durationMonths: number,
+    durationValue: number,
+    durationType: "MONTHLY" | "WEEKLY",
+    guarantor1Id: string,
+    guarantor2Id?: string | null,
+    bypassLimit: boolean = false,
     remarks?: string | null
   ) {
     const member = await prisma.member.findUnique({
@@ -85,7 +108,63 @@ export class LoanService {
       throw new NotFoundError("সদস্য খুঁজে পাওয়া যায়নি।");
     }
 
-    const emiAmount = this.calculateEmi(amount, interestRate, durationMonths);
+    // 1. Enforce Single Active Loan Lock
+    const activeOrPendingLoan = await prisma.loan.findFirst({
+      where: {
+        memberId,
+        status: { in: [LoanStatus.PENDING, LoanStatus.APPROVED, LoanStatus.ACTIVE] },
+        deletedAt: null
+      }
+    });
+
+    if (activeOrPendingLoan) {
+      throw new ValidationError("সদস্যের ইতিমধ্যে একটি সক্রিয় বা পেন্ডিং ঋণ রয়েছে। সেটি সম্পূর্ণ পরিশোধ না করা পর্যন্ত নতুন ঋণের আবেদন করা যাবে না।");
+    }
+
+    // 2. Validate Guarantors
+    if (guarantor1Id === memberId || guarantor2Id === memberId) {
+      throw new ValidationError("সদস্য নিজে নিজের জামিনদার হতে পারবেন না।");
+    }
+
+    const g1 = await prisma.member.findUnique({ where: { id: guarantor1Id } });
+    if (!g1 || g1.deletedAt) {
+      throw new ValidationError("প্রথম জামিনদার সদস্যটি খুঁজে পাওয়া যায়নি।");
+    }
+
+    if (guarantor2Id) {
+      const g2 = await prisma.member.findUnique({ where: { id: guarantor2Id } });
+      if (!g2 || g2.deletedAt) {
+        throw new ValidationError("দ্বিতীয় জামিনদার সদস্যটি খুঁজে পাওয়া যায়নি।");
+      }
+      if (guarantor1Id === guarantor2Id) {
+        throw new ValidationError("প্রথম ও দ্বিতীয় জামিনদার একই সদস্য হতে পারবে না।");
+      }
+    }
+
+    // 3. Enforce 80% Savings Limit (Weekly Subscription + Other deposits)
+    const deposits = await prisma.deposit.findMany({
+      where: { memberId, deletedAt: null },
+      include: { items: { where: { deletedAt: null } } }
+    });
+
+    let totalSavings = 0;
+    for (const dep of deposits) {
+      for (const item of dep.items) {
+        if (item.type === "WEEKLY_SUBSCRIPTION" || item.type === "OTHER") {
+          totalSavings += item.amount;
+        }
+      }
+    }
+
+    const maxEligibleLoan = Math.round(totalSavings * 0.80);
+    if (amount > maxEligibleLoan && !bypassLimit) {
+      throw new ValidationError(
+        `ঋণের পরিমাণ সদস্যের মোট জমানো সঞ্চয়/শেয়ার মূল্যের ৮০% এর বেশি। সর্বোচ্চ অনুমোদিত ঋণ: ${(maxEligibleLoan / 100).toFixed(2)} BDT (মোট সঞ্চয়: ${(totalSavings / 100).toFixed(2)} BDT)।`
+      );
+    }
+
+    const emiAmount = this.calculateEmi(amount, interestRate, durationValue);
+    const durationMonths = durationType === "WEEKLY" ? Math.ceil(durationValue / 4) : durationValue;
 
     const loan = await prisma.loan.create({
       data: {
@@ -93,6 +172,11 @@ export class LoanService {
         amount,
         interestRate,
         durationMonths,
+        durationValue,
+        durationType,
+        guarantor1Id,
+        guarantor2Id: guarantor2Id || null,
+        bypassLimit,
         emiAmount,
         remarks,
         status: LoanStatus.PENDING
@@ -103,7 +187,8 @@ export class LoanService {
   }
 
   /**
-   * Approves or rejects a loan. Disburses funds and posts accounting logs.
+   * Approves or rejects a loan. Tracks joint approvals (MD, Secretary, Treasurer).
+   * Disburses funds and posts accounting logs only after all 3 approvals.
    */
   static async approveLoan(
     loanId: string,
@@ -113,6 +198,7 @@ export class LoanService {
       paymentMode?: PaymentMode;
       bankAccountId?: string | null;
       remarks?: string | null;
+      approveAsRole?: "PRESIDENT" | "SECRETARY" | "TREASURER" | null;
     }
   ) {
     const loan = await prisma.loan.findUnique({
@@ -124,11 +210,18 @@ export class LoanService {
       throw new NotFoundError("ঋণ আবেদনটি খুঁজে পাওয়া যায়নি।");
     }
 
-    if (loan.status !== LoanStatus.PENDING) {
+    if (loan.status !== LoanStatus.PENDING && loan.status !== LoanStatus.APPROVED) {
       throw new ValidationError("শুধুমাত্র পেন্ডিং ঋণ আবেদন অনুমোদন বা প্রত্যাখ্যান করা সম্ভব।");
     }
 
     const today = new Date();
+
+    // Query actor roles
+    const userRoles = await prisma.userRole.findMany({
+      where: { userId: actorId },
+      include: { role: true }
+    });
+    const roles = userRoles.map((ur) => ur.role.name);
 
     const result = await prisma.$transaction(async (tx) => {
       if (status === "REJECTED") {
@@ -153,7 +246,59 @@ export class LoanService {
         return updatedLoan;
       }
 
-      // APPROVED logic
+      // APPROVED logic (Joint signature tracking)
+      let pApp = false;
+      let sApp = false;
+      let tApp = false;
+
+      if (options?.approveAsRole) {
+        const role = options.approveAsRole;
+        if (role === "PRESIDENT" && (roles.includes("PRESIDENT") || roles.includes("SUPER_ADMIN"))) pApp = true;
+        if (role === "SECRETARY" && (roles.includes("SECRETARY") || roles.includes("SUPER_ADMIN"))) sApp = true;
+        if (role === "TREASURER" && (roles.includes("TREASURER") || roles.includes("SUPER_ADMIN"))) tApp = true;
+      } else {
+        if (roles.includes("PRESIDENT")) pApp = true;
+        if (roles.includes("SECRETARY")) sApp = true;
+        if (roles.includes("TREASURER")) tApp = true;
+        if (roles.includes("SUPER_ADMIN")) {
+          // If SUPER_ADMIN approves and no role is specified, check the first false signature
+          if (!loan.presidentApproved) pApp = true;
+          else if (!loan.secretaryApproved) sApp = true;
+          else if (!loan.treasurerApproved) tApp = true;
+        }
+      }
+
+      if (!pApp && !sApp && !tApp) {
+        throw new ValidationError("অনুমোদনকারী ব্যবহারকারীর এই ঋণে স্বাক্ষর করার অনুমতি নেই।");
+      }
+
+      // Update approval flags
+      const updatedLoan = await tx.loan.update({
+        where: { id: loanId },
+        data: {
+          presidentApproved: pApp ? true : undefined,
+          secretaryApproved: sApp ? true : undefined,
+          treasurerApproved: tApp ? true : undefined,
+        }
+      });
+
+      const isFullyApproved = updatedLoan.presidentApproved && updatedLoan.secretaryApproved && updatedLoan.treasurerApproved;
+
+      if (!isFullyApproved) {
+        // If not yet fully approved, return the partially approved loan
+        await AuditService.log({
+          userId: actorId,
+          action: "APPROVE",
+          tableName: "Loan",
+          recordId: loanId,
+          oldData: loan,
+          newData: updatedLoan,
+          tx
+        });
+        return updatedLoan;
+      }
+
+      // Fully Approved: Execute disbursement and generate schedule
       const paymentMode = options?.paymentMode || PaymentMode.CASH;
       const bankAccountId = options?.bankAccountId;
 
@@ -161,7 +306,7 @@ export class LoanService {
       let fundingAccount = null;
       if (paymentMode === PaymentMode.CASH) {
         fundingAccount = await tx.bankAccount.findFirst({
-          where: { name: "Cash on Hand" }
+          where: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }
         });
       } else {
         if (!bankAccountId) {
@@ -182,27 +327,30 @@ export class LoanService {
         data: { balance: { decrement: loan.amount } }
       });
 
-      // 2. Update Loan Status
-      const updatedLoan = await tx.loan.update({
+      // 2. Generate flat schedule
+      const scheduleResult = this.generateAmortizationSchedule(
+        loan.amount,
+        Number(loan.interestRate),
+        updatedLoan.durationValue,
+        updatedLoan.durationType,
+        today
+      );
+
+      // 3. Update Loan Status
+      const finalLoan = await tx.loan.update({
         where: { id: loanId },
         data: {
           status: LoanStatus.ACTIVE,
           disbursedAt: today,
           disbursedById: actorId,
+          emiAmount: scheduleResult.emiAmount,
           remarks: options?.remarks
         }
       });
 
-      // 3. Generate Loan Schedule entries
-      const scheduleData = this.generateAmortizationSchedule(
-        loan.amount,
-        Number(loan.interestRate),
-        loan.durationMonths,
-        today
-      );
-
+      // Create Schedule Entries
       await tx.loanSchedule.createMany({
-        data: scheduleData.map((s) => ({
+        data: scheduleResult.schedule.map((s) => ({
           loanId: loan.id,
           dueDate: s.dueDate,
           emiNumber: s.emiNumber,
@@ -235,11 +383,11 @@ export class LoanService {
         tableName: "Loan",
         recordId: loanId,
         oldData: loan,
-        newData: updatedLoan,
+        newData: finalLoan,
         tx
       });
 
-      return updatedLoan;
+      return finalLoan;
     });
 
     await DashboardService.invalidateCache();
@@ -248,15 +396,17 @@ export class LoanService {
     if (loan.member.email) {
       try {
         if (status === "APPROVED") {
-          await NotificationService.sendLoanApprovalNotice(
-            loan.member.email,
-            loan.member.name,
-            loan.amount / 100,
-            Number(loan.interestRate),
-            loan.durationMonths,
-            loan.emiAmount / 100,
-            loan.member.userId || undefined
-          );
+          if (result.status === LoanStatus.ACTIVE) {
+            await NotificationService.sendLoanApprovalNotice(
+              loan.member.email,
+              loan.member.name,
+              loan.amount / 100,
+              Number(loan.interestRate),
+              result.durationMonths,
+              result.emiAmount / 100,
+              loan.member.userId || undefined
+            );
+          }
         } else {
           await NotificationService.sendLoanRejectionNotice(
             loan.member.email,

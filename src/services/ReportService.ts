@@ -48,7 +48,8 @@ export class ReportService {
       WEEKLY_SUBSCRIPTION: 0,
       ADMISSION_FEE: 0,
       PENALTY: 0,
-      OTHER: 0
+      OTHER: 0,
+      LOAN_REPAYMENT: 0
     };
 
     const details = deposits.map((d) => {
@@ -85,7 +86,8 @@ export class ReportService {
         weeklySubscriptionBdt: typeTotals.WEEKLY_SUBSCRIPTION / 100,
         admissionFeeBdt: typeTotals.ADMISSION_FEE / 100,
         penaltyBdt: typeTotals.PENALTY / 100,
-        otherBdt: typeTotals.OTHER / 100
+        otherBdt: typeTotals.OTHER / 100,
+        loanRepaymentBdt: typeTotals.LOAN_REPAYMENT / 100
       },
       details
     };
@@ -169,7 +171,7 @@ export class ReportService {
       throw new NotFoundError("সদস্য খুঁজে পাওয়া যায়নি।");
     }
 
-    const [deposits, shares] = await Promise.all([
+    const [deposits, shares, loans] = await Promise.all([
       prisma.deposit.findMany({
         where: { memberId, deletedAt: null },
         include: { items: { where: { deletedAt: null } } },
@@ -178,6 +180,14 @@ export class ReportService {
       prisma.shareRecord.findMany({
         where: { memberId, deletedAt: null },
         orderBy: { createdAt: "asc" }
+      }),
+      prisma.loan.findMany({
+        where: { memberId, deletedAt: null },
+        include: {
+          schedules: true,
+          payments: true
+        },
+        orderBy: { createdAt: "desc" }
       })
     ]);
 
@@ -187,6 +197,7 @@ export class ReportService {
     let totalSavingsPaisa = 0;
     let totalAdmissionFeePaisa = 0;
     let totalPenaltyPaisa = 0;
+    let totalLoanRepaymentPaisa = 0;
 
     const passbook: any[] = [];
 
@@ -199,6 +210,8 @@ export class ReportService {
           totalAdmissionFeePaisa += item.amount;
         } else if (item.type === "PENALTY") {
           totalPenaltyPaisa += item.amount;
+        } else if (item.type === "LOAN_REPAYMENT") {
+          totalLoanRepaymentPaisa += item.amount;
         }
 
         passbook.push({
@@ -210,6 +223,23 @@ export class ReportService {
           amountBdt: item.amount / 100
         });
       });
+    });
+
+    // Calculate loan stats
+    let totalLoanPrincipalPaisa = 0;
+    let totalLoanPaidPaisa = 0;
+    let totalLoanOutstandingPaisa = 0;
+
+    loans.forEach((loan) => {
+      if (loan.status === "ACTIVE" || loan.status === "PAID" || loan.status === "DEFAULTED") {
+        totalLoanPrincipalPaisa += loan.amount;
+        const paid = loan.payments.reduce((sum, p) => sum + p.amount, 0);
+        totalLoanPaidPaisa += paid;
+        
+        const expected = loan.schedules.reduce((sum, s) => sum + s.totalAmount, 0);
+        const schedPaid = loan.schedules.reduce((sum, s) => sum + s.paidAmount, 0);
+        totalLoanOutstandingPaisa += (expected - schedPaid);
+      }
     });
 
     // Sort passbook by date ascending
@@ -235,8 +265,22 @@ export class ReportService {
         totalSavingsBdt: totalSavingsPaisa / 100,
         totalAdmissionFeeBdt: totalAdmissionFeePaisa / 100,
         totalPenaltyBdt: totalPenaltyPaisa / 100,
-        totalDepositedBdt: (totalSavingsPaisa + totalAdmissionFeePaisa + totalPenaltyPaisa) / 100
+        totalLoanRepaymentBdt: totalLoanRepaymentPaisa / 100,
+        totalDepositedBdt: (totalSavingsPaisa + totalAdmissionFeePaisa + totalPenaltyPaisa + totalLoanRepaymentPaisa) / 100,
+        totalLoanPrincipalBdt: totalLoanPrincipalPaisa / 100,
+        totalLoanPaidBdt: totalLoanPaidPaisa / 100,
+        totalLoanOutstandingBdt: totalLoanOutstandingPaisa / 100
       },
+      loans: loans.map((l) => ({
+        id: l.id,
+        amountBdt: l.amount / 100,
+        interestRate: Number(l.interestRate),
+        durationValue: l.durationValue,
+        durationType: l.durationType,
+        status: l.status,
+        createdAt: l.createdAt,
+        disbursedAt: l.disbursedAt
+      })),
       passbook
     };
   }

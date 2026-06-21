@@ -3,28 +3,37 @@ import { AuthService } from "../src/services/AuthService";
 import { prisma } from "../src/lib/db";
 
 describe("Public Signup & Login Verification", () => {
-  beforeEach(async () => {
-    // Clean up test data if any
+  const cleanTestData = async () => {
     try {
-      await prisma.member.deleteMany({
+      const existingMember = await prisma.member.findFirst({
         where: { phone: "01799999999" }
       });
+      if (existingMember) {
+        await prisma.nominee.deleteMany({ where: { memberId: existingMember.id } });
+        await prisma.shareRecord.deleteMany({ where: { memberId: existingMember.id } });
+        
+        const deposits = await prisma.deposit.findMany({ where: { memberId: existingMember.id } });
+        const depositIds = deposits.map(d => d.id);
+        
+        await prisma.depositItem.deleteMany({ where: { depositId: { in: depositIds } } });
+        await prisma.deposit.deleteMany({ where: { memberId: existingMember.id } });
+        
+        await prisma.member.delete({ where: { id: existingMember.id } });
+      }
       await prisma.user.deleteMany({
         where: { email: "testsignedup@example.com" }
       });
-    } catch (e) { }
+    } catch (e) {
+      console.error("Cleanup error:", e);
+    }
+  };
+
+  beforeEach(async () => {
+    await cleanTestData();
   });
 
   afterAll(async () => {
-    // Clean up test data
-    try {
-      await prisma.member.deleteMany({
-        where: { phone: "01799999999" }
-      });
-      await prisma.user.deleteMany({
-        where: { email: "testsignedup@example.com" }
-      });
-    } catch (e) { }
+    await cleanTestData();
     await prisma.$disconnect();
   });
 

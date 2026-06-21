@@ -84,7 +84,11 @@ export class DepositService {
         }
       });
 
-      // 2. Loop items to process shares and create records
+      // 2. Loop items to process shares, loans, and create records
+      const creditLines: Array<{ accountCode: string; amount: number; type: "CREDIT" }> = [];
+      let loanPrincipalRepaid = 0;
+      let loanInterestRepaid = 0;
+
       for (const item of data.items) {
         // Auto share calculation (1 Share = 1,000 BDT = 100,000 Paisa)
         let shares = 0;
@@ -114,12 +118,132 @@ export class DepositService {
             }
           });
         }
+
+        // If it's a loan repayment, process schedule allocation
+        if (item.type === "LOAN_REPAYMENT") {
+          const activeLoan = await transactionClient.loan.findFirst({
+            where: {
+              memberId: data.memberId,
+              status: "ACTIVE",
+              deletedAt: null
+            },
+            include: {
+              schedules: {
+                where: { status: { in: ["UNPAID", "PARTIAL"] } },
+                orderBy: { emiNumber: "asc" }
+              }
+            }
+          });
+
+          if (!activeLoan) {
+            throw new ValidationError("সদস্যের কোনো সক্রিয় ঋণ অ্যাকাউন্ট নেই।");
+          }
+
+          let remainingPayment = item.amount;
+          let principalPaid = 0;
+          let interestPaid = 0;
+
+          for (const schedule of activeLoan.schedules) {
+            if (remainingPayment <= 0) break;
+
+            const scheduleTotal = schedule.totalAmount;
+            const currentPaid = schedule.paidAmount;
+
+            // Calculate outstanding interest
+            const instInterest = schedule.interestAmount;
+            const paidInterest = Math.min(currentPaid, instInterest);
+            const outstandingInterest = instInterest - paidInterest;
+
+            // Apply to interest
+            const interestAllocation = Math.min(remainingPayment, outstandingInterest);
+            remainingPayment -= interestAllocation;
+            interestPaid += interestAllocation;
+
+            // Calculate outstanding principal
+            const instPrincipal = schedule.principalAmount;
+            const paidPrincipal = Math.max(0, currentPaid - instInterest);
+            const outstandingPrincipal = instPrincipal - paidPrincipal;
+
+            // Apply to principal
+            const principalAllocation = Math.min(remainingPayment, outstandingPrincipal);
+            remainingPayment -= principalAllocation;
+            principalPaid += principalAllocation;
+
+            // Update schedule
+            const newPaidAmount = currentPaid + interestAllocation + principalAllocation;
+            const isPaid = newPaidAmount >= scheduleTotal;
+
+            await transactionClient.loanSchedule.update({
+              where: { id: schedule.id },
+              data: {
+                paidAmount: newPaidAmount,
+                status: isPaid ? "PAID" : "PARTIAL",
+                paidAt: isPaid ? today : null
+              }
+            });
+          }
+
+          // Create LoanPayment record
+          const payment = await transactionClient.loanPayment.create({
+            data: {
+              loanId: activeLoan.id,
+              amount: item.amount,
+              interestPaid,
+              principalPaid,
+              paymentDate: today,
+              paymentMode: data.paymentMode,
+              bankAccountId: data.paymentMode === "BANK" ? data.bankAccountId : null,
+              receivedById: officerId,
+              remarks: `কালেক্টেড ইন রসিদ ${receiptCode}`
+            }
+          });
+
+          // Check if loan is completely repaid
+          const remainingUnpaidCount = await transactionClient.loanSchedule.count({
+            where: {
+              loanId: activeLoan.id,
+              status: { in: ["UNPAID", "PARTIAL"] }
+            }
+          });
+
+          if (remainingUnpaidCount === 0) {
+            await transactionClient.loan.update({
+              where: { id: activeLoan.id },
+              data: { status: "PAID" }
+            });
+          }
+
+          await AuditService.log({
+            userId: officerId,
+            action: "CREATE",
+            tableName: "LoanPayment",
+            recordId: payment.id,
+            newData: payment,
+            tx: transactionClient
+          });
+
+          loanPrincipalRepaid += principalPaid;
+          loanInterestRepaid += interestPaid;
+        } else {
+          // Standard deposit types
+          let accountCode = "2000"; // Default to Member Savings (Liabilities)
+          if (item.type === "WEEKLY_SUBSCRIPTION") {
+            accountCode = "3000"; // Member Share Capital (Equity)
+          } else if (item.type === "ADMISSION_FEE") {
+            accountCode = "4000"; // Admission Fee Income (Revenue)
+          } else if (item.type === "PENALTY") {
+            accountCode = "4010"; // Penalty Income (Revenue)
+          }
+          creditLines.push({
+            accountCode,
+            amount: item.amount,
+            type: "CREDIT" as const
+          });
+        }
       }
 
       // 3. Update Balance Ledgers
       if (data.paymentMode === "CASH") {
-        // Auto-create "Cash on Hand" account if it doesn't exist, then increment balance.
-        // Uses accountNumber as the unique key (accountNumber has @unique in schema).
         await transactionClient.bankAccount.upsert({
           where: { accountNumber: "CASH-001" },
           update: { balance: { increment: totalPaisa } },
@@ -130,7 +254,6 @@ export class DepositService {
           }
         });
       } else {
-        // Increment the specific bank account if provided, else the first non-cash account.
         const bankAccount = data.bankAccountId
           ? await transactionClient.bankAccount.findUnique({ where: { id: data.bankAccountId } })
           : await transactionClient.bankAccount.findFirst({
@@ -145,6 +268,22 @@ export class DepositService {
         }
       }
 
+      // Add loan repayment credits to journal lines if they exist
+      if (loanPrincipalRepaid > 0) {
+        creditLines.push({
+          accountCode: "1040", // Loan Receivable (Asset) - credited to reduce balance
+          amount: loanPrincipalRepaid,
+          type: "CREDIT" as const
+        });
+      }
+      if (loanInterestRepaid > 0) {
+        creditLines.push({
+          accountCode: "4030", // Interest Income (Revenue)
+          amount: loanInterestRepaid,
+          type: "CREDIT" as const
+        });
+      }
+
       // 4. Auto-post balanced Double Entry Journal Entry
       const journalLines: Array<{ accountCode: string; amount: number; type: "DEBIT" | "CREDIT" }> = [
         {
@@ -152,21 +291,7 @@ export class DepositService {
           amount: totalPaisa,
           type: "DEBIT" as const
         },
-        ...data.items.map((item) => {
-          let accountCode = "2000"; // Default to Member Savings (Liabilities)
-          if (item.type === "WEEKLY_SUBSCRIPTION") {
-            accountCode = "3000"; // Member Share Capital (Equity)
-          } else if (item.type === "ADMISSION_FEE") {
-            accountCode = "4000"; // Admission Fee Income (Revenue)
-          } else if (item.type === "PENALTY") {
-            accountCode = "4010"; // Penalty Income (Revenue)
-          }
-          return {
-            accountCode,
-            amount: item.amount,
-            type: "CREDIT" as const
-          };
-        })
+        ...creditLines
       ];
 
       await AccountingService.postJournalEntry(transactionClient, {

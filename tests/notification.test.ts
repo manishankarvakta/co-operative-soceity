@@ -34,7 +34,11 @@ jest.mock("../src/lib/db", () => ({
       findFirst: jest.fn(),
       findUnique: jest.fn(),
       findMany: jest.fn(),
-      update: jest.fn()
+      update: jest.fn(),
+      upsert: jest.fn()
+    },
+    userRole: {
+      findMany: jest.fn().mockResolvedValue([{ role: { name: "TREASURER" } }])
     },
     bankTransaction: {
       create: jest.fn(),
@@ -369,6 +373,11 @@ describe("Notification System Unit Tests", () => {
           amount: 500000,
           interestRate: 10,
           durationMonths: 12,
+          durationValue: 12,
+          durationType: "MONTHLY",
+          presidentApproved: true,
+          secretaryApproved: true,
+          treasurerApproved: false,
           emiAmount: 45000,
           remarks: "Approval test",
           status: "PENDING",
@@ -388,9 +397,23 @@ describe("Notification System Unit Tests", () => {
           name: "Cash on Hand",
           balance: 1000000
         });
-        (prisma.loan.update as jest.Mock).mockResolvedValue({
-          ...mockLoan,
-          status: "ACTIVE"
+        (prisma.loan.update as jest.Mock).mockImplementation(({ where, data }) => {
+          if (data.status === "ACTIVE") {
+            return Promise.resolve({
+              ...mockLoan,
+              presidentApproved: true,
+              secretaryApproved: true,
+              treasurerApproved: true,
+              status: "ACTIVE",
+              emiAmount: 45000
+            });
+          }
+          return Promise.resolve({
+            ...mockLoan,
+            presidentApproved: true,
+            secretaryApproved: true,
+            treasurerApproved: true
+          });
         });
         (prisma.loanSchedule.createMany as jest.Mock).mockResolvedValue({ count: 12 });
         (prisma.notification.create as jest.Mock).mockResolvedValue({ id: "notif-3" });

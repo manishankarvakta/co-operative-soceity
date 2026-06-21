@@ -10,7 +10,7 @@ const translations = {
     admissionFeeCardTitle: "ভর্তি ফি নির্ধারণ",
     admissionFeeCardDesc: "নতুন সদস্য নিবন্ধনের সময় ভর্তি ফি নির্ধারণ করুন",
     admissionFeeLabel: "ভর্তি ফি (টাকা)",
-    presetLabel: "দ্রুত নির্বাচন (Presets)",
+
     helpText: "এখানে সেট করা ভর্তি ফি নতুন সদস্য ভর্তির সময় স্বয়ংক্রিয়ভাবে ব্যবহৃত হবে।",
     saveBtn: "সংরক্ষণ করুন",
     successMsg: "ভর্তি ফি সফলভাবে আপডেট করা হয়েছে!",
@@ -22,7 +22,7 @@ const translations = {
     admissionFeeCardTitle: "Admission Fee Configuration",
     admissionFeeCardDesc: "Configure the standard admission fee amount for new members",
     admissionFeeLabel: "Admission Fee (BDT)",
-    presetLabel: "Quick Presets",
+
     helpText: "The admission fee configured here will automatically apply to any new member registration.",
     saveBtn: "Save Settings",
     successMsg: "Admission fee updated successfully!",
@@ -61,12 +61,12 @@ export default function AdmitFeeSettingsPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-48xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            {t.title}
+            {t.title}3
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {t.subtitle}
@@ -92,28 +92,6 @@ export default function AdmitFeeSettingsPage() {
           <div className="p-6 space-y-6">
             {/* Form Fields */}
             <div className="space-y-4 max-w-md">
-              <div>
-                <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
-                  {t.presetLabel}
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[1000, 2000, 5000, 10000].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setAdmissionFee(preset)}
-                      className={`py-2 text-xs font-semibold rounded-lg border transition-all duration-150 ${
-                        admissionFee === preset
-                          ? "bg-emerald-600 border-transparent text-white shadow-sm"
-                          : "border-gray-250 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-750"
-                      }`}
-                    >
-                      {preset.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <div>
                 <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
                   {t.admissionFeeLabel}

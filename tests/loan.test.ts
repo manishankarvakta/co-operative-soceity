@@ -11,6 +11,7 @@ jest.mock("../src/lib/db", () => ({
     },
     loan: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       count: jest.fn(),
@@ -28,6 +29,12 @@ jest.mock("../src/lib/db", () => ({
       findFirst: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
+    },
+    userRole: {
+      findMany: jest.fn(),
+    },
+    deposit: {
+      findMany: jest.fn(),
     },
     $transaction: jest.fn((cb) => cb(prisma)),
   },
@@ -51,13 +58,24 @@ jest.mock("../src/services/DashboardService", () => ({
   },
 }));
 
+jest.mock("../src/services/NotificationService", () => ({
+  NotificationService: {
+    sendLoanApprovalNotice: jest.fn().mockResolvedValue(undefined),
+    sendLoanRejectionNotice: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
 describe("Loan System Validation Schemas (Zod)", () => {
   describe("applyLoanSchema", () => {
+    const validUuid = "12345678-1234-1234-1234-1234567890ab";
+
     it("should validate a valid application payload", () => {
       const result = applyLoanSchema.safeParse({
         amount: 500000,
         interestRate: 10.5,
         durationMonths: 12,
+        durationValue: 12,
+        guarantor1Id: validUuid,
         remarks: "Emergency fund"
       });
       expect(result.success).toBe(true);
@@ -67,7 +85,8 @@ describe("Loan System Validation Schemas (Zod)", () => {
       const result = applyLoanSchema.safeParse({
         amount: -100,
         interestRate: 10,
-        durationMonths: 12
+        durationValue: 12,
+        guarantor1Id: validUuid
       });
       expect(result.success).toBe(false);
     });
@@ -156,15 +175,17 @@ describe("LoanService Business Logic & Calculation Math", () => {
     jest.clearAllMocks();
   });
 
+
+
   describe("calculateEmi", () => {
-    it("should calculate monthly EMI correctly using PMT formula (reducing balance)", () => {
+    it("should calculate monthly EMI correctly using flat rate", () => {
       const principal = 1000000; // 10,000 BDT in Paisa
-      const annualRate = 12.00;  // 12% annual rate = 1% per month
+      const annualRate = 12.00;  // 12% flat rate
       const durationMonths = 12;
 
-      // PMT: 1000000 * 0.01 * (1.01)^12 / ((1.01)^12 - 1) = 88848.78 -> 88849
+      // Flat EMI: (1000000 + (1000000 * 0.12)) / 12 = 93333.33 -> 93333
       const emi = LoanService.calculateEmi(principal, annualRate, durationMonths);
-      expect(emi).toBe(88849);
+      expect(emi).toBe(93333);
     });
 
     it("should calculate correct flat EMI if interest rate is 0%", () => {
@@ -174,23 +195,25 @@ describe("LoanService Business Logic & Calculation Math", () => {
   });
 
   describe("generateAmortizationSchedule", () => {
-    it("should generate proper month-by-month installments with a final rounding adjustments", () => {
+    it("should generate proper month-by-month installments with flat rate calculation", () => {
       const principal = 1000000; // 10,000 BDT in Paisa
-      const annualRate = 12.00;  // 1% per month
+      const annualRate = 12.00;  // 12% flat rate
       const durationMonths = 12;
       const startDate = new Date("2026-06-15");
 
-      const schedule = LoanService.generateAmortizationSchedule(principal, annualRate, durationMonths, startDate);
+      const result = LoanService.generateAmortizationSchedule(principal, annualRate, durationMonths, "MONTHLY", startDate);
+      const schedule = result.schedule;
 
       expect(schedule).toHaveLength(12);
 
       // Check first installment details
-      // Interest = 1000000 * 0.01 = 10000
-      // Principal = 88849 - 10000 = 78849
+      // Principal = 1000000 / 12 = 83333
+      // Interest = (1000000 * 0.12) / 12 = 10000
+      // Total = 93333
       expect(schedule[0].emiNumber).toBe(1);
       expect(schedule[0].interestAmount).toBe(10000);
-      expect(schedule[0].principalAmount).toBe(78849);
-      expect(schedule[0].totalAmount).toBe(88849);
+      expect(schedule[0].principalAmount).toBe(83333);
+      expect(schedule[0].totalAmount).toBe(93333);
 
       // Sum of all principal amounts must equal the original principal
       const totalPrincipal = schedule.reduce((sum, s) => sum + s.principalAmount, 0);
@@ -205,20 +228,39 @@ describe("LoanService Business Logic & Calculation Math", () => {
       (prisma.member.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        LoanService.applyLoan(memberId, 50000, 10, 6)
+        LoanService.applyLoan(memberId, 50000, 10, 6, "MONTHLY", "guarantor-uuid")
       ).rejects.toThrow("সদস্য খুঁজে পাওয়া যায়নি।");
     });
 
     it("should successfully save application with PENDING status and calculated EMI", async () => {
-      const mockMember = { id: memberId, name: "Sakib Al Hasan", deletedAt: null };
-      (prisma.member.findUnique as jest.Mock).mockResolvedValue(mockMember);
+      // Mock member lookup for member and guarantor
+      (prisma.member.findUnique as jest.Mock).mockImplementation(({ where }) => {
+        if (where.id === memberId) {
+          return Promise.resolve({ id: memberId, name: "Sakib Al Hasan", deletedAt: null });
+        }
+        if (where.id === "guarantor-uuid") {
+          return Promise.resolve({ id: "guarantor-uuid", name: "Mushfiqur Rahim", deletedAt: null });
+        }
+        return Promise.resolve(null);
+      });
+
+      (prisma.loan.findFirst as jest.Mock).mockResolvedValue(null);
+
+      (prisma.deposit.findMany as jest.Mock).mockResolvedValue([
+        {
+          items: [
+            { type: "WEEKLY_SUBSCRIPTION", amount: 2000000, deletedAt: null }
+          ]
+        }
+      ]);
+
       (prisma.loan.create as jest.Mock).mockResolvedValue({
         id: "loan-uuid",
         status: LoanStatus.PENDING,
-        emiAmount: 88849
+        emiAmount: 93333
       });
 
-      const loan = await LoanService.applyLoan(memberId, 1000000, 12, 12, "Need standard loan");
+      const loan = await LoanService.applyLoan(memberId, 1000000, 12, 12, "MONTHLY", "guarantor-uuid", null, false, "Need standard loan");
 
       expect(loan.id).toBe("loan-uuid");
       expect(loan.status).toBe(LoanStatus.PENDING);
@@ -228,7 +270,12 @@ describe("LoanService Business Logic & Calculation Math", () => {
           amount: 1000000,
           interestRate: 12,
           durationMonths: 12,
-          emiAmount: 88849,
+          durationValue: 12,
+          durationType: "MONTHLY",
+          guarantor1Id: "guarantor-uuid",
+          guarantor2Id: null,
+          bypassLimit: false,
+          emiAmount: 93333,
           remarks: "Need standard loan",
           status: LoanStatus.PENDING
         }
@@ -269,6 +316,9 @@ describe("LoanService Business Logic & Calculation Math", () => {
         member: { name: "Adnan", memberCode: "MEM-001" }
       };
       (prisma.loan.findUnique as jest.Mock).mockResolvedValue(mockLoan);
+      (prisma.userRole.findMany as jest.Mock).mockResolvedValue([
+        { role: { name: "SUPER_ADMIN" } }
+      ]);
       (prisma.loan.update as jest.Mock).mockResolvedValue({
         ...mockLoan,
         status: LoanStatus.REJECTED
@@ -293,19 +343,41 @@ describe("LoanService Business Logic & Calculation Math", () => {
         amount: 1000000,
         interestRate: 12,
         durationMonths: 12,
+        durationValue: 12,
+        durationType: "MONTHLY",
+        presidentApproved: true,
+        secretaryApproved: true,
+        treasurerApproved: false,
         deletedAt: null,
         member: { id: "member-uuid", name: "Rana", memberCode: "MEM-002" }
       };
 
       (prisma.loan.findUnique as jest.Mock).mockResolvedValue(mockLoan);
+      (prisma.userRole.findMany as jest.Mock).mockResolvedValue([
+        { role: { name: "TREASURER" } }
+      ]);
       (prisma.bankAccount.findFirst as jest.Mock).mockResolvedValue({
         id: "cash-acc-id",
         name: "Cash on Hand",
         balance: 1500000 // has sufficient balance
       });
-      (prisma.loan.update as jest.Mock).mockResolvedValue({
-        ...mockLoan,
-        status: LoanStatus.ACTIVE
+      (prisma.loan.update as jest.Mock).mockImplementation(({ where, data }) => {
+        if (data.status === LoanStatus.ACTIVE) {
+          return Promise.resolve({
+            ...mockLoan,
+            presidentApproved: true,
+            secretaryApproved: true,
+            treasurerApproved: true,
+            status: LoanStatus.ACTIVE,
+            disbursedAt: new Date()
+          });
+        }
+        return Promise.resolve({
+          ...mockLoan,
+          presidentApproved: true,
+          secretaryApproved: true,
+          treasurerApproved: true
+        });
       });
       (prisma.loanSchedule.createMany as jest.Mock).mockResolvedValue({ count: 12 });
 
@@ -333,6 +405,7 @@ describe("LoanService Business Logic & Calculation Math", () => {
           status: LoanStatus.ACTIVE,
           disbursedAt: expect.any(Date),
           disbursedById: actorId,
+          emiAmount: 93333,
           remarks: "Approved & Disbursed"
         }
       });

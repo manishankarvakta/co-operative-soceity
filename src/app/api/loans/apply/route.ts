@@ -16,8 +16,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "অনুমতি নেই।" }, { status: 403 });
     }
 
+    const isStaffOrAdmin = session.user.roles?.some((role: string) =>
+      ["SUPER_ADMIN", "ACCOUNTANT", "PRESIDENT", "SECRETARY", "TREASURER"].includes(role)
+    );
+
     const memberId = session.user.memberId;
-    if (!memberId) {
+    if (!memberId && !isStaffOrAdmin) {
       return NextResponse.json(
         { success: false, code: "FORBIDDEN", message: "শুধুমাত্র নিবন্ধিত সদস্যরাই ঋণের জন্য আবেদন করতে পারবেন।" },
         { status: 403 }
@@ -37,8 +41,27 @@ export async function POST(request: Request) {
       );
     }
 
-    const { amount, interestRate, durationMonths, remarks } = parsed.data;
-    const loan = await LoanService.applyLoan(memberId, amount, interestRate, durationMonths, remarks);
+    const targetMemberId = (isStaffOrAdmin && parsed.data.memberId) ? parsed.data.memberId : session.user.memberId;
+
+    if (!targetMemberId) {
+      return NextResponse.json(
+        { success: false, code: "BAD_REQUEST", message: "ঋণের জন্য সদস্য আইডি প্রদান করা আবশ্যক।" },
+        { status: 400 }
+      );
+    }
+
+    const { amount, interestRate, durationValue, durationType, guarantor1Id, guarantor2Id, bypassLimit, remarks } = parsed.data;
+    const loan = await LoanService.applyLoan(
+      targetMemberId,
+      amount,
+      interestRate,
+      durationValue,
+      durationType,
+      guarantor1Id,
+      guarantor2Id,
+      bypassLimit,
+      remarks
+    );
 
     return NextResponse.json({ success: true, loan }, { status: 201 });
   } catch (error) {

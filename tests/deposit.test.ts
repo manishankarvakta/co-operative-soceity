@@ -23,7 +23,8 @@ jest.mock("../src/lib/db", () => ({
     },
     bankAccount: {
       findFirst: jest.fn(),
-      update: jest.fn()
+      update: jest.fn(),
+      upsert: jest.fn()
     },
     $transaction: jest.fn((cb) => cb(prisma))
   }
@@ -190,10 +191,15 @@ describe("DepositService Business Logic", () => {
       }
     });
 
-    // Cash box account balance incremented by 650000 (total amount in Paisa)
-    expect(prisma.bankAccount.update).toHaveBeenCalledWith({
-      where: { id: "cash-acc" },
-      data: { balance: { increment: 650000 } }
+    // Cash box account balance upserted by 650000 (total amount in Paisa)
+    expect(prisma.bankAccount.upsert).toHaveBeenCalledWith({
+      where: { accountNumber: "CASH-001" },
+      update: { balance: { increment: 650000 } },
+      create: {
+        accountNumber: "CASH-001",
+        name: "Cash on Hand",
+        balance: 650000
+      }
     });
   });
 
