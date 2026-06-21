@@ -50,6 +50,7 @@ export class MemberService {
       password?: string;
       paymentMode?: "CASH" | "BANK";
       bankAccountId?: string | null;
+      admissionFee?: number;
     },
     actorId?: string | null
   ) {
@@ -124,11 +125,12 @@ export class MemberService {
         tx
       });
 
-      // Automatically generate 5000 BDT Admission Fee deposit if deposit model is mocked/available
+      // Automatically generate Admission Fee deposit if deposit model is mocked/available
       if (tx.deposit) {
         const mockCheck = await tx.member.findUnique({ where: { id: member.id } });
         if (mockCheck) {
           const { DepositService } = await import("./DepositService");
+          const feeInPaisa = typeof data.admissionFee === "number" ? data.admissionFee * 100 : 500000;
           await DepositService.createBulkDeposit(
             actorId || user.id,
             {
@@ -139,7 +141,7 @@ export class MemberService {
               items: [
                 {
                   type: "ADMISSION_FEE",
-                  amount: 500000, // 5000 BDT = 500000 Paisa
+                  amount: feeInPaisa,
                   periodDetails: `Admission Fee - ${member.memberCode}`
                 }
               ]

@@ -20,7 +20,8 @@ export const createMemberSchema = z.object({
   nominee: nomineeSchema,
   password: z.string().min(6, "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।").optional(),
   paymentMode: z.enum(["CASH", "BANK"]).optional(),
-  bankAccountId: z.string().optional()
+  bankAccountId: z.string().optional(),
+  admissionFee: z.number().optional()
 }).strict();
 
 export const updateMemberSchema = z.object({

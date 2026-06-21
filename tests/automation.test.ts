@@ -40,7 +40,8 @@ jest.mock("../src/lib/db", () => {
     bankAccount: {
       findFirst: jest.fn(),
       update: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
+      upsert: jest.fn()
     },
     profitDistribution: {
       create: jest.fn()
@@ -169,10 +170,10 @@ describe("ERP Business Logic Automation Tests", () => {
       );
 
       // Verify Cash account updated
-      expect(prisma.bankAccount.update).toHaveBeenCalledWith(
+      expect(prisma.bankAccount.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: "cash-account-id" },
-          data: { balance: { increment: 500000 } }
+          where: { accountNumber: "CASH-001" },
+          update: { balance: { increment: 500000 } }
         })
       );
 

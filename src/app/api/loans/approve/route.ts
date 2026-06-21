@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { loanId, status, paymentMode, bankAccountId, remarks } = parsed.data;
+    const { loanId, status, paymentMode, bankAccountId, remarks, approveAsRole } = parsed.data;
 
     // Dynamically check permission based on the status action
     const action = status === "APPROVED" ? "approve" : "reject";
@@ -36,7 +36,8 @@ export async function POST(request: Request) {
     const loan = await LoanService.approveLoan(loanId, status, session.user.id, {
       paymentMode,
       bankAccountId,
-      remarks
+      remarks,
+      approveAsRole
     });
 
     return NextResponse.json({ success: true, loan });

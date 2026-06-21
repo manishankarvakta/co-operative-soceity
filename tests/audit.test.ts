@@ -39,7 +39,8 @@ jest.mock("../src/lib/db", () => ({
       findUnique: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
+      upsert: jest.fn()
     },
     bankTransaction: {
       create: jest.fn(),

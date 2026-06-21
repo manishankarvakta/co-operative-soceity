@@ -25,17 +25,18 @@ export default function DepositForm() {
 
   // Billing types checkboxes and amounts (values in raw BDT)
   const [bills, setBills] = useState({
-    WEEKLY_SUBSCRIPTION: { checked: false, amount: "1000", period: "Week 01" },
-    ADMISSION_FEE: { checked: false, amount: "5000", period: "Admission" },
-    PENALTY: { checked: false, amount: "500", period: "Late Fine" },
-    OTHER: { checked: false, amount: "0", period: "Miscellaneous" }
+    WEEKLY_SUBSCRIPTION: { checked: false, amount: "1000", period: "Week 01", visible: true },
+    ADMISSION_FEE: { checked: false, amount: "5000", period: "Admission", visible: true },
+    PENALTY: { checked: false, amount: "500", period: "Late Fine", visible: true },
+    OTHER: { checked: false, amount: "0", period: "Miscellaneous", visible: true },
+    LOAN_REPAYMENT: { checked: false, amount: "0", period: "Installment", visible: false }
   });
 
   useEffect(() => {
     // Fetch active members to populate dropdown selectors
     const loadMembers = async () => {
       try {
-        const res = await fetch("/api/members?limit=100");
+        const res = await fetch("/api/members?limit=200");
         const data = await res.json();
         setMembers(data.members || []);
       } catch (err) {
@@ -60,6 +61,57 @@ export default function DepositForm() {
     loadBanks();
   }, []);
 
+  // Fetch active loan and late penalties when member selection changes
+  useEffect(() => {
+    if (!selectedMemberId) {
+      setBills((prev) => ({
+        ...prev,
+        LOAN_REPAYMENT: { checked: false, amount: "0", period: "Installment", visible: false }
+      }));
+      return;
+    }
+
+    const loadActiveLoan = async () => {
+      try {
+        const res = await fetch(`/api/loans/active?memberId=${selectedMemberId}`);
+        const data = await res.json();
+        if (data.success && data.hasActiveLoan) {
+          setBills((prev) => {
+            const nextState = {
+              ...prev,
+              LOAN_REPAYMENT: {
+                checked: true, // auto-check active installment
+                amount: String(data.nextSchedule?.remainingAmountBdt || 0),
+                period: data.nextSchedule ? `Installment ${data.nextSchedule.emiNumber}` : "Installment",
+                visible: true
+              }
+            };
+            
+            // If there's an overdue penalty fee calculated, auto-check and pre-populate Penalty
+            if (data.penaltyAmountBdt > 0) {
+              nextState.PENALTY = {
+                checked: true,
+                amount: String(data.penaltyAmountBdt),
+                period: `Late Fine (${data.overdueCount} schedule(s))`,
+                visible: true
+              };
+            }
+            return nextState;
+          });
+        } else {
+          setBills((prev) => ({
+            ...prev,
+            LOAN_REPAYMENT: { checked: false, amount: "0", period: "Installment", visible: false }
+          }));
+        }
+      } catch (err) {
+        console.error("Error loading active loan details:", err);
+      }
+    };
+
+    loadActiveLoan();
+  }, [selectedMemberId]);
+
   const handleCheckboxChange = (type: keyof typeof bills) => {
     setBills((prev) => ({
       ...prev,
@@ -83,7 +135,7 @@ export default function DepositForm() {
 
   // Calculate dynamic totals
   const totalBdt = Object.values(bills)
-    .filter((b) => b.checked)
+    .filter((b) => b.checked && b.visible)
     .reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
 
   // Auto share calculation (1 Share = 1,000 BDT subscription)
@@ -103,7 +155,7 @@ export default function DepositForm() {
     }
 
     const activeItems = Object.entries(bills)
-      .filter(([_, b]) => b.checked)
+      .filter(([_, b]) => b.checked && b.visible)
       .map(([type, b]) => ({
         type,
         amount: Math.round((parseFloat(b.amount) || 0) * 100), // Convert to Paisa/Cents
@@ -277,7 +329,7 @@ export default function DepositForm() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
-            {Object.entries(bills).map(([type, b]) => (
+            {Object.entries(bills).filter(([_, b]) => b.visible).map(([type, b]) => (
               <tr key={type} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/30 transition-colors">
                 <td className="px-5 py-4 text-center">
                   <input
@@ -294,6 +346,8 @@ export default function DepositForm() {
                     ? "ভর্তি ফি (Admission)"
                     : type === "PENALTY"
                     ? "জরিমানা (Penalty)"
+                    : type === "LOAN_REPAYMENT"
+                    ? "লোন কিস্তি (Loan Repayment)"
                     : "অন্যান্য (Other)"}
                 </td>
                 <td className="px-5 py-4">

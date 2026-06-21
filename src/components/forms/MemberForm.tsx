@@ -91,11 +91,37 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
   const [paymentMode, setPaymentMode] = useState<"CASH" | "BANK">("CASH");
   const [bankAccountId, setBankAccountId] = useState("");
   const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [admissionFee, setAdmissionFee] = useState<number>(5000);
 
   const isEditMode = !!initialData;
 
   useEffect(() => {
+    const loadSavedFee = () => {
+      const savedFee = localStorage.getItem("somoby_admission_fee");
+      if (savedFee) {
+        const parsed = parseInt(savedFee, 10);
+        if (!isNaN(parsed)) {
+          setAdmissionFee(parsed);
+        }
+      }
+    };
+
+    loadSavedFee();
+
+    window.addEventListener("somoby_settings_changed", loadSavedFee);
+    return () => {
+      window.removeEventListener("somoby_settings_changed", loadSavedFee);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isEditMode) {
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      setJoinDate(`${year}-${month}-${day}`);
+
       fetch("/api/bank/accounts")
         .then((res) => res.json())
         .then((data) => {
@@ -257,7 +283,8 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       },
       ...(!isEditMode && {
         paymentMode,
-        bankAccountId: paymentMode === "BANK" ? bankAccountId : undefined
+        bankAccountId: paymentMode === "BANK" ? bankAccountId : undefined,
+        admissionFee
       })
     };
 
@@ -375,8 +402,8 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
           {!isEditMode && (
             <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg space-y-4">
               <div className="flex justify-between items-center text-sm font-semibold text-emerald-800 dark:text-emerald-300 border-b border-emerald-200/50 pb-2">
-                <span>{L.admissionFee}</span>
-                <span>৫,০০০ BDT</span>
+                <span>{lang === "BN" ? "ভর্তি ফি" : "Admission Fee"}</span>
+                <span>{admissionFee.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")} BDT</span>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

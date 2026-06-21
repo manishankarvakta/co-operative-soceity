@@ -72,7 +72,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<Resource, Action[]>>> = {
     projects: ["read"],
     backups: [],
     reports: ["read"],
-    loans: ["read"],
+    loans: ["read", "approve", "reject"],
   },
   TREASURER: {
     accounting: ["read"],
@@ -83,7 +83,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<Resource, Action[]>>> = {
     projects: ["read"],
     backups: [],
     reports: ["read"],
-    loans: ["read"],
+    loans: ["read", "approve", "reject"],
   },
   MEMBER: {
     accounting: [],
