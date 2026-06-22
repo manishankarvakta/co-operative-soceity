@@ -86,7 +86,7 @@ export default function BankWorkspacePage() {
   const labels = {
     BN: {
       title: "ব্যাংক ও নগদ অ্যাকাউন্ট ব্যবস্থাপনা (Bank Workspace)",
-      subtitle: "সমিতির ব্যাংক হিসাবসমূহ, স্থানান্তর খতিয়ান এবং অফিসারদের স্বাক্ষর কনসোল।",
+      subtitle: "সমিতির bank হিসাবসমূহ, স্থানান্তর খতিয়ান এবং অফিসারদের স্বাক্ষর কনসোল।",
       addAcc: "+ নতুন অ্যাকাউন্ট তৈরি",
       closeAcc: "ফর্ম বন্ধ করুন",
       addTx: "+ লেনদেন / স্থানান্তর এন্ট্রি",
@@ -141,7 +141,7 @@ export default function BankWorkspacePage() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-8">
+    <div className="space-y-6">
 
       {/* Sign-off Confirm Modal */}
       <ConfirmModal
@@ -165,16 +165,16 @@ export default function BankWorkspacePage() {
       {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Header */}
+      {/* Header Bar */}
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">{labels[lang].title}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
         </div>
         <div className="flex gap-3">
           <Link
-            href="/dashboard/bank/new"
-            className="px-4 py-2 bg-gray-150 hover:bg-gray-250 border border-gray-200 dark:bg-zinc-800 text-gray-850 dark:text-white font-bold text-sm rounded-lg shadow transition text-center"
+            href="/dashboard/accounting/bank/new"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-250 dark:bg-zinc-800 text-gray-850 dark:text-white font-bold text-sm rounded-lg shadow transition text-center"
           >
             {labels[lang].addAcc}
           </Link>
@@ -227,7 +227,7 @@ export default function BankWorkspacePage() {
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow overflow-hidden">
             <div className="overflow-x-auto text-sm">
               <table className="w-full text-left">
-                <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800">
+                <thead className="bg-gray-55 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800">
                   <tr>
                     <th className="px-6 py-4">{labels[lang].colAccName}</th>
                     <th className="px-6 py-4">{labels[lang].colTxType}</th>

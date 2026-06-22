@@ -19,10 +19,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || undefined;
     const status = (searchParams.get("status") as MemberStatus) || undefined;
+    const role = searchParams.get("role") || undefined;
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-    const result = await MemberService.listMembers({ search, status, page, limit });
+    const result = await MemberService.listMembers({ search, status, page, limit, role });
     return NextResponse.json(result);
   } catch (error) {
     console.error("GET Members Exception:", error);

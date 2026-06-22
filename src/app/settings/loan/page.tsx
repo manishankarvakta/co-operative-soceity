@@ -40,7 +40,7 @@ const translations = {
     duplicateError: "এই মেয়াদ এবং ধরনের পলিসি ইতিমধ্যে বিদ্যমান রয়েছে।"
   },
   EN: {
-    title: "Loan Rules & Rates Settings",
+    title: "Loan Rules & Rates Settingss",
     subtitle: "Configure installment durations and interest rates for loan applications",
     cardTitle: "Loan Duration & Service Charge Policies",
     cardDesc: "Policies defined here will automatically populate and apply calculations in the Loan Application Form.",
@@ -159,7 +159,7 @@ export default function LoanSettingsPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-8xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>

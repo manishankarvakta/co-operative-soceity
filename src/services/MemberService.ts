@@ -324,6 +324,7 @@ export class MemberService {
     status?: MemberStatus;
     page?: number;
     limit?: number;
+    role?: string;
   }) {
     const page = params.page || 1;
     const limit = params.limit || 10;
@@ -333,6 +334,18 @@ export class MemberService {
       deletedAt: null,
       status: params.status || undefined
     };
+
+    if (params.role) {
+      whereClause.user = {
+        userRoles: {
+          some: {
+            role: {
+              name: params.role
+            }
+          }
+        }
+      };
+    }
 
     if (params.search) {
       whereClause.OR = [
@@ -370,7 +383,18 @@ export class MemberService {
   static async getMemberById(id: string) {
     const member = await prisma.member.findUnique({
       where: { id },
-      include: { nominee: true }
+      include: {
+        nominee: true,
+        user: {
+          include: {
+            userRoles: {
+              include: {
+                role: true
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!member || member.deletedAt) {

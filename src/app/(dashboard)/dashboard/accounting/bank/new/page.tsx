@@ -37,7 +37,7 @@ export default function NewBankAccountPage() {
       } else {
         showToast("success", lang === "BN" ? "অ্যাকাউন্ট তৈরি হয়েছে" : "Account Created", lang === "BN" ? "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।" : "Account created successfully.");
         setTimeout(() => {
-          router.push("/dashboard/bank");
+          router.push("/dashboard/accounting/bank");
         }, 1000);
       }
     } catch (err) {
@@ -76,7 +76,7 @@ export default function NewBankAccountPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">{labels[lang].subtitle}</p>
         </div>
         <button
-          onClick={() => router.push("/dashboard/bank")}
+          onClick={() => router.push("/dashboard/accounting/bank")}
           className="px-4 py-2 border rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
         >
           {labels[lang].back}

@@ -1,7 +1,9 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { ShieldAlert } from "lucide-react";
 import MemberForm from "@/components/forms/MemberForm";
 import NomineeForm from "@/components/forms/NomineeForm";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
@@ -16,12 +18,25 @@ interface ProfilePageProps {
 export default function MemberProfilePage({ params }: ProfilePageProps) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const { lang } = useLanguage();
   const [member, setMember] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editNomineeMode, setEditNomineeMode] = useState(false);
+
+  const [selectedRole, setSelectedRole] = useState("");
+  const [roleUpdating, setRoleUpdating] = useState(false);
+
+  const isSuperAdmin = session?.user && (session.user as any).roles?.includes("SUPER_ADMIN");
+
+  useEffect(() => {
+    if (searchParams.get("edit") === "true") {
+      setEditMode(true);
+    }
+  }, [searchParams]);
 
   // Modal & Toast
   const { toast, showToast } = useToast();
@@ -99,6 +114,14 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
         setError(data.message || labels[lang].errorNotFoud);
       } else {
         setMember(data);
+        const roles = data.user?.userRoles?.map((ur: any) => ur.role.name) || [];
+        if (roles.includes("SUPER_ADMIN")) {
+          setSelectedRole("SUPER_ADMIN");
+        } else if (roles.includes("ACCOUNTANT")) {
+          setSelectedRole("ACCOUNTANT");
+        } else {
+          setSelectedRole("MEMBER");
+        }
       }
     } catch (err) {
       setError(labels[lang].serverError);
@@ -130,6 +153,28 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
       showToast("error", labels[lang].serverError, labels[lang].serverError);
     } finally {
       setDeleteLoading(false);
+    }
+  };
+
+  const handleRoleUpdate = async () => {
+    setRoleUpdating(true);
+    try {
+      const response = await fetch(`/api/members/${id}/role`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: selectedRole })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        showToast("error", lang === "BN" ? "রোল আপডেট ব্যর্থ" : "Role Update Failed", result.message || result.error || "");
+      } else {
+        showToast("success", lang === "BN" ? "রোল আপডেট সফল" : "Role Updated", result.message || "");
+        fetchProfile();
+      }
+    } catch (error) {
+      showToast("error", labels[lang].serverError, labels[lang].serverError);
+    } finally {
+      setRoleUpdating(false);
     }
   };
 
@@ -222,46 +267,91 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Member Profile Card */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-            <h2 className="text-lg font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-              {labels[lang].profileSummary}
-            </h2>
+        {/* Left Column: Member Profile Card & Role Settings */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+              <h2 className="text-lg font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                {labels[lang].profileSummary}
+              </h2>
+            </div>
+            <div className="px-6 py-2">
+              <dl className="divide-y divide-gray-100 dark:divide-zinc-800 text-sm">
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].mobile}</dt>
+                  <dd className="font-bold font-mono text-gray-900 dark:text-white">{member.phone}</dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].email}</dt>
+                  <dd className="font-semibold text-gray-900 dark:text-white">{member.email || "—"}</dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].joinDate}</dt>
+                  <dd className="font-semibold text-gray-900 dark:text-white font-mono">
+                    {new Date(member.joinDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
+                  </dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].status}</dt>
+                  <dd>
+                    <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                      {member.status}
+                    </span>
+                  </dd>
+                </div>
+                <div className="py-4 flex justify-between items-center">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium">
+                    {lang === "BN" ? "সিস্টেম রোল" : "System Role"}
+                  </dt>
+                  <dd className="font-bold text-gray-900 dark:text-white">
+                    <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-zinc-800 border dark:border-zinc-700">
+                      {(() => {
+                        const roles = member.user?.userRoles?.map((ur: any) => ur.role.name) || [];
+                        if (roles.includes("SUPER_ADMIN")) return lang === "BN" ? "এডমিন" : "Admin";
+                        if (roles.includes("ACCOUNTANT")) return lang === "BN" ? "হিসাব রক্ষক" : "Accounter";
+                        return lang === "BN" ? "সাধারণ সদস্য" : "Member";
+                      })()}
+                    </span>
+                  </dd>
+                </div>
+                <div className="py-4">
+                  <dt className="text-gray-500 dark:text-gray-400 font-medium mb-2">{labels[lang].address}</dt>
+                  <dd className="bg-gray-50 dark:bg-zinc-850/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
+                    {member.address}
+                  </dd>
+                </div>
+              </dl>
+            </div>
           </div>
-          <div className="px-6 py-2">
-            <dl className="divide-y divide-gray-100 dark:divide-zinc-800 text-sm">
-              <div className="py-4 flex justify-between items-center">
-                <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].mobile}</dt>
-                <dd className="font-bold font-mono text-gray-900 dark:text-white">{member.phone}</dd>
+
+          {/* Role Settings Card */}
+          {isSuperAdmin && (
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden p-6">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <ShieldAlert className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-450" />
+                {lang === "BN" ? "ভূমিকা ও অ্যাক্সেস নিয়ন্ত্রণ" : "Role & Access Control"}
+              </h3>
+              <div className="flex items-center gap-4">
+                <select
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  className="block w-full max-w-xs px-3 py-2 text-sm bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:text-white"
+                >
+                  <option value="MEMBER">{lang === "BN" ? "সদস্য (Member)" : "Member"}</option>
+                  <option value="ACCOUNTANT">{lang === "BN" ? "হিসাব রক্ষক (Accounter)" : "Accounter"}</option>
+                  <option value="SUPER_ADMIN">{lang === "BN" ? "এডমিন (Admin)" : "Admin"}</option>
+                </select>
+                <button
+                  onClick={handleRoleUpdate}
+                  disabled={roleUpdating}
+                  className="px-4 py-2 text-xs font-bold text-white bg-emerald-650 hover:bg-emerald-700 rounded-lg shadow-sm disabled:opacity-50 transition-all shrink-0"
+                >
+                  {roleUpdating ? (lang === "BN" ? "আপডেট হচ্ছে..." : "Updating...") : (lang === "BN" ? "রোল পরিবর্তন করুন" : "Update Role")}
+                </button>
               </div>
-              <div className="py-4 flex justify-between items-center">
-                <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].email}</dt>
-                <dd className="font-semibold text-gray-900 dark:text-white">{member.email || "—"}</dd>
-              </div>
-              <div className="py-4 flex justify-between items-center">
-                <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].joinDate}</dt>
-                <dd className="font-semibold text-gray-900 dark:text-white font-mono">
-                  {new Date(member.joinDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
-                </dd>
-              </div>
-              <div className="py-4 flex justify-between items-center">
-                <dt className="text-gray-500 dark:text-gray-400 font-medium">{labels[lang].status}</dt>
-                <dd>
-                  <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-                    {member.status}
-                  </span>
-                </dd>
-              </div>
-              <div className="py-4">
-                <dt className="text-gray-500 dark:text-gray-400 font-medium mb-2">{labels[lang].address}</dt>
-                <dd className="bg-gray-50 dark:bg-zinc-850/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
-                  {member.address}
-                </dd>
-              </div>
-            </dl>
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Nominee Profile Card */}
