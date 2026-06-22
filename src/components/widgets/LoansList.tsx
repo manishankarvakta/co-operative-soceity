@@ -117,15 +117,15 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
           <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
         </div>
         {showApplyButton && (
-          <button
-            onClick={() => setIsApplyModalOpen(true)}
+          <Link
+            href="/dashboard/microfinance/apply"
             className="flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition duration-200 shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             {L.newBtn}
-          </button>
+          </Link>
         )}
       </div>
 
@@ -231,20 +231,7 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
         </div>
       )}
 
-      {/* Apply Loan Modal Dialog */}
-      {isApplyModalOpen && (
-        <div className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200">
-            <LoanApplicationForm
-              onSuccess={() => {
-                setIsApplyModalOpen(false);
-                fetchLoans();
-              }}
-              onCancel={() => setIsApplyModalOpen(false)}
-            />
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

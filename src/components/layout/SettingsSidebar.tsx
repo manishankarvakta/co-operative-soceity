@@ -8,11 +8,13 @@ const translations = {
   BN: {
     settingsTitle: "সিস্টেম সেটিংস",
     admitFeeLink: "ভর্তি ফি (Admit Fee)",
+    loanLink: "ঋণ পলিসি (Loan Rules)",
     backToDashboard: "ড্যাশবোর্ডে ফিরে যান",
   },
   EN: {
     settingsTitle: "System Settings",
     admitFeeLink: "Admission Fee Settings",
+    loanLink: "Loan Rules & Rates",
     backToDashboard: "Back to Dashboard",
   }
 };
@@ -23,7 +25,22 @@ export default function SettingsSidebar() {
   const t = translations[lang];
 
   const menuItems = [
-    { key: "admitFee", href: "/settings/admitFee", label: t.admitFeeLink },
+    {
+      key: "admitFee",
+      href: "/settings/admitFee",
+      label: t.admitFeeLink,
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-1.958-.59c-1.007-.733-1.007-1.921 0-2.654 1.008-.733 2.64-.733 3.648 0L14 9.182M12 3v3m0 12v3" />
+      )
+    },
+    {
+      key: "loan",
+      href: "/settings/loan",
+      label: t.loanLink,
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      )
+    }
   ];
 
   return (
@@ -54,7 +71,7 @@ export default function SettingsSidebar() {
                 }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-1.958-.59c-1.007-.733-1.007-1.921 0-2.654 1.008-.733 2.64-.733 3.648 0L14 9.182M12 3v3m0 12v3" />
+                {item.icon}
               </svg>
               {item.label}
             </Link>

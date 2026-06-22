@@ -3,6 +3,21 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
 
+interface LoanRule {
+  id: string;
+  durationValue: number;
+  durationType: "WEEKLY" | "MONTHLY";
+  interestRate: number;
+}
+
+const DEFAULT_RULES: LoanRule[] = [
+  { id: "1", durationValue: 10, durationType: "WEEKLY", interestRate: 10 },
+  { id: "2", durationValue: 20, durationType: "WEEKLY", interestRate: 12 },
+  { id: "3", durationValue: 3, durationType: "MONTHLY", interestRate: 8 },
+  { id: "4", durationValue: 6, durationType: "MONTHLY", interestRate: 10 },
+  { id: "5", durationValue: 12, durationType: "MONTHLY", interestRate: 12 }
+];
+
 interface LoanApplicationFormProps {
   onSuccess: () => void;
   onCancel: () => void;
@@ -15,6 +30,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
 
   // Lists
   const [members, setMembers] = useState<any[]>([]);
+  const [loanRules, setLoanRules] = useState<LoanRule[]>(DEFAULT_RULES);
   
   // Form State
   const [memberId, setMemberId] = useState("");
@@ -24,13 +40,24 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
   const [durationType, setDurationType] = useState<"MONTHLY" | "WEEKLY">("MONTHLY");
   const [guarantor1Id, setGuarantor1Id] = useState("");
   const [guarantor2Id, setGuarantor2Id] = useState("");
-  const [bypassLimit, setBypassLimit] = useState(false);
+  const [bypassLimit, setBypassLimit] = useState(true);
   const [remarks, setRemarks] = useState("");
+  const [selectedRuleId, setSelectedRuleId] = useState("");
 
   // Member Status / Savings Check
   const [checkingSavings, setCheckingSavings] = useState(false);
   const [hasActiveLoan, setHasActiveLoan] = useState(false);
   const [totalSavingsBdt, setTotalSavingsBdt] = useState(0);
+
+  const handleRuleChange = (ruleId: string) => {
+    setSelectedRuleId(ruleId);
+    const rule = loanRules.find((r) => r.id === ruleId);
+    if (rule) {
+      setDurationValue(rule.durationValue.toString());
+      setDurationType(rule.durationType);
+      setInterestRate(rule.interestRate.toString());
+    }
+  };
 
   useEffect(() => {
     // Fetch members to populate dropdown selectors
@@ -44,6 +71,42 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
       }
     };
     loadMembers();
+
+    const loadLoanRules = async () => {
+      try {
+        const res = await fetch("/api/loans/rules");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.rules) && data.rules.length > 0) {
+          setLoanRules(data.rules);
+          const first = data.rules[0];
+          setSelectedRuleId(first.id);
+          setDurationValue(first.durationValue.toString());
+          setDurationType(first.durationType);
+          setInterestRate(first.interestRate.toString());
+        } else {
+          setLoanRules(DEFAULT_RULES);
+          const firstDefault = DEFAULT_RULES[0];
+          setSelectedRuleId(firstDefault.id);
+          setDurationValue(firstDefault.durationValue.toString());
+          setDurationType(firstDefault.durationType);
+          setInterestRate(firstDefault.interestRate.toString());
+        }
+      } catch (err) {
+        console.error("Error loading loan rules:", err);
+        setLoanRules(DEFAULT_RULES);
+        const firstDefault = DEFAULT_RULES[0];
+        setSelectedRuleId(firstDefault.id);
+        setDurationValue(firstDefault.durationValue.toString());
+        setDurationType(firstDefault.durationType);
+        setInterestRate(firstDefault.interestRate.toString());
+      }
+    };
+    loadLoanRules();
+
+    window.addEventListener("somoby_settings_changed", loadLoanRules);
+    return () => {
+      window.removeEventListener("somoby_settings_changed", loadLoanRules);
+    };
   }, []);
 
   // When selected member changes, check active loan and total savings
@@ -248,16 +311,9 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
             <p className="text-xs text-gray-400 mt-1">{L.checking}</p>
           )}
 
-          {memberId && !checkingSavings && (
-            <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-zinc-850 border border-gray-100 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-              {hasActiveLoan ? (
-                <p className="text-rose-500 font-bold">{L.activeLoanError}</p>
-              ) : (
-                <>
-                  <p>{L.savingsInfo} <span className="font-bold text-gray-800 dark:text-white font-mono">{totalSavingsBdt.toLocaleString()} BDT</span></p>
-                  <p>{L.limitInfo} <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">{maxEligible.toLocaleString()} BDT</span></p>
-                </>
-              )}
+          {memberId && !checkingSavings && hasActiveLoan && (
+            <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-zinc-850 border border-gray-100 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-rose-500 font-bold">{L.activeLoanError}</p>
             </div>
           )}
         </div>
@@ -298,11 +354,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
             className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white font-mono"
             placeholder="e.g. 10000"
           />
-          {exceedsLimit && !bypassLimit && !hasActiveLoan && memberId && (
-            <p className="text-[11px] text-rose-500 font-semibold mt-1">
-              ⚠️ ঋণের পরিমাণ সঞ্চয়ের ৮০% অতিক্রম করেছে। (সীমা: {maxEligible} BDT)
-            </p>
-          )}
+
         </div>
 
         {/* Guarantor 2 */}
@@ -326,61 +378,42 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
           </select>
         </div>
 
-        {/* Interest Rate */}
+        {/* Duration & Policy Selection */}
         <div>
           <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
-            {L.interestRate} <span className="text-rose-500">*</span>
+            {lang === "BN" ? "ঋণের মেয়াদ (Duration & Rate)" : "Loan Duration & Rate"} <span className="text-rose-500">*</span>
+          </label>
+          <select
+            value={selectedRuleId}
+            onChange={(e) => handleRuleChange(e.target.value)}
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-205 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
+          >
+            {loanRules.map((rule) => {
+              const typeStr = rule.durationType === "WEEKLY" ? (lang === "BN" ? "সপ্তাহ" : "Weeks") : (lang === "BN" ? "মাস" : "Months");
+              return (
+                <option key={rule.id} value={rule.id}>
+                  {rule.durationValue} {typeStr} ({rule.interestRate}% Flat)
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        {/* Interest Rate (Auto-filled & Read-only) */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+            {L.interestRate}
           </label>
           <input
-            type="number"
-            step="0.1"
-            required
-            disabled={hasActiveLoan || !memberId}
-            value={interestRate}
-            onChange={(e) => setInterestRate(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white font-mono"
-            placeholder="10"
+            type="text"
+            readOnly
+            disabled
+            value={`${interestRate}% Flat`}
+            className="w-full px-4 py-2.5 text-sm bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl dark:text-zinc-400 font-mono font-semibold cursor-not-allowed"
           />
         </div>
 
-        {/* Frequency & Duration */}
-        <div>
-          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
-            {L.durationType} & {L.duration} <span className="text-rose-500">*</span>
-          </label>
-          <div className="flex gap-2">
-            <select
-              value={durationType}
-              onChange={(e) => setDurationType(e.target.value as any)}
-              className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
-            >
-              <option value="MONTHLY">{L.monthly}</option>
-              <option value="WEEKLY">{L.weekly}</option>
-            </select>
-            <input
-              type="number"
-              required
-              disabled={hasActiveLoan || !memberId}
-              value={durationValue}
-              onChange={(e) => setDurationValue(e.target.value)}
-              className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white font-mono"
-              placeholder={durationType === "WEEKLY" ? "50" : "12"}
-            />
-          </div>
-        </div>
 
-        {/* Bypass Limit */}
-        <div className="flex items-center pt-5">
-          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 font-semibold cursor-pointer">
-            <input
-              type="checkbox"
-              checked={bypassLimit}
-              onChange={(e) => setBypassLimit(e.target.checked)}
-              className="w-4 h-4 text-emerald-600 bg-gray-150 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
-            />
-            {L.bypass}
-          </label>
-        </div>
 
         {/* Remarks */}
         <div className="md:col-span-2">

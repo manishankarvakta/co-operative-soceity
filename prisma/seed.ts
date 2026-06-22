@@ -177,6 +177,24 @@ async function main() {
   });
   console.log('Test active fiscal year created.');
 
+  // 6. Seed default Loan Rules if none exist
+  const existingRulesCount = await prisma.loanRule.count();
+  if (existingRulesCount === 0) {
+    const defaultRules = [
+      { durationValue: 10, durationType: "WEEKLY", interestRate: 10 },
+      { durationValue: 20, durationType: "WEEKLY", interestRate: 12 },
+      { durationValue: 3, durationType: "MONTHLY", interestRate: 8 },
+      { durationValue: 6, durationType: "MONTHLY", interestRate: 10 },
+      { durationValue: 12, durationType: "MONTHLY", interestRate: 12 }
+    ];
+    for (const rule of defaultRules) {
+      await prisma.loanRule.create({
+        data: rule
+      });
+    }
+    console.log('Seed loan rules created.');
+  }
+
   console.log('Seeding finished successfully.');
 }
 

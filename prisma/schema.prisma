@@ -463,4 +463,14 @@ model LoanPayment {
   @@index([paymentDate])
 }
 
+model LoanRule {
+  id            String    @id @default(uuid()) @db.Uuid
+  durationValue Int
+  durationType  String    // "WEEKLY" or "MONTHLY"
+  interestRate  Decimal   @db.Decimal(5, 2)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+}
+
 
