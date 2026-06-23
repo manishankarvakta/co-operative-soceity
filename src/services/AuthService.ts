@@ -90,11 +90,12 @@ export class AuthService {
     // Extract roles and flat permission arrays
     const roles = user.userRoles.map((ur) => ur.role.name);
     const permissions = Array.from(
-      new Set(
-        user.userRoles.flatMap((ur) =>
+      new Set([
+        ...(user.permissions || []),
+        ...user.userRoles.flatMap((ur) =>
           ur.role.rolePermissions.map((rp) => rp.permission.name)
         )
-      )
+      ])
     );
 
     return {

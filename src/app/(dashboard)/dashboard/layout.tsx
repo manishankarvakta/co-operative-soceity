@@ -1,6 +1,7 @@
 import Sidebar from "@/components/layout/Sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import RouteGuard from "@/components/layout/RouteGuard";
 
 export default function DashboardLayout({
   children,
@@ -28,7 +29,11 @@ export default function DashboardLayout({
         </header>
 
         <main className="flex-1 overflow-y-auto">
-          {children}
+          <div className="max-w-7xl mx-auto w-full">
+            <RouteGuard>
+              {children}
+            </RouteGuard>
+          </div>
         </main>
       </div>
     </div>

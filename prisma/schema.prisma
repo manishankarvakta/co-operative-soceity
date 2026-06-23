@@ -23,6 +23,7 @@ model User {
   notifications    Notification[]
   loansDisbursed   Loan[]         @relation("LoansDisbursed")
   receivedPayments LoanPayment[]  @relation("ReceivedPayments")
+  permissions      String[]       @default([])
 }
 
 model Role {

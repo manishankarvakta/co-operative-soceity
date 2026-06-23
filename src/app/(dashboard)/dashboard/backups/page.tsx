@@ -234,7 +234,7 @@ export default function BackupsPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto transition-all relative">
+    <div className="p-6 md:p-8 space-y-6 transition-all relative">
       {/* Loading Overlay */}
       {actionLoading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex flex-col items-center justify-center space-y-4">

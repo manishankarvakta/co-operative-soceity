@@ -251,10 +251,10 @@ export default function JournalVouchersPage() {
 
       {/* Create Voucher Form */}
       {showForm && (
-        <div className="flex justify-center transition-all">
+        <div className="transition-all">
           <form
             onSubmit={handleCreateJournal}
-            className="w-full max-w-4xl bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-lg space-y-6"
+            className="w-full bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-lg space-y-6"
           >
             <div className="flex items-center gap-2 border-b dark:border-zinc-800 pb-3">
               <span className="p-1.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg text-emerald-600 dark:text-emerald-400">

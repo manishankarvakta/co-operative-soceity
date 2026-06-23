@@ -1,6 +1,6 @@
 import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { ConflictError, NotFoundError } from "@/backend/errors";
+import { ConflictError, NotFoundError, ValidationError } from "@/backend/errors";
 import { DashboardService } from "./DashboardService";
 import { MemberStatus } from "@prisma/client";
 import { NotificationService } from "./NotificationService";
@@ -54,6 +54,9 @@ export class MemberService {
     },
     actorId?: string | null
   ) {
+    if (data.phone === data.nominee.phone) {
+      throw new ValidationError("সদস্য এবং নমিনীর মোবাইল নম্বর একই হতে পারবে না।");
+    }
     // 1. Validate phone uniqueness
     const existingPhone = await prisma.member.findUnique({
       where: { phone: data.phone }
@@ -212,6 +215,12 @@ export class MemberService {
       if (existingPhone && !existingPhone.deletedAt) {
         throw new ConflictError("এই মোবাইল নম্বরটি ইতিমধ্যে ব্যবহার করা হয়েছে।");
       }
+    }
+
+    const targetPhone = data.phone || member.phone;
+    const targetNomineePhone = data.nominee?.phone || member.nominee?.phone;
+    if (targetPhone && targetNomineePhone && targetPhone === targetNomineePhone) {
+      throw new ValidationError("সদস্য এবং নমিনীর মোবাইল নম্বর একই হতে পারবে না।");
     }
 
     const updatedData: any = {

@@ -89,7 +89,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-5xl mx-auto">
+    <div className="p-6 md:p-8 space-y-6">
       {/* Back button */}
       <div className="flex justify-between items-center">
         <Link

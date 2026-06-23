@@ -61,7 +61,7 @@ export default function AdmitFeeSettingsPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-48xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>

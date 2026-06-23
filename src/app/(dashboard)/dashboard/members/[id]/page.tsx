@@ -210,7 +210,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-8 max-w-5xl mx-auto relative">
+    <div className="p-6 md:p-8 space-y-8 relative">
 
       {/* Delete Confirm Modal */}
       <ConfirmModal

@@ -22,6 +22,7 @@ interface FieldErrors {
   nomineeAddress?: string;
   nomineeEmergency?: string;
   bankAccount?: string;
+  password?: string;
 }
 
 const bdPhoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
@@ -74,6 +75,7 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
   const [name, setName] = useState(initialData?.name || "");
   const [phone, setPhone] = useState(initialData?.phone || "");
   const [email, setEmail] = useState(initialData?.email || "");
+  const [password, setPassword] = useState("");
   const [address, setAddress] = useState(initialData?.address || "");
   const [joinDate, setJoinDate] = useState(
     initialData?.joinDate ? new Date(initialData.joinDate).toISOString().split("T")[0] : ""
@@ -173,6 +175,8 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       nomineeAddressRequired: "নমিনীর ঠিকানা কমপক্ষে ৫ অক্ষরের হতে হবে।",
       nomineeEmergencyRequired: "জরুরি যোগাযোগের নম্বর বা বিবরণ দিন।",
       serverError: "সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+      password: "পাসওয়ার্ড (Password)",
+      passwordRequired: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।",
     },
     EN: {
       formTitle: "New Member Registration Form",
@@ -212,6 +216,8 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       nomineeAddressRequired: "Nominee address must be at least 5 characters.",
       nomineeEmergencyRequired: "Emergency contact info is required.",
       serverError: "Server error. Please try again.",
+      password: "Password",
+      passwordRequired: "Password must be at least 6 characters.",
     }
   };
 
@@ -226,6 +232,13 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = L.emailInvalid;
     if (!address || address.trim().length < 5) errors.address = L.addressRequired;
     if (!joinDate) errors.joinDate = L.joinDateRequired;
+
+    if (!isEditMode && (!password || password.trim().length < 6)) {
+      errors.password = L.passwordRequired;
+    }
+    if (phone && nomineePhone && phone === nomineePhone) {
+      errors.nomineePhone = lang === "BN" ? "সদস্য এবং নমিনীর মোবাইল নম্বর একই হতে পারবে না।" : "Member and nominee phone numbers cannot be the same.";
+    }
 
     if (!nomineeName || nomineeName.trim().length < 2) errors.nomineeName = L.nomineeNameRequired;
     if (!nomineeRelationship || nomineeRelationship.trim().length < 2) errors.nomineeRelationship = L.nomineeRelRequired;
@@ -284,7 +297,8 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       ...(!isEditMode && {
         paymentMode,
         bankAccountId: paymentMode === "BANK" ? bankAccountId : undefined,
-        admissionFee
+        admissionFee,
+        password: password || undefined
       })
     };
 
@@ -315,7 +329,7 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
 
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-4xl bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-zinc-800 transition-all">
+    <form onSubmit={handleSubmit} className="w-full bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-zinc-800 transition-all">
       {/* Header */}
       <div className="mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
@@ -367,6 +381,18 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
               className={inputClass(fieldErrors.email)}
             />
           </Field>
+
+          {!isEditMode && (
+            <Field label={L.password} required error={fieldErrors.password}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setFieldErrors(f => ({ ...f, password: undefined })); }}
+                placeholder={lang === "BN" ? "পাসওয়ার্ড টাইপ করুন" : "Enter password"}
+                className={inputClass(fieldErrors.password)}
+              />
+            </Field>
+          )}
 
           <Field label={L.address} required error={fieldErrors.address}>
             <textarea

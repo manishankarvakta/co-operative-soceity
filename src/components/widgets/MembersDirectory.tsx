@@ -289,31 +289,31 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
                       {new Date(member.joinDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                      <div className="flex gap-2 justify-end">
                         <Link
                           href={`/dashboard/members/${member.id}`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100/70 border border-emerald-250 dark:border-emerald-800/50 rounded-md transition-all shadow-sm"
+                          className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-250 dark:border-emerald-900/40 transition"
+                          title={lang === "BN" ? "বিস্তারিত দেখুন" : "View Details"}
                         >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>{lang === "BN" ? "দেখুন" : "View"}</span>
+                          <Eye className="w-4.5 h-4.5" />
                         </Link>
                         <Link
                           href={`/dashboard/members/${member.id}?edit=true`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-450 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100/70 border border-blue-200 dark:border-blue-800/50 rounded-md transition-all shadow-sm"
+                          className="p-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-200 dark:border-blue-900/40 transition"
+                          title={lang === "BN" ? "সম্পাদনা" : "Edit"}
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
-                          <span>{lang === "BN" ? "এডিট" : "Edit"}</span>
+                          <Edit2 className="w-4.5 h-4.5" />
                         </Link>
                         <button
                           onClick={() => {
                             setMemberToDelete(member);
                             setDeleteModal(true);
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 dark:text-rose-450 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100/70 border border-rose-200 dark:border-rose-800/50 rounded-md transition-all shadow-sm"
+                          className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-450 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
+                          title={lang === "BN" ? "মুছে ফেলুন" : "Delete"}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>{lang === "BN" ? "ডিলিট" : "Delete"}</span>
+                          <Trash2 className="w-4.5 h-4.5" />
                         </button>
                       </div>
                     </td>

@@ -173,7 +173,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+    <form onSubmit={handleSubmit} className="w-full bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
       {/* Tab Switcher */}
       <div className="flex gap-6 border-b border-gray-100 dark:border-zinc-800/50 pb-0 mb-8">
         <button

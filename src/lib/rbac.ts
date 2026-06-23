@@ -103,19 +103,27 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<Resource, Action[]>>> = {
  * Evaluates whether any user role possesses authorization for the specified resource action.
  */
 export function canAccess(user: RBACUser | null | undefined, resource: Resource, action: Action): boolean {
-  if (!user || !user.roles || !Array.isArray(user.roles)) {
+  if (!user) {
     return false;
   }
 
+  const roles = user.roles || [];
+  const permissions = user.permissions || [];
+
   // SUPER_ADMIN automatically has access to all actions on all resources
-  if (user.roles.includes("SUPER_ADMIN")) {
+  if (roles.includes("SUPER_ADMIN") || permissions.includes("*:*") || permissions.includes("SUPER_ADMIN")) {
     return true;
   }
 
-  // Iterate user roles to check for action capability
-  for (const role of user.roles) {
-    const permissions = ROLE_PERMISSIONS[role];
-    if (permissions && permissions[resource]?.includes(action)) {
+  // 1. Check direct dynamic database permissions (e.g. "deposits:read" or "deposits:all")
+  if (permissions.includes(`${resource}:${action}`) || permissions.includes(`${resource}:all`)) {
+    return true;
+  }
+
+  // 2. Fallback to static role-based permissions (for compatibility/default seed users)
+  for (const role of roles) {
+    const rolePerms = ROLE_PERMISSIONS[role];
+    if (rolePerms && rolePerms[resource]?.includes(action)) {
       return true;
     }
   }

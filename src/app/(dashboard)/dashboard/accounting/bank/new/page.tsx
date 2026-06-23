@@ -68,7 +68,7 @@ export default function NewBankAccountPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6">
       <Toast toast={toast} />
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>

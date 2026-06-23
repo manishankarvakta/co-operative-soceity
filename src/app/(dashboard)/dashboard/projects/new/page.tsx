@@ -22,7 +22,7 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-3xl mx-auto">
+    <div className="p-6 md:p-8 space-y-6">
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{labels[lang].title}</h1>
@@ -36,7 +36,7 @@ export default function NewProjectPage() {
         </button>
       </div>
 
-      <div className="flex justify-center pt-4">
+      <div className="pt-4">
         <ProjectForm onSuccess={() => {
           setTimeout(() => {
             router.push("/dashboard/projects");

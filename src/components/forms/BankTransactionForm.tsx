@@ -131,7 +131,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+    <form onSubmit={handleSubmit} className="w-full bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
       <div className="flex justify-between items-center mb-6 border-b pb-3 dark:border-zinc-800">
         <h2 className="text-lg font-bold text-gray-800 dark:text-white">{labels[lang].title}</h2>
         <button

@@ -4,17 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/providers/LanguageProvider";
 
+import { useSession } from "next-auth/react";
+
 const translations = {
   BN: {
     settingsTitle: "সিস্টেম সেটিংস",
     admitFeeLink: "ভর্তি ফি (Admit Fee)",
     loanLink: "ঋণ পলিসি (Loan Rules)",
+    permissionsLink: "অনুমতিসমূহ (Permissions)",
     backToDashboard: "ড্যাশবোর্ডে ফিরে যান",
   },
   EN: {
     settingsTitle: "System Settings",
     admitFeeLink: "Admission Fee Settings",
     loanLink: "Loan Rules & Rates",
+    permissionsLink: "User Permissions",
     backToDashboard: "Back to Dashboard",
   }
 };
@@ -23,6 +27,10 @@ export default function SettingsSidebar() {
   const pathname = usePathname();
   const { lang } = useLanguage();
   const t = translations[lang];
+  const { data: session } = useSession();
+  
+  const userRoles = (session?.user as any)?.roles || [];
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
 
   const menuItems = [
     {
@@ -40,7 +48,15 @@ export default function SettingsSidebar() {
       icon: (
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       )
-    }
+    },
+    ...(isSuperAdmin ? [{
+      key: "permissions",
+      href: "/settings/permissions",
+      label: t.permissionsLink,
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm-1.136 10.708a3 3 0 11-4.243-4.243 3 3 0 014.243 4.243z" />
+      )
+    }] : [])
   ];
 
   return (

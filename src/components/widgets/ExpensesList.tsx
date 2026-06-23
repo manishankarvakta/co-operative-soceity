@@ -7,11 +7,11 @@ import { useLanguage } from "@/providers/LanguageProvider";
 
 type PendingAction = { type: "approve" | "reject"; id: string } | null;
 
-interface ExpensesDirectoryProps {
-  status?: "PENDING" | "APPROVED" | "REJECTED";
+interface ExpensesListProps {
+  status: "" | "PENDING" | "APPROVED" | "REJECTED";
 }
 
-export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
+export default function ExpensesList({ status }: ExpensesListProps) {
   const { lang } = useLanguage();
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,11 +24,7 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
   const fetchExpenses = async (page = 1) => {
     setLoading(true);
     try {
-      const urlParams = new URLSearchParams({
-        page: page.toString(),
-        limit: "10",
-        status: status || ""
-      });
+      const urlParams = new URLSearchParams({ page: page.toString(), limit: "10", status });
       const response = await fetch(`/api/expenses?${urlParams}`);
       const data = await response.json();
       setExpenses(data.expenses || []);
@@ -71,8 +67,8 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
     }
   };
 
-  const getStatusBadge = (statusVal: string) => {
-    switch (statusVal) {
+  const getStatusBadge = (s: string) => {
+    switch (s) {
       case "PENDING":
         return <span className="px-2.5 py-1 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full dark:bg-amber-950/20 dark:text-amber-400">পেন্ডিং (Pending)</span>;
       case "APPROVED":
@@ -94,59 +90,12 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
     return categories[cat]?.[lang] || cat;
   };
 
-  const getHeadings = () => {
-    if (status === "PENDING") {
-      return {
-        BN: {
-          title: "পেন্ডিং অনুমোদন (Pending Sign-off)",
-          subtitle: "অনুমোদনের জন্য পেন্ডিং থাকা সকল খরচের তালিকা ও ড্যাশবোর্ড।"
-        },
-        EN: {
-          title: "Pending Approval",
-          subtitle: "List of all expense records pending for sign-off approval."
-        }
-      }[lang];
-    } else if (status === "APPROVED") {
-      return {
-        BN: {
-          title: "অনুমোদিত খরচসমূহ (Approved Expenses)",
-          subtitle: "সমিতির অনুমোদিত সকল খরচের তালিকা।"
-        },
-        EN: {
-          title: "Approved Expenses",
-          subtitle: "List of all approved cooperative expense records."
-        }
-      }[lang];
-    } else if (status === "REJECTED") {
-      return {
-        BN: {
-          title: "প্রত্যাখ্যাত খরচসমূহ (Rejected Expenses)",
-          subtitle: "সমিতির প্রত্যাখ্যান করা সকল খরচের তালিকা।"
-        },
-        EN: {
-          title: "Rejected Expenses",
-          subtitle: "List of all rejected cooperative expense records."
-        }
-      }[lang];
-    } else {
-      return {
-        BN: {
-          title: "খরচ ব্যবস্থাপনা তালিকা (Expense Ledger)",
-          subtitle: "সমিতির বিভিন্ন প্রজেক্ট ও সাধারণ খরচের তালিকা এবং অনুমোদন ড্যাশবোর্ড।"
-        },
-        EN: {
-          title: "Expense Ledger",
-          subtitle: "List of general/project expenses and sign-off approval dashboards."
-        }
-      }[lang];
-    }
-  };
-
-  const H = getHeadings();
-
   const L = {
     BN: {
-      addBtn: "+ নতুন খরচ এন্ট্রি",
+      title: "খরচ ব্যবস্থাপনা তালিকা (Expense Ledger)",
+      subtitle: "সমিতির বিভিন্ন প্রজেক্ট ও সাধারণ খরচের তালিকা এবং অনুমোদন ড্যাশবোর্ড।",
+      addBtn: "+ নতুন খরচ এন্ট্রি", closeBtn: "ফর্ম বন্ধ করুন",
+      filterAll: "সকল খরচ", filterPending: "পেন্ডিং অনুমোদন", filterApproved: "অনুমোদিত খরচ", filterRejected: "প্রত্যাখ্যাত খরচ",
       category: "ক্যাটাগরি", amount: "পরিমাণ (BDT)", date: "তারিখ", location: "স্থান / মাধ্যম",
       loggedBy: "এন্ট্রি করেছেন", status: "অবস্থা", action: "অ্যাকশন",
       approve: "অনুমোদন", reject: "রিজেক্ট",
@@ -156,7 +105,9 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
       empty: "কোনো খরচের বিবরণ পাওয়া যায়নি।", loading: "লোডিং হচ্ছে...",
     },
     EN: {
-      addBtn: "+ Record Expense",
+      title: "Expense Management", subtitle: "List of general/project expenses and sign-off approval dashboards.",
+      addBtn: "+ Record Expense", closeBtn: "Close Form",
+      filterAll: "All Expenses", filterPending: "Pending Approval", filterApproved: "Approved Expenses", filterRejected: "Rejected Expenses",
       category: "Category", amount: "Amount (BDT)", date: "Date", location: "Location / Mode",
       loggedBy: "Logged By", status: "Status", action: "Action",
       approve: "Approve", reject: "Reject",
@@ -189,14 +140,35 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
       {/* Title block */}
       <div className="flex justify-between items-center border-b pb-4 border-gray-200 dark:border-zinc-800">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{H.title}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{H.subtitle}</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{L.title}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{L.subtitle}</p>
         </div>
         <div className="flex gap-3">
-          <Link href="/dashboard/expenses/new" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-md hover:shadow-md transition">
+          <Link href="/dashboard/expenses/new" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-sm hover:shadow-md transition">
             {L.addBtn}
           </Link>
         </div>
+      </div>
+
+      {/* Filters / Navigation Tabs */}
+      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-850/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
+        {[
+          { key: "", label: L.filterAll, href: "/dashboard/expenses" },
+          { key: "PENDING", label: L.filterPending, href: "/dashboard/expenses/pending" },
+          { key: "APPROVED", label: L.filterApproved, href: "/dashboard/expenses/approved" },
+          { key: "REJECTED", label: L.filterRejected, href: "/dashboard/expenses/rejected" },
+        ].map((tab) => {
+          const isActive = status === tab.key;
+          return (
+            <Link
+              key={tab.key}
+              href={tab.href}
+              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Table */}
@@ -211,7 +183,7 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
                 <th className="px-6 py-4">{L.location}</th>
                 <th className="px-6 py-4">{L.loggedBy}</th>
                 <th className="px-6 py-4">{L.status}</th>
-                {(!status || status === "PENDING") && <th className="px-6 py-4 text-right">{L.action}</th>}
+                <th className="px-6 py-4 text-right">{L.action}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
@@ -232,22 +204,20 @@ export default function ExpensesDirectory({ status }: ExpensesDirectoryProps) {
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{exp.location}</td>
                     <td className="px-6 py-4 text-gray-650 dark:text-gray-400">{exp.loggedBy.name || exp.loggedBy.email}</td>
                     <td className="px-6 py-4">{getStatusBadge(exp.status)}</td>
-                    {(!status || status === "PENDING") && (
-                      <td className="px-6 py-4 text-right space-x-2">
-                        {exp.status === "PENDING" && (
-                          <>
-                            <button onClick={() => setPendingAction({ type: "approve", id: exp.id })}
-                              className="px-2.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded transition">
-                              {L.approve}
-                            </button>
-                            <button onClick={() => setPendingAction({ type: "reject", id: exp.id })}
-                              className="px-2.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded transition">
-                              {L.reject}
-                            </button>
-                          </>
-                        )}
-                      </td>
-                    )}
+                    <td className="px-6 py-4 text-right space-x-2">
+                      {exp.status === "PENDING" && (
+                        <>
+                          <button onClick={() => setPendingAction({ type: "approve", id: exp.id })}
+                            className="px-2.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded transition">
+                            {L.approve}
+                          </button>
+                          <button onClick={() => setPendingAction({ type: "reject", id: exp.id })}
+                            className="px-2.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded transition">
+                            {L.reject}
+                          </button>
+                        </>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
