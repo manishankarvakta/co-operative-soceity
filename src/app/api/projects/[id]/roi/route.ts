@@ -48,6 +48,7 @@ export async function POST(request: Request, { params }: Context) {
     const { id } = await params;
     const body = await request.json();
     const totalProfit = parseInt(body.totalProfit, 10);
+    const paymentMode = body.paymentMode;
 
     if (isNaN(totalProfit) || totalProfit <= 0) {
       return NextResponse.json(
@@ -56,7 +57,14 @@ export async function POST(request: Request, { params }: Context) {
       );
     }
 
-    const result = await ProjectService.distributeProjectProfit(id, { totalProfit });
+    if (paymentMode && paymentMode !== "CASH" && paymentMode !== "BANK") {
+      return NextResponse.json(
+        { success: false, code: "VALIDATION_ERROR", message: "অকার্যকর পেমেন্ট মোড।" },
+        { status: 400 }
+      );
+    }
+
+    const result = await ProjectService.distributeProjectProfit(id, { totalProfit, paymentMode });
     return NextResponse.json({ success: true, distribution: result });
   } catch (error) {
     if (error instanceof BaseError) {

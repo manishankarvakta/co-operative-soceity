@@ -23,6 +23,25 @@ export class FiscalYearService {
       throw new ValidationError("শুরুর তারিখ অবশ্যই শেষের তারিখের চেয়ে আগে হতে হবে।");
     }
 
+    // Programmatic Date Lock for Year 1 and Year 2
+    const startIso = typeof data.startDate === "string" ? data.startDate : start.toISOString().split("T")[0];
+    const endIso = typeof data.endDate === "string" ? data.endDate : end.toISOString().split("T")[0];
+
+    const isFirstYear = data.name.includes("2025-2026") || endIso === "2026-06-30";
+    const isSecondYear = data.name.includes("2026-2027") || startIso === "2026-07-01" || endIso === "2027-06-30";
+
+    if (isFirstYear) {
+      if (endIso !== "2026-06-30") {
+        throw new ValidationError("প্রথম বছরের হিসাবকাল ৩০শে জুন, ২০২৬ইং পর্যন্ত লক করা আছে যা পরিবর্তনযোগ্য নয়।");
+      }
+    }
+
+    if (isSecondYear) {
+      if (startIso !== "2026-07-01" || endIso !== "2027-06-30") {
+        throw new ValidationError("২য় বছরের হিসাবকাল ১লা জুলাই, ২০২৬ইং থেকে ৩০শে জুন, ২০২৭ইং পর্যন্ত লক করা আছে যা পরিবর্তনযোগ্য নয়।");
+      }
+    }
+
     const isActive = !!data.isActive;
 
     return await prisma.$transaction(async (tx) => {

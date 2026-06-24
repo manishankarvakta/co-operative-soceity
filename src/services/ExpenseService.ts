@@ -34,6 +34,20 @@ export class ExpenseService {
       bankAccountId?: string | null;
     }
   ) {
+    // Salary Entry Restriction for 5 Years (until June 30, 2031)
+    const isSalary = data.category.toUpperCase() === "SALARY" || 
+                     data.category.toUpperCase().includes("SALARY") || 
+                     data.category.includes("বেতন");
+    if (isSalary) {
+      const expenseDate = new Date(data.date);
+      const lockDeadline = new Date("2031-07-01T00:00:00.000Z");
+      if (expenseDate < lockDeadline) {
+        throw new ValidationError(
+          "প্রতিষ্ঠানের আর্থিক সচ্ছলতা না আসা পর্যন্ত আগামী ৫ বছর (৩০শে জুন, ২০৩১ পর্যন্ত) অংশীদারদের বেতন এন্ট্রি করার কোনো সুযোগ নেই।"
+        );
+      }
+    }
+
     const combinedBalance = await this.getCombinedBalance(prisma);
     if (combinedBalance < data.amount) {
       throw new ValidationError("পর্যাপ্ত ব্যালেন্স নেই।");
