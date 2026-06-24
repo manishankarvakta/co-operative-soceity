@@ -367,7 +367,18 @@ export class MemberService {
     const [members, totalCount] = await Promise.all([
       prisma.member.findMany({
         where: whereClause,
-        include: { nominee: true },
+        include: {
+          nominee: true,
+          user: {
+            include: {
+              userRoles: {
+                include: {
+                  role: true
+                }
+              }
+            }
+          }
+        },
         skip,
         take: limit,
         orderBy: { memberCode: "asc" }
