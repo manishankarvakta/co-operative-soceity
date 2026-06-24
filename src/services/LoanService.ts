@@ -33,7 +33,7 @@ export class LoanService {
   ) {
     const totalInterest = Math.round(principal * (interestRatePercent / 100));
     const totalPayable = principal + totalInterest;
-    
+
     const emiTotal = Math.round(totalPayable / durationValue);
     const emiPrincipal = Math.round(principal / durationValue);
     const emiInterest = emiTotal - emiPrincipal;
@@ -52,7 +52,7 @@ export class LoanService {
 
       let instPrincipal = emiPrincipal;
       let instInterest = emiInterest;
-      
+
       if (i === durationValue) {
         // Last installment gets the remaining balance to avoid rounding errors
         instPrincipal = remainingPrincipal;

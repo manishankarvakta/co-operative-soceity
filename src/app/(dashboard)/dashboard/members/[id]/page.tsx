@@ -26,9 +26,15 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editNomineeMode, setEditNomineeMode] = useState(false);
+  const [successModal, setSuccessModal] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState("");
   const [roleUpdating, setRoleUpdating] = useState(false);
+
+  const handleMemberUpdateSuccess = (updatedMember: any) => {
+    setMember(updatedMember);
+    setSuccessModal(true);
+  };
 
   const isSuperAdmin = session?.user && (session.user as any).roles?.includes("SUPER_ADMIN");
 
@@ -199,7 +205,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
         >
           {labels[lang].backCancel}
         </button>
-        <MemberForm initialData={member} memberId={id} />
+        <MemberForm initialData={member} memberId={id} onSuccess={handleMemberUpdateSuccess} />
       </div>
     );
   }
@@ -227,6 +233,38 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
 
       {/* Toast */}
       <Toast toast={toast} />
+
+      {/* Success Modal */}
+      {successModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div 
+            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 text-center shadow-2xl border border-gray-100 dark:border-zinc-850 overflow-hidden"
+            style={{ animation: "cm-slideUp 0.22s cubic-bezier(0.34,1.56,0.64,1)" }}
+          >
+            <div className="h-1 w-full bg-emerald-500 absolute top-0 left-0" />
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 mt-2">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              {lang === "BN" ? "সফলভাবে আপডেট করা হয়েছে!" : "Successfully Updated!"}
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed">
+              {lang === "BN" ? "সদস্যের তথ্য সফলভাবে সংরক্ষণ করা হয়েছে।" : "Member details have been updated successfully."}
+            </p>
+            <button
+              onClick={() => {
+                setSuccessModal(false);
+                setEditMode(false);
+              }}
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition-all duration-200"
+            >
+              {lang === "BN" ? "ঠিক আছে" : "OK"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Standalone Nominee Form Overlay */}
       {editNomineeMode && (
@@ -345,7 +383,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
                 <button
                   onClick={handleRoleUpdate}
                   disabled={roleUpdating}
-                  className="px-4 py-2 text-xs font-bold text-white bg-emerald-650 hover:bg-emerald-700 rounded-lg shadow-sm disabled:opacity-50 transition-all shrink-0"
+                  className="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm disabled:opacity-50 transition-all shrink-0"
                 >
                   {roleUpdating ? (lang === "BN" ? "আপডেট হচ্ছে..." : "Updating...") : (lang === "BN" ? "রোল পরিবর্তন করুন" : "Update Role")}
                 </button>

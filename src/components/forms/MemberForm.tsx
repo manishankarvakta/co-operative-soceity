@@ -7,6 +7,7 @@ import { useLanguage } from "@/providers/LanguageProvider";
 interface MemberFormProps {
   initialData?: any;
   memberId?: string;
+  onSuccess?: (updatedMember: any) => void;
 }
 
 // Per-field error state shape
@@ -64,7 +65,7 @@ function inputClass(hasError?: string) {
   }`;
 }
 
-export default function MemberForm({ initialData, memberId }: MemberFormProps) {
+export default function MemberForm({ initialData, memberId, onSuccess }: MemberFormProps) {
   const router = useRouter();
   const { lang } = useLanguage();
   const [loading, setLoading] = useState(false);
@@ -316,8 +317,12 @@ export default function MemberForm({ initialData, memberId }: MemberFormProps) {
       if (!response.ok || !result.success) {
         handleServerError(result.code || "", result.message || L.serverError);
       } else {
-        router.push(isEditMode ? `/dashboard/members/${memberId}` : "/dashboard/members");
-        router.refresh();
+        if (onSuccess) {
+          onSuccess(result.member);
+        } else {
+          router.push(isEditMode ? `/dashboard/members/${memberId}` : "/dashboard/members");
+          router.refresh();
+        }
       }
     } catch {
       setServerError(L.serverError);
