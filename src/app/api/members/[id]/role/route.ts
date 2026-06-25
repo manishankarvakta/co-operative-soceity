@@ -22,7 +22,7 @@ export async function PUT(request: Request, { params }: Context) {
     const body = await request.json();
     const { role: newRoleName } = body;
 
-    const allowedRoles = ["MEMBER", "ACCOUNTANT", "SUPER_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER"];
+    const allowedRoles = ["MEMBER", "ACCOUNTANT", "SUPER_ADMIN"];
     if (!newRoleName || !allowedRoles.includes(newRoleName)) {
       return NextResponse.json({ error: "ভুল রোল নির্বাচন করা হয়েছে।" }, { status: 400 });
     }
