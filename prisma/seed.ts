@@ -175,7 +175,19 @@ async function main() {
       isActive: true
     }
   });
-  console.log('Test active fiscal year created.');
+
+  // Seed second fiscal year (July 1, 2026 - June 30, 2027)
+  await prisma.fiscalYear.upsert({
+    where: { name: 'FY 2026-2027' },
+    update: {},
+    create: {
+      name: 'FY 2026-2027',
+      startDate: new Date('2026-07-01T00:00:00.000Z'),
+      endDate: new Date('2027-06-30T23:59:59.999Z'),
+      isActive: false
+    }
+  });
+  console.log('Test fiscal years created.');
 
   // 6. Seed default Loan Rules if none exist
   const existingRulesCount = await prisma.loanRule.count();

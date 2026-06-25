@@ -199,6 +199,9 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             <option value="TRANSPORT">{labels[lang].transport}</option>
             <option value="ENTERTAINMENT">{labels[lang].entertainment}</option>
             <option value="LAND_PURCHASE">{labels[lang].land}</option>
+            <option value="SALARY" disabled className="text-gray-450 dark:text-zinc-500 bg-gray-150/40 dark:bg-zinc-800/20 cursor-not-allowed">
+              {lang === "BN" ? "বেতন (৫ বছরের জন্য লকড)" : "Salary (Locked for 5 Years)"}
+            </option>
             <option value="OTHER">{labels[lang].other}</option>
           </select>
         </div>

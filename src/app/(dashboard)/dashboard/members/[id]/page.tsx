@@ -39,9 +39,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
   const isSuperAdmin = session?.user && (session.user as any).roles?.includes("SUPER_ADMIN");
 
   useEffect(() => {
-    if (searchParams.get("edit") === "true") {
-      setEditMode(true);
-    }
+    setEditMode(searchParams.get("edit") === "true");
   }, [searchParams]);
 
   // Modal & Toast
@@ -200,12 +198,19 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
     return (
       <div className="p-6 md:p-8 flex flex-col items-center space-y-4">
         <button
-          onClick={() => setEditMode(false)}
+          onClick={() => router.push(`/dashboard/members/${id}`)}
           className="self-start px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm rounded-lg border transition-all mb-4"
         >
           {labels[lang].backCancel}
         </button>
-        <MemberForm initialData={member} memberId={id} onSuccess={handleMemberUpdateSuccess} />
+        <MemberForm
+          initialData={member}
+          memberId={id}
+          onSuccess={() => {
+            router.push(`/dashboard/members/${id}`);
+            fetchProfile();
+          }}
+        />
       </div>
     );
   }
@@ -290,7 +295,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={() => setEditMode(true)}
+            onClick={() => router.push(`/dashboard/members/${id}?edit=true`)}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-md transition-all duration-200"
           >
             {labels[lang].editBtn}

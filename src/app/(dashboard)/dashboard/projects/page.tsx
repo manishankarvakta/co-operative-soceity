@@ -16,6 +16,7 @@ export default function ProjectsPage() {
 
   // Profit distribution input
   const [distributeAmount, setDistributeAmount] = useState("");
+  const [paymentMode, setPaymentMode] = useState<"CASH" | "BANK">("CASH");
   const [distributing, setDistributing] = useState(false);
 
   // Modal & Toast
@@ -79,7 +80,7 @@ export default function ProjectsPage() {
       const res = await fetch(`/api/projects/${selectedProject.id}/roi`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ totalProfit: paisaVal })
+        body: JSON.stringify({ totalProfit: paisaVal, paymentMode })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -129,6 +130,14 @@ export default function ProjectsPage() {
       investorRatio: "মূলধন অনুপাত",
       distTitle: "লভ্যাংশ (Dividend) বন্টন প্যানেল",
       distAmt: "বন্টনযোগ্য নিট মুনাফা (BDT)",
+      paymentMode: "পেমেন্ট মোড",
+      cashOption: "নগদ তহবিল (Cash)",
+      bankOption: "ব্যাংক হিসাব (Bank)",
+      splitsTitle: "প্রস্তাবিত তহবিল ভাগসমূহ (Calculated Splits)",
+      devSplit: "ব্যবসায়িক উন্নয়ন ফান্ড (৯৫%):",
+      destituteSplit: "গরিব ও দুঃস্থ তহবিল (২.৫%):",
+      sportsSplit: "খেলাধুলা ও বিনোদন (২.৫%):",
+      fdReserve: "প্রতিষ্ঠানের স্থায়ী আমানত (FD Reserve ৭.৫%):",
       distSubmit: "লভ্যাংশ বন্টন করুন",
       distributing: "বন্টন করা হচ্ছে...",
       loading: "লোডিং হচ্ছে..."
@@ -148,11 +157,31 @@ export default function ProjectsPage() {
       investorRatio: "Capital Ratio",
       distTitle: "Profit Distribution Panel",
       distAmt: "Total Profit to Distribute (BDT)",
+      paymentMode: "Payment Mode",
+      cashOption: "Cash on Hand",
+      bankOption: "Bank Account",
+      splitsTitle: "Calculated Fund Splits",
+      devSplit: "Biz Dev Fund (95%):",
+      destituteSplit: "Poor & Destitute (2.5%):",
+      sportsSplit: "Sports & Cultural (2.5%):",
+      fdReserve: "Corporate FD Reserve (7.5%):",
       distSubmit: "Distribute Profit",
       distributing: "Processing Distribution...",
       loading: "Loading..."
     }
   };
+
+  const inputAmountBdt = parseFloat(distributeAmount) || 0;
+  const totalProfitPaisa = Math.round(inputAmountBdt * 100);
+  const devFundPaisa = Math.round(totalProfitPaisa * 0.95);
+  const destituteFundPaisa = Math.round(totalProfitPaisa * 0.025);
+  const sportsFundPaisa = totalProfitPaisa - devFundPaisa - destituteFundPaisa;
+  const fixedDepositPaisa = Math.round(totalProfitPaisa * 0.075);
+
+  const devFundBdt = devFundPaisa / 100;
+  const destituteFundBdt = destituteFundPaisa / 100;
+  const sportsFundBdt = sportsFundPaisa / 100;
+  const fixedDepositBdt = fixedDepositPaisa / 100;
 
   return (
     <div className="p-6 md:p-8 space-y-6">
@@ -297,6 +326,54 @@ export default function ProjectsPage() {
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-650 dark:text-gray-300 mb-1">
+                      {labels[lang].paymentMode}
+                    </label>
+                    <select
+                      value={paymentMode}
+                      onChange={(e) => setPaymentMode(e.target.value as any)}
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                    >
+                      <option value="CASH">{labels[lang].cashOption}</option>
+                      <option value="BANK">{labels[lang].bankOption}</option>
+                    </select>
+                  </div>
+
+                  {/* Calculations Preview */}
+                  {inputAmountBdt > 0 && (
+                    <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/20 border border-gray-150/40 dark:border-zinc-800 rounded-lg text-xs space-y-2 text-gray-600 dark:text-gray-300">
+                      <span className="block font-bold text-[10px] text-gray-400 uppercase tracking-wider mb-1">
+                        {labels[lang].splitsTitle}
+                      </span>
+                      <div className="flex justify-between items-center">
+                        <span>{labels[lang].devSplit}</span>
+                        <strong className="font-mono text-gray-800 dark:text-white">
+                          {devFundBdt.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT
+                        </strong>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>{labels[lang].destituteSplit}</span>
+                        <strong className="font-mono text-gray-800 dark:text-white">
+                          {destituteFundBdt.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT
+                        </strong>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>{labels[lang].sportsSplit}</span>
+                        <strong className="font-mono text-gray-800 dark:text-white">
+                          {sportsFundBdt.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT
+                        </strong>
+                      </div>
+                      <div className="flex justify-between items-center border-t border-dashed dark:border-zinc-800 pt-2 font-bold text-emerald-600 dark:text-emerald-400">
+                        <span>{labels[lang].fdReserve}</span>
+                        <strong className="font-mono">
+                          {fixedDepositBdt.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT
+                        </strong>
+                      </div>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={distributing}

@@ -7,7 +7,7 @@ import { useLanguage } from "@/providers/LanguageProvider";
 interface MemberFormProps {
   initialData?: any;
   memberId?: string;
-  onSuccess?: (updatedMember: any) => void;
+  onSuccess?: () => void;
 }
 
 // Per-field error state shape
@@ -318,11 +318,11 @@ export default function MemberForm({ initialData, memberId, onSuccess }: MemberF
         handleServerError(result.code || "", result.message || L.serverError);
       } else {
         if (onSuccess) {
-          onSuccess(result.member);
+          onSuccess();
         } else {
           router.push(isEditMode ? `/dashboard/members/${memberId}` : "/dashboard/members");
-          router.refresh();
         }
+        router.refresh();
       }
     } catch {
       setServerError(L.serverError);

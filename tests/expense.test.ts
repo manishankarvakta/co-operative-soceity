@@ -106,6 +106,40 @@ describe("ExpenseService Business Logic", () => {
         }
       });
     });
+
+    it("should throw ValidationError if salary expense is logged before 2031-07-01", async () => {
+      await expect(
+        ExpenseService.createExpense("officer-1", {
+          category: "Salary",
+          date: "2026-06-15",
+          amount: 50000,
+          paymentMode: "CASH",
+          location: "Dhaka"
+        })
+      ).rejects.toThrow("প্রতিষ্ঠানের আর্থিক সচ্ছলতা না আসা পর্যন্ত আগামী ৫ বছর");
+    });
+
+    it("should succeed to log salary expense if transaction date is after 2031-07-01", async () => {
+      (prisma.bankAccount.findMany as jest.Mock).mockResolvedValue([
+        { id: "acc-1", balance: 100000, deletedAt: null }
+      ]);
+      (prisma.expense.create as jest.Mock).mockResolvedValue({
+        id: "exp-salary",
+        category: "Salary",
+        amount: 50000,
+        status: ExpenseStatus.PENDING
+      });
+
+      const result = await ExpenseService.createExpense("officer-1", {
+        category: "Salary",
+        date: "2031-08-01",
+        amount: 50000,
+        paymentMode: "CASH",
+        location: "Salary payment"
+      });
+
+      expect(result.id).toBe("exp-salary");
+    });
   });
 
   describe("approveExpense", () => {

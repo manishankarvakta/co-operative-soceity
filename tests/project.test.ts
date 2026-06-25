@@ -212,9 +212,15 @@ describe("ProjectService Business Logic", () => {
         ]
       });
       (prisma.profitDistribution.create as jest.Mock).mockResolvedValue({ id: "dist-1" });
+      (prisma.bankAccount.findFirst as jest.Mock).mockResolvedValue({
+        id: "cash-acc",
+        name: "Cash on Hand",
+        balance: 1000000
+      });
 
       const dist = await ProjectService.distributeProjectProfit("proj-1", {
-        totalProfit: 80000 // 800 BDT
+        totalProfit: 80000, // 800 BDT
+        paymentMode: "CASH"
       });
 
       expect(dist.id).toBe("dist-1");
@@ -225,8 +231,19 @@ describe("ProjectService Business Logic", () => {
 
       const AccountingServiceMock = require("../src/services/AccountingService").AccountingService;
       // Proportional distributions: User 1 gets 75% * 80000 = 60000 Paisa. User 2 gets 25% * 80000 = 20000 Paisa.
+      // FD transfer leg takes 7.5% * 80000 = 6000 Paisa.
       expect(AccountingServiceMock.postJournalEntry).toHaveBeenNthCalledWith(
         1,
+        prisma,
+        expect.objectContaining({
+          lines: [
+            { accountCode: "1030", amount: 6000, type: "DEBIT" },
+            { accountCode: "1000", amount: 6000, type: "CREDIT" }
+          ]
+        })
+      );
+      expect(AccountingServiceMock.postJournalEntry).toHaveBeenNthCalledWith(
+        2,
         prisma,
         expect.objectContaining({
           lines: [
@@ -236,7 +253,7 @@ describe("ProjectService Business Logic", () => {
         })
       );
       expect(AccountingServiceMock.postJournalEntry).toHaveBeenNthCalledWith(
-        2,
+        3,
         prisma,
         expect.objectContaining({
           lines: [

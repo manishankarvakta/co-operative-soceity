@@ -38,10 +38,25 @@ export class AuditService {
     const oldVal = params.oldData ? JSON.parse(JSON.stringify(params.oldData)) : null;
     const newVal = params.newData ? JSON.parse(JSON.stringify(params.newData)) : null;
 
+    let validUserId: string | null = null;
+    if (params.userId) {
+      try {
+        const userExists = await prismaClient.user.findUnique({
+          where: { id: params.userId },
+          select: { id: true }
+        });
+        if (userExists) {
+          validUserId = params.userId;
+        }
+      } catch (err) {
+        console.warn("[AuditService] Invalid or non-existent userId for audit log:", params.userId, err);
+      }
+    }
+
     try {
       return await prismaClient.auditLog.create({
         data: {
-          userId: params.userId || null,
+          userId: validUserId,
           action: params.action,
           tableName: params.tableName,
           recordId: params.recordId || null,

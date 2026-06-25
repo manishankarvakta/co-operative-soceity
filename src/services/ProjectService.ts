@@ -153,6 +153,7 @@ export class ProjectService {
     projectId: string,
     data: {
       totalProfit: number; // Stored in Paisa/Cents
+      paymentMode?: "CASH" | "BANK";
     }
   ) {
     const project = await prisma.project.findUnique({
@@ -178,6 +179,8 @@ export class ProjectService {
       throw new ValidationError("প্রজেক্টে বিনিয়োগকৃত মূলধনের পরিমাণ শূন্য।");
     }
 
+    const paymentMode = data.paymentMode || "CASH";
+
     return await prisma.$transaction(async (tx) => {
       // 1. Calculate standard splits (95% Dev, 2.5% Destitute, 2.5% Sports, 7.5% FD as reserve)
       const devFund = Math.round(data.totalProfit * 0.95);
@@ -196,6 +199,64 @@ export class ProjectService {
           fixedDeposit
         }
       });
+
+      // 1.5. Execute Fixed Deposit Reserve Transfer if fixedDeposit > 0
+      if (fixedDeposit > 0) {
+        let sourceBankAccount = null;
+        if (paymentMode === "CASH") {
+          sourceBankAccount = await tx.bankAccount.findFirst({
+            where: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }
+          });
+        } else {
+          sourceBankAccount = await tx.bankAccount.findFirst({
+            where: { NOT: { OR: [{ accountNumber: "CASH-001" }, { name: "Cash on Hand" }] }, deletedAt: null }
+          });
+        }
+
+        if (!sourceBankAccount || sourceBankAccount.balance < fixedDeposit) {
+          throw new ValidationError(
+            `এফডি রিজার্ভের জন্য পর্যাপ্ত ব্যালেন্স নেই। প্রয়োজনীয়: ${(fixedDeposit / 100).toLocaleString()} BDT`
+          );
+        }
+
+        // Decrement source account balance
+        await tx.bankAccount.update({
+          where: { id: sourceBankAccount.id },
+          data: { balance: { decrement: fixedDeposit } }
+        });
+
+        // Increment or create Fixed Deposit bank account
+        let fdBankAccount = await tx.bankAccount.findFirst({
+          where: { name: "Fixed Deposit Reserve" }
+        });
+
+        if (!fdBankAccount) {
+          fdBankAccount = await tx.bankAccount.create({
+            data: {
+              name: "Fixed Deposit Reserve",
+              accountNumber: "FD-RESERVE-01",
+              balance: fixedDeposit
+            }
+          });
+        } else {
+          await tx.bankAccount.update({
+            where: { id: fdBankAccount.id },
+            data: { balance: { increment: fixedDeposit } }
+          });
+        }
+
+        // Post Journal Entry for Fixed Deposit leg
+        const creditAssetCode = paymentMode === "CASH" ? "1000" : "1010";
+        await AccountingService.postJournalEntry(tx, {
+          reference: `FD-${project.id.substring(0, 4).toUpperCase()}`,
+          description: `প্রজেক্ট লভ্যাংশ হতে ৭.৫% স্থায়ী আমানত (FD Reserve) তহবিলে স্থানান্তর - ${project.name}`,
+          date: new Date(),
+          lines: [
+            { accountCode: "1030", amount: fixedDeposit, type: "DEBIT" },
+            { accountCode: creditAssetCode, amount: fixedDeposit, type: "CREDIT" }
+          ]
+        });
+      }
 
       // 2. Loop investors and distribute profit share proportional to investment ratios
       for (const inv of project.investments) {

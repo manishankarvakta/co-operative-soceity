@@ -7,12 +7,14 @@ import { Eye, Edit2, Trash2 } from "lucide-react";
 import MemberSearchFilters from "@/components/widgets/MemberSearchFilters";
 import { useLanguage } from "@/providers/LanguageProvider";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
+import { useSession } from "next-auth/react";
 
 interface MembersDirectoryProps {
   role?: string;
 }
 
 export default function MembersDirectory({ role }: MembersDirectoryProps) {
+  const { data: session } = useSession();
   const { lang } = useLanguage();
   const router = useRouter();
   const [members, setMembers] = useState<any[]>([]);
@@ -50,6 +52,28 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       console.error("Failed to load members:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const userRoles = (session?.user as any)?.roles || [];
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
+
+  const handleRoleChange = async (memberId: string, newRole: string) => {
+    try {
+      const response = await fetch(`/api/members/${memberId}/role`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        showToast("error", labels[lang].roleUpdateFail, result.error || labels[lang].roleUpdateFail);
+      } else {
+        showToast("success", labels[lang].roleUpdateSuccess, labels[lang].roleUpdateSuccess);
+        fetchMembers(pagination.currentPage);
+      }
+    } catch (error) {
+      showToast("error", labels[lang].serverError, labels[lang].serverError);
     }
   };
 
@@ -125,6 +149,7 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       colName: "সদস্যের নাম",
       colPhone: "মোবাইল নম্বর",
       colStatus: "অবস্থা (Status)",
+      colRole: "রোল (Role)",
       colDate: "যোগদানের তারিখ",
       colAction: "অ্যাকশন",
       loading: "অপেক্ষা করুন...",
@@ -142,7 +167,15 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       deleteFailMsg: "সদস্য মুছে ফেলতে ব্যর্থ হয়েছে।",
       deleteSuccess: "সফলভাবে মুছে ফেলা হয়েছে",
       deleteSuccessMsg: "সদস্য অ্যাকাউন্টটি মুছে ফেলা হয়েছে।",
-      serverError: "সার্ভারে সমস্যা হয়েছে।"
+      serverError: "সার্ভারে সমস্যা হয়েছে।",
+      roleSuperAdmin: "সুপার এডমিন",
+      roleMember: "সাধারণ সদস্য",
+      roleAccountant: "হিসাব রক্ষক",
+      rolePresident: "সভাপতি",
+      roleSecretary: "সাধারণ সম্পাদক",
+      roleTreasurer: "কোষাধ্যক্ষ",
+      roleUpdateSuccess: "রোল সফলভাবে পরিবর্তন করা হয়েছে।",
+      roleUpdateFail: "রোল পরিবর্তন করতে ব্যর্থ হয়েছে।"
     },
     EN: {
       active: "Active",
@@ -153,6 +186,7 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       colName: "Member Name",
       colPhone: "Mobile No.",
       colStatus: "Status",
+      colRole: "Role",
       colDate: "Join Date",
       colAction: "Action",
       loading: "Please wait...",
@@ -170,7 +204,15 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       deleteFailMsg: "Failed to delete member.",
       deleteSuccess: "Successfully deleted",
       deleteSuccessMsg: "Member account has been deleted.",
-      serverError: "Server error occurred."
+      serverError: "Server error occurred.",
+      roleSuperAdmin: "Super Admin",
+      roleMember: "Member",
+      roleAccountant: "Accountant",
+      rolePresident: "President",
+      roleSecretary: "Secretary",
+      roleTreasurer: "Treasurer",
+      roleUpdateSuccess: "Role updated successfully.",
+      roleUpdateFail: "Failed to update role."
     }
   };
 
@@ -197,6 +239,33 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       default:
         return null;
     }
+  };
+
+  const getRoleBadge = (roleName: string) => {
+    const roleLabels: Record<string, string> = {
+      MEMBER: labels[lang].roleMember,
+      ACCOUNTANT: labels[lang].roleAccountant,
+      PRESIDENT: labels[lang].rolePresident,
+      SECRETARY: labels[lang].roleSecretary,
+      TREASURER: labels[lang].roleTreasurer,
+      SUPER_ADMIN: labels[lang].roleSuperAdmin,
+    };
+    const label = roleLabels[roleName] || roleName;
+
+    let colorClass = "text-gray-600 bg-gray-50 border-gray-200 dark:bg-zinc-800 dark:text-gray-400 dark:border-zinc-700";
+    if (roleName === "SUPER_ADMIN") {
+      colorClass = "text-red-700 bg-red-50 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/50";
+    } else if (roleName === "ACCOUNTANT") {
+      colorClass = "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50";
+    } else if (roleName === "PRESIDENT" || roleName === "SECRETARY" || roleName === "TREASURER") {
+      colorClass = "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-900/50";
+    }
+
+    return (
+      <span className={`px-2.5 py-1 text-xs font-semibold border rounded-full ${colorClass}`}>
+        {label}
+      </span>
+    );
   };
 
   const headings = getRoleHeadings();
@@ -254,6 +323,7 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
                 <th className="px-6 py-4">{labels[lang].colName}</th>
                 <th className="px-6 py-4">{labels[lang].colPhone}</th>
                 <th className="px-6 py-4">{labels[lang].colStatus}</th>
+                <th className="px-6 py-4">{labels[lang].colRole}</th>
                 <th className="px-6 py-4">{labels[lang].colDate}</th>
                 <th className="px-6 py-4 text-right">{labels[lang].colAction}</th>
               </tr>
@@ -261,64 +331,85 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
             <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-500">
+                  <td colSpan={7} className="text-center py-8 text-gray-500">
                     {labels[lang].loading}
                   </td>
                 </tr>
               ) : members.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-500">
+                  <td colSpan={7} className="text-center py-8 text-gray-500">
                     {labels[lang].noData}
                   </td>
                 </tr>
               ) : (
-                members.map((member) => (
-                  <tr key={member.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-6 py-4 font-mono font-semibold text-emerald-700 dark:text-emerald-400">
-                      {member.memberCode}
-                    </td>
-                    <td className="px-6 py-4 font-bold text-gray-800 dark:text-white">
-                      {member.name}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                      {member.phone}
-                    </td>
-                    <td className="px-6 py-4">
-                      {getStatusBadge(member.status)}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                      {new Date(member.joinDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
-                    </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
-                      <div className="flex gap-2 justify-end">
-                        <Link
-                          href={`/dashboard/members/${member.id}`}
-                          className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-250 dark:border-emerald-900/40 transition"
-                          title={lang === "BN" ? "বিস্তারিত দেখুন" : "View Details"}
-                        >
-                          <Eye className="w-4.5 h-4.5" />
-                        </Link>
-                        <Link
-                          href={`/dashboard/members/${member.id}?edit=true`}
-                          className="p-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-200 dark:border-blue-900/40 transition"
-                          title={lang === "BN" ? "সম্পাদনা" : "Edit"}
-                        >
-                          <Edit2 className="w-4.5 h-4.5" />
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setMemberToDelete(member);
-                            setDeleteModal(true);
-                          }}
-                          className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-450 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
-                          title={lang === "BN" ? "মুছে ফেলুন" : "Delete"}
-                        >
-                          <Trash2 className="w-4.5 h-4.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                members.map((member) => {
+                  const currentRole = member.user?.userRoles?.[0]?.role?.name || "MEMBER";
+                  return (
+                    <tr key={member.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+                      <td className="px-6 py-4 font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                        {member.memberCode}
+                      </td>
+                      <td className="px-6 py-4 font-bold text-gray-800 dark:text-white">
+                        {member.name}
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                        {member.phone}
+                      </td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(member.status)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {isSuperAdmin && member.user ? (
+                          <select
+                            value={currentRole}
+                            onChange={(e) => handleRoleChange(member.id, e.target.value)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-1.5 dark:bg-zinc-800 dark:border-zinc-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500"
+                          >
+                            <option value="MEMBER">{labels[lang].roleMember}</option>
+                            <option value="ACCOUNTANT">{labels[lang].roleAccountant}</option>
+                            <option value="PRESIDENT">{labels[lang].rolePresident}</option>
+                            <option value="SECRETARY">{labels[lang].roleSecretary}</option>
+                            <option value="TREASURER">{labels[lang].roleTreasurer}</option>
+                            <option value="SUPER_ADMIN">{labels[lang].roleSuperAdmin}</option>
+                          </select>
+                        ) : (
+                          getRoleBadge(currentRole)
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                        {new Date(member.joinDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
+                      </td>
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        <div className="flex gap-2 justify-end">
+                          <Link
+                            href={`/dashboard/members/${member.id}`}
+                            className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-250 dark:border-emerald-900/40 transition"
+                            title={lang === "BN" ? "বিস্তারিত দেখুন" : "View Details"}
+                          >
+                            <Eye className="w-4.5 h-4.5" />
+                          </Link>
+                          <Link
+                            href={`/dashboard/members/${member.id}?edit=true`}
+                            className="p-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-200 dark:border-blue-900/40 transition"
+                            title={lang === "BN" ? "সম্পাদনা" : "Edit"}
+                          >
+                            <Edit2 className="w-4.5 h-4.5" />
+                          </Link>
+                          <button
+                            onClick={() => {
+                              setMemberToDelete(member);
+                              setDeleteModal(true);
+                            }}
+                            className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-450 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
+                            title={lang === "BN" ? "মুছে ফেলুন" : "Delete"}
+                          >
+                            <Trash2 className="w-4.5 h-4.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

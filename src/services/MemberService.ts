@@ -232,26 +232,58 @@ export class MemberService {
       joinDate: data.joinDate ? new Date(data.joinDate) : undefined
     };
 
-    // Include nominee nested updates if provided
-    if (data.nominee && member.nominee) {
-      updatedData.nominee = {
-        update: {
-          name: data.nominee.name,
-          relationship: data.nominee.relationship,
-          phone: data.nominee.phone,
-          address: data.nominee.address,
-          emergencyContact: data.nominee.emergencyContact
-        }
-      };
+    // Include nominee nested updates/creation if provided
+    if (data.nominee) {
+      if (member.nominee) {
+        updatedData.nominee = {
+          update: {
+            name: data.nominee.name,
+            relationship: data.nominee.relationship,
+            phone: data.nominee.phone,
+            address: data.nominee.address,
+            emergencyContact: data.nominee.emergencyContact
+          }
+        };
+      } else {
+        updatedData.nominee = {
+          create: {
+            name: data.nominee.name || "",
+            relationship: data.nominee.relationship || "",
+            phone: data.nominee.phone || "",
+            address: data.nominee.address || "",
+            emergencyContact: data.nominee.emergencyContact || ""
+          }
+        };
+      }
     }
 
     const statusChangedToSuspended =
       data.status === "SUSPENDED" && member.status !== "SUSPENDED";
 
-    const result = await prisma.member.update({
-      where: { id },
-      data: updatedData,
-      include: { nominee: true }
+    const result = await prisma.$transaction(async (tx) => {
+      // If user exists and email is being updated, update user email as well
+      if (member.userId && data.email && data.email !== member.email) {
+        const existingEmail = await tx.user.findFirst({
+          where: {
+            email: data.email,
+            id: { not: member.userId },
+            deletedAt: null
+          }
+        });
+        if (existingEmail) {
+          throw new ConflictError("এই ইমেইলটি ইতিমধ্যে ব্যবহার করা হয়েছে।");
+        }
+        await tx.user.update({
+          where: { id: member.userId },
+          data: { email: data.email }
+        });
+      }
+
+      return await tx.member.update({
+        where: { id },
+        data: updatedData,
+        include: { nominee: true }
+      });
     });
 
     await DashboardService.invalidateCache();
@@ -367,7 +399,18 @@ export class MemberService {
     const [members, totalCount] = await Promise.all([
       prisma.member.findMany({
         where: whereClause,
-        include: { nominee: true },
+        include: {
+          nominee: true,
+          user: {
+            include: {
+              userRoles: {
+                include: {
+                  role: true
+                }
+              }
+            }
+          }
+        },
         skip,
         take: limit,
         orderBy: { memberCode: "asc" }
