@@ -90,7 +90,7 @@ export class ProjectService {
 
       // 4. Auto-post balanced Double Entry Journal Entry
       const assetCode = data.paymentMode === "CASH" ? "1000" : "1010";
-      
+
       await AccountingService.postJournalEntry(tx, {
         reference: investment.id.substring(0, 8).toUpperCase(),
         description: `প্রজেক্ট বিনিয়োগ - ${project.name} (${member.name})`,

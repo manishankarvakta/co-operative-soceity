@@ -11,6 +11,7 @@ const translations = {
     settingsTitle: "সিস্টেম সেটিংস",
     admitFeeLink: "ভর্তি ফি (Admit Fee)",
     loanLink: "ঋণ পলিসি (Loan Rules)",
+    expenseCategoryLink: "খরচ ক্যাটাগরি (Expense Category)",
     permissionsLink: "অনুমতিসমূহ (Permissions)",
     backToDashboard: "ড্যাশবোর্ডে ফিরে যান",
   },
@@ -18,6 +19,7 @@ const translations = {
     settingsTitle: "System Settings",
     admitFeeLink: "Admission Fee Settings",
     loanLink: "Loan Rules & Rates",
+    expenseCategoryLink: "Expense Categories",
     permissionsLink: "User Permissions",
     backToDashboard: "Back to Dashboard",
   }
@@ -47,6 +49,17 @@ export default function SettingsSidebar() {
       label: t.loanLink,
       icon: (
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      )
+    },
+    {
+      key: "expense-category",
+      href: "/settings/expense-category",
+      label: t.expenseCategoryLink,
+      icon: (
+        <>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.5 1.5 0 0 0 2.122 0l4.318-4.318a1.5 1.5 0 0 0 0-2.122L11.159 3.659A2.25 2.25 0 0 0 9.568 3Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5h.008v.008H6V7.5Z" />
+        </>
       )
     },
     ...(isSuperAdmin ? [{

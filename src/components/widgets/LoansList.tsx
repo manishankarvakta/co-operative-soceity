@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
 import LoanApplicationForm from "@/components/forms/LoanApplicationForm";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface LoansListProps {
   status: "PENDING" | "ACTIVE" | "PAID" | "REJECTED";
@@ -19,6 +20,40 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+
+  const { data: session } = useSession();
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+
+  const userRoles = (session?.user as any)?.roles || [];
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
+
+  const handleApprove = async (loanId: string) => {
+    setApprovingId(loanId);
+    setError(null);
+    try {
+      const res = await fetch("/api/loans/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          loanId,
+          status: "APPROVED",
+          paymentMode: "CASH",
+          remarks: lang === "BN" ? "এডমিন প্যানেল থেকে অনুমোদিত।" : "Approved via Quick Admin Action"
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchLoans();
+      } else {
+        setError(data.message || (lang === "BN" ? "অনুমোদন ব্যর্থ হয়েছে।" : "Approval failed."));
+      }
+    } catch (err) {
+      console.error(err);
+      setError(lang === "BN" ? "সার্ভারে সমস্যা হয়েছে।" : "Internal server error.");
+    } finally {
+      setApprovingId(null);
+    }
+  };
 
   const fetchLoans = async () => {
     setLoading(true);
@@ -200,17 +235,27 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
                   </td>
                   {status === "PENDING" && (
                     <td className="px-6 py-4">
-                      <div className="flex gap-2.5 text-xs">
-                        <span className={`px-2 py-0.5 rounded font-bold ${loan.presidentApproved ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400" : "bg-gray-100 dark:bg-zinc-800 text-gray-450"}`}>
-                          {L.president}: {loan.presidentApproved ? "✅" : "⏳"}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded font-bold ${loan.secretaryApproved ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400" : "bg-gray-100 dark:bg-zinc-800 text-gray-450"}`}>
-                          {L.secretary}: {loan.secretaryApproved ? "✅" : "⏳"}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded font-bold ${loan.treasurerApproved ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400" : "bg-gray-100 dark:bg-zinc-800 text-gray-455"}`}>
-                          {L.treasurer}: {loan.treasurerApproved ? "✅" : "⏳"}
-                        </span>
-                      </div>
+                      {isSuperAdmin ? (
+                        <button
+                          onClick={() => handleApprove(loan.id)}
+                          disabled={approvingId === loan.id}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition disabled:opacity-50 flex items-center gap-1.5"
+                        >
+                          {approvingId === loan.id ? (
+                            <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                          )}
+                          {lang === "BN" ? "অনুমোদন" : "Approve"}
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-405 font-bold">⏳ {lang === "BN" ? "পেন্ডিং" : "Pending"}</span>
+                      )}
                     </td>
                   )}
                   <td className="px-6 py-4">

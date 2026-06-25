@@ -261,10 +261,10 @@ export class LoanService {
         if (roles.includes("SECRETARY")) sApp = true;
         if (roles.includes("TREASURER")) tApp = true;
         if (roles.includes("SUPER_ADMIN")) {
-          // If SUPER_ADMIN approves and no role is specified, check the first false signature
-          if (!loan.presidentApproved) pApp = true;
-          else if (!loan.secretaryApproved) sApp = true;
-          else if (!loan.treasurerApproved) tApp = true;
+          // If SUPER_ADMIN approves and no role is specified, fully approve by setting all signatures to true
+          pApp = true;
+          sApp = true;
+          tApp = true;
         }
       }
 
