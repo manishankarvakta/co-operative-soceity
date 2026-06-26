@@ -2,6 +2,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import RouteGuard from "@/components/layout/RouteGuard";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 
 export default function DashboardLayout({
   children,
@@ -16,7 +17,8 @@ export default function DashboardLayout({
       {/* Main content area, pushed to the right by the sidebar width */}
       <div className="flex-1 ml-64 flex flex-col min-h-screen overflow-hidden">
         {/* Optional top navbar could go here */}
-        <header className="h-16 border-b border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-end px-6">
+        <header className="h-16 border-b border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-6">
+          <Breadcrumbs />
           <div className="flex items-center gap-4">
             <LanguageToggle />
             <ThemeToggle />
