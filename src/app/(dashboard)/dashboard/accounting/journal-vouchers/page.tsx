@@ -460,10 +460,10 @@ export default function JournalVouchersPage() {
             {journalEntries.map((entry) => (
               <div
                 key={entry.id}
-                className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                className="bg-white dark:bg-zinc-900 rounded-xl border border-emerald-500/10 dark:border-emerald-500/20 border-l-4 border-l-emerald-500 dark:border-l-emerald-600 shadow-sm hover:shadow-md transition-all overflow-hidden"
               >
                 {/* Entry Header */}
-                <div className="p-4 bg-gray-50/80 dark:bg-zinc-850/60 border-b dark:border-zinc-800 flex flex-col sm:flex-row justify-between sm:items-center gap-2 text-xs">
+                <div className="p-4 bg-emerald-50/30 dark:bg-emerald-950/10 border-b border-emerald-500/10 dark:border-emerald-500/20 flex flex-col sm:flex-row justify-between sm:items-center gap-2 text-xs">
                   <div>
                     <h4 className="text-gray-800 dark:text-white text-sm font-bold">{entry.description}</h4>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-gray-400 mt-1 font-medium">
@@ -471,23 +471,23 @@ export default function JournalVouchersPage() {
                       <span>Ref: <strong className="text-gray-500 dark:text-gray-300">{entry.reference || "N/A"}</strong></span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-350 self-start sm:self-auto font-mono text-[11px] font-bold bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-gray-100 dark:border-zinc-800 shadow-2xs">
+                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-355 self-start sm:self-auto font-mono text-[11px] font-bold bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-gray-100 dark:border-zinc-800 shadow-2xs">
                     <Calendar className="w-3.5 h-3.5 text-gray-400" />
                     <span>{new Date(entry.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US", { dateStyle: "medium" })}</span>
                   </div>
                 </div>
 
                 {/* Entry Lines */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                <div className="w-full overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[500px] md:min-w-full table-auto">
                     <thead>
-                      <tr className="text-gray-450 bg-gray-50/20 dark:bg-zinc-900 border-b dark:border-zinc-855 font-bold">
+                      <tr className="text-gray-500 bg-gray-50/20 dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 font-bold">
                         <th className="px-6 py-2.5">{t.account}</th>
                         <th className="px-6 py-2.5 text-right font-bold text-gray-600 dark:text-gray-400">{t.debit}</th>
                         <th className="px-6 py-2.5 text-right font-bold text-gray-600 dark:text-gray-400">{t.credit}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-zinc-850">
+                    <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
                       {entry.lines.map((line: any) => (
                         <tr
                           key={line.id}

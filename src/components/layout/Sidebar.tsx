@@ -51,8 +51,11 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { key: "Dashboard", href: "/dashboard", icon: "home" },
-  { key: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
   { key: "People", href: "/dashboard/members", icon: "users" },
+  { key: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
+  { key: "Expenses", href: "/dashboard/expenses", icon: "credit-card" },
+  { key: "Microcredit", href: "/dashboard/microfinance", icon: "bank-notes" },
+  { key: "Projects", href: "/dashboard/projects", icon: "briefcase" },
   {
     key: "Shares",
     icon: "pie-chart",
@@ -61,8 +64,6 @@ const navigation: NavItem[] = [
       { key: "ShareReports", href: "/dashboard/shares/reports" },
     ]
   },
-  { key: "Expenses", href: "/dashboard/expenses", icon: "credit-card" },
-  { key: "Microcredit", href: "/dashboard/microfinance", icon: "bank-notes" },
   {
     key: "Accounting",
     icon: "calculator",
@@ -110,7 +111,6 @@ const navigation: NavItem[] = [
       }
     ]
   },
-  { key: "Projects", href: "/dashboard/projects", icon: "briefcase" },
   { key: "Reports", href: "/dashboard/reports", icon: "file-text" },
   { key: "Backups", href: "/dashboard/backups", icon: "database" },
 ];
@@ -466,7 +466,9 @@ export default function Sidebar() {
             );
           }
 
-          const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href!));
+          const isActive = item.href === "/dashboard"
+            ? pathname === "/dashboard"
+            : pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href + "/"));
           const displayName = t[item.key] || item.key;
           return (
             <Link
