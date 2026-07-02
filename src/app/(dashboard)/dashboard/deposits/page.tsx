@@ -123,9 +123,9 @@ export default function DepositsListPage() {
       </div>
 
       {/* Tables Grid */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
-        <div className="overflow-x-auto">
-          <table className="min-w-[600px] sm:min-w-full text-left text-sm">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300 w-full max-w-full">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
             <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4 hidden md:table-cell">{labels[lang].colReceipt}</th>

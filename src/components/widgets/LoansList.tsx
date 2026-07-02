@@ -256,8 +256,9 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
           <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">{L.noLoans}</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
-          <table className="min-w-[600px] sm:min-w-full text-left text-sm">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden w-full max-w-full">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
             <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-150 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.member}</th>
@@ -326,7 +327,8 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
             </tbody>
           </table>
         </div>
-      )}
+      </div>
+    )}
 
 
     </div>

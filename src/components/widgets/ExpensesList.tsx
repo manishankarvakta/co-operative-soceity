@@ -173,9 +173,9 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-[600px] sm:min-w-full text-left text-sm">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden w-full max-w-full">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
             <thead className="bg-gray-50/80 dark:bg-zinc-850/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.category}</th>
@@ -202,8 +202,8 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
                     <td className="px-6 py-4 font-mono text-gray-650 dark:text-gray-300 hidden sm:table-cell">
                       {new Date(exp.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                     </td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden md:table-cell">{exp.location}</td>
-                    <td className="px-6 py-4 text-gray-650 dark:text-gray-400 hidden md:table-cell">{exp.loggedBy.name || exp.loggedBy.email}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden md:table-cell max-w-[200px] break-words">{exp.location}</td>
+                    <td className="px-6 py-4 text-gray-650 dark:text-gray-400 hidden md:table-cell max-w-[155px] truncate" title={exp.loggedBy.name || exp.loggedBy.email}>{exp.loggedBy.name || exp.loggedBy.email}</td>
                     <td className="px-6 py-4">{getStatusBadge(exp.status)}</td>
                     <td className="px-6 py-4 text-right space-x-2">
                       {exp.status === "PENDING" && (
