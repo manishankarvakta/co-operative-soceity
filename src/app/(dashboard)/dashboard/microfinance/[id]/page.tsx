@@ -86,13 +86,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
     setActionLoading(true);
     setError(null);
 
-    const activeRole = selectedRole || undefined;
-    if (status === "APPROVED" && !activeRole && isSuperAdmin) {
-      setError(lang === "BN" ? "দয়া করে অনুমোদনের ভূমিকা সিলেক্ট করুন।" : "Please select an approval role.");
-      setActionLoading(false);
-      return;
-    }
-
+    // Bypassed joint signatures - directly approving as admin
     if (status === "APPROVED" && paymentMode === "BANK" && !bankAccountId) {
       setError(lang === "BN" ? "দয়া করে ব্যাংক অ্যাকাউন্ট সিলেক্ট করুন।" : "Please select a bank account.");
       setActionLoading(false);
@@ -105,7 +99,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
       paymentMode,
       bankAccountId: paymentMode === "BANK" ? bankAccountId : null,
       remarks: remarks || null,
-      approveAsRole: activeRole || null
+      approveAsRole: null
     };
 
     try {
@@ -408,164 +402,81 @@ export default function LoanDetailsPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Joint Approval board and Actions Panel */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-        {/* Joint Approval progress tracker */}
-        <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm space-y-4">
-          <h3 className="text-sm font-extrabold text-gray-800 dark:text-white border-b pb-2 border-gray-100 dark:border-zinc-800 uppercase tracking-wide">{L.jointApprovals}</h3>
-          
-          <div className="space-y-3.5">
-            {/* President */}
-            <div className="flex justify-between items-center p-3 rounded-xl bg-gray-50/50 dark:bg-zinc-850 border border-gray-100/50 dark:border-zinc-800 text-sm">
-              <div className="flex flex-col">
-                <span className="font-bold text-gray-900 dark:text-white">{lang === "BN" ? "মোঃ জহিরুল ইসলাম সবুজ" : "Md. Johirul Islam Sobuj"}</span>
-                <span className="text-[10px] text-gray-400 uppercase mt-0.5">{L.president}</span>
-              </div>
-              <div>
-                {loan.presidentApproved ? (
-                  <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">✅ {L.signed}</span>
-                ) : (
-                  <span className="text-xs font-semibold text-amber-500 flex items-center gap-1">⏳ {L.pendingSign}</span>
+      {/* Action Panel */}
+      {isPendingApproval && isStaffOrAdmin && (
+        <div className="max-w-2xl mx-auto bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm space-y-4 ring-1 ring-emerald-500/10">
+          <h3 className="text-sm font-extrabold text-emerald-800 dark:text-emerald-400 border-b pb-2 border-gray-100 dark:border-zinc-800 uppercase tracking-wide flex items-center gap-1.5">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+            {L.actionPanel}
+          </h3>
+
+          <div className="space-y-4">
+            {/* CASH/BANK paymentMode selection */}
+            <div>
+              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">
+                {L.paymentMode}
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={paymentMode}
+                  onChange={(e) => setPaymentMode(e.target.value as any)}
+                  className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
+                >
+                  <option value="CASH">Cash (ক্যাশ বক্স)</option>
+                  <option value="BANK">Bank Account (ব্যাংক)</option>
+                </select>
+
+                {paymentMode === "BANK" && (
+                  <select
+                    required
+                    value={bankAccountId}
+                    onChange={(e) => setBankAccountId(e.target.value)}
+                    className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
+                  >
+                    <option value="">-- {lang === "BN" ? "ব্যাংক নির্বাচন" : "Select Bank"} --</option>
+                    {bankAccounts.map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name} ({acc.accountNumber})
+                      </option>
+                    ))}
+                  </select>
                 )}
               </div>
             </div>
 
-            {/* Secretary */}
-            <div className="flex justify-between items-center p-3 rounded-xl bg-gray-50/50 dark:bg-zinc-850 border border-gray-100/50 dark:border-zinc-800 text-sm">
-              <div className="flex flex-col">
-                <span className="font-bold text-gray-900 dark:text-white">{lang === "BN" ? "সম্পাদক" : "Secretary"}</span>
-                <span className="text-[10px] text-gray-400 uppercase mt-0.5">{lang === "BN" ? "ডিজিটাল সিগনেচার" : "Digital Signature"}</span>
-              </div>
-              <div>
-                {loan.secretaryApproved ? (
-                  <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">✅ {L.signed}</span>
-                ) : (
-                  <span className="text-xs font-semibold text-amber-500 flex items-center gap-1">⏳ {L.pendingSign}</span>
-                )}
-              </div>
+            {/* Remarks */}
+            <div>
+              <textarea
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+                placeholder={L.remarksPlaceholder}
+                rows={2}
+                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white resize-none"
+              />
             </div>
 
-            {/* Treasurer */}
-            <div className="flex justify-between items-center p-3 rounded-xl bg-gray-50/50 dark:bg-zinc-850 border border-gray-100/50 dark:border-zinc-800 text-sm">
-              <div className="flex flex-col">
-                <span className="font-bold text-gray-900 dark:text-white">{lang === "BN" ? "কোষাধ্যক্ষ" : "Treasurer"}</span>
-                <span className="text-[10px] text-gray-400 uppercase mt-0.5">{lang === "BN" ? "ডিজিটাল সিগনেচার" : "Digital Signature"}</span>
-              </div>
-              <div>
-                {loan.treasurerApproved ? (
-                  <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">✅ {L.signed}</span>
-                ) : (
-                  <span className="text-xs font-semibold text-amber-500 flex items-center gap-1">⏳ {L.pendingSign}</span>
-                )}
-              </div>
+            {/* Actions buttons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={() => handleApproval("REJECTED")}
+                className="flex-1 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-sm rounded-xl border border-rose-200 transition"
+              >
+                {L.rejectBtn}
+              </button>
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={() => handleApproval("APPROVED")}
+                className="flex-1 px-4 py-2.5 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow transition"
+              >
+                {actionLoading ? L.processing : L.approveBtn}
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Dynamic Action signature Desk (Only shown if pending approval) */}
-        {isPendingApproval && isStaffOrAdmin && (
-          <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm space-y-4 ring-1 ring-emerald-500/10">
-            <h3 className="text-sm font-extrabold text-emerald-800 dark:text-emerald-400 border-b pb-2 border-gray-100 dark:border-zinc-800 uppercase tracking-wide flex items-center gap-1.5">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-              {L.actionPanel}
-            </h3>
-
-            <div className="space-y-4">
-              {/* Role select (For Super Admin only) */}
-              {isSuperAdmin && (
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">
-                    {L.roleSelect}
-                  </label>
-                  <select
-                     value={selectedRole}
-                     onChange={(e) => setSelectedRole(e.target.value as any)}
-                     className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
-                  >
-                    <option value="">-- Role Select --</option>
-                    {!loan.presidentApproved && <option value="PRESIDENT">{L.president}</option>}
-                    {!loan.secretaryApproved && <option value="SECRETARY">{L.secretary}</option>}
-                    {!loan.treasurerApproved && <option value="TREASURER">{L.treasurer}</option>}
-                  </select>
-                </div>
-              )}
-
-              {/* Show role if inferred */}
-              {!isSuperAdmin && (
-                <div className="text-xs text-gray-505">
-                  {lang === "BN" ? "আপনি স্বাক্ষর করছেন হিসেবে:" : "You are signing as:"} <strong className="text-emerald-700 dark:text-emerald-400">
-                    {selectedRole === "PRESIDENT" ? L.president : selectedRole === "SECRETARY" ? L.secretary : L.treasurer}
-                  </strong>
-                </div>
-              )}
-
-              {/* CASH/BANK paymentMode selection - only triggers on the 3rd final sign, but good to collect */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">
-                  {L.paymentMode}
-                </label>
-                <div className="flex gap-2">
-                  <select
-                    value={paymentMode}
-                    onChange={(e) => setPaymentMode(e.target.value as any)}
-                    className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
-                  >
-                    <option value="CASH">Cash (ক্যাশ বক্স)</option>
-                    <option value="BANK">Bank Account (ব্যাংক)</option>
-                  </select>
-
-                  {paymentMode === "BANK" && (
-                    <select
-                      required
-                      value={bankAccountId}
-                      onChange={(e) => setBankAccountId(e.target.value)}
-                      className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
-                    >
-                      <option value="">-- {lang === "BN" ? "ব্যাংক নির্বাচন" : "Select Bank"} --</option>
-                      {bankAccounts.map((acc) => (
-                        <option key={acc.id} value={acc.id}>
-                          {acc.name} ({acc.accountNumber})
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-              </div>
-
-              {/* Remarks */}
-              <div>
-                <textarea
-                  value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
-                  placeholder={L.remarksPlaceholder}
-                  rows={2}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white resize-none"
-                />
-              </div>
-
-              {/* Actions buttons */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  disabled={actionLoading}
-                  onClick={() => handleApproval("REJECTED")}
-                  className="flex-1 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-sm rounded-xl border border-rose-200 transition"
-                >
-                  {L.rejectBtn}
-                </button>
-                <button
-                  type="button"
-                  disabled={actionLoading || (!selectedRole && isSuperAdmin)}
-                  onClick={() => handleApproval("APPROVED")}
-                  className="flex-1 px-4 py-2.5 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow transition"
-                >
-                  {actionLoading ? L.processing : L.approveBtn}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Amortization Schedule table */}
       {loan.status !== "PENDING" && loan.status !== "REJECTED" && (

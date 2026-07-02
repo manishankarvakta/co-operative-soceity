@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { useExpenseCategory } from "@/providers/ExpenseCategoryProvider";
 
 interface ExpenseFormProps {
   onSuccess?: () => void;
@@ -11,6 +12,7 @@ interface ExpenseFormProps {
 export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
   const router = useRouter();
   const { lang } = useLanguage();
+  const { categories } = useExpenseCategory();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -18,6 +20,12 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
   // Form states
   const [category, setCategory] = useState("OFFICE_RENT");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+
+  useEffect(() => {
+    if (categories.length > 0 && !categories.find(c => c.id === category)) {
+      setCategory(categories[0].id);
+    }
+  }, [categories, category]);
   const [amount, setAmount] = useState("");
   const [paymentMode, setPaymentMode] = useState<"CASH" | "BANK">("CASH");
   const [location, setLocation] = useState("");
@@ -39,7 +47,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
         console.error(err);
       }
     };
-    
+
     // Fetch bank accounts
     const loadBanks = async () => {
       try {
@@ -195,14 +203,16 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             onChange={(e) => setCategory(e.target.value)}
             className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           >
-            <option value="OFFICE_RENT">{labels[lang].rent}</option>
-            <option value="TRANSPORT">{labels[lang].transport}</option>
-            <option value="ENTERTAINMENT">{labels[lang].entertainment}</option>
-            <option value="LAND_PURCHASE">{labels[lang].land}</option>
-            <option value="SALARY" disabled className="text-gray-450 dark:text-zinc-500 bg-gray-150/40 dark:bg-zinc-800/20 cursor-not-allowed">
-              {lang === "BN" ? "বেতন (৫ বছরের জন্য লকড)" : "Salary (Locked for 5 Years)"}
-            </option>
-            <option value="OTHER">{labels[lang].other}</option>
+            {categories.map((cat) => (
+              <option 
+                key={cat.id} 
+                value={cat.id}
+                disabled={cat.id === "SALARY"}
+                className={cat.id === "SALARY" ? "text-gray-450 dark:text-zinc-500 bg-gray-150/40 dark:bg-zinc-800/20 cursor-not-allowed" : ""}
+              >
+                {lang === "BN" ? cat.nameBN : cat.nameEN}
+              </option>
+            ))}
           </select>
         </div>
 

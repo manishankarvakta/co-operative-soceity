@@ -15,10 +15,8 @@ export default function ApplyLoanPage() {
   };
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-6 md:p-8 shadow-sm">
-        <LoanApplicationForm onSuccess={handleSuccess} onCancel={handleCancel} />
-      </div>
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-6 md:p-8 shadow-sm">
+      <LoanApplicationForm onSuccess={handleSuccess} onCancel={handleCancel} />
     </div>
   );
 }

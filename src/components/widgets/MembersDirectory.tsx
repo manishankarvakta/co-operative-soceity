@@ -367,9 +367,6 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
                           >
                             <option value="MEMBER">{labels[lang].roleMember}</option>
                             <option value="ACCOUNTANT">{labels[lang].roleAccountant}</option>
-                            <option value="PRESIDENT">{labels[lang].rolePresident}</option>
-                            <option value="SECRETARY">{labels[lang].roleSecretary}</option>
-                            <option value="TREASURER">{labels[lang].roleTreasurer}</option>
                             <option value="SUPER_ADMIN">{labels[lang].roleSuperAdmin}</option>
                           </select>
                         ) : (
