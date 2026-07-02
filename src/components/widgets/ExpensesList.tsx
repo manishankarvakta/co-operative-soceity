@@ -8,11 +8,12 @@ import { useLanguage } from "@/providers/LanguageProvider";
 type PendingAction = { type: "approve" | "reject"; id: string } | null;
 
 interface ExpensesListProps {
-  status: "" | "PENDING" | "APPROVED" | "REJECTED";
+  status?: "" | "PENDING" | "APPROVED" | "REJECTED";
 }
 
-export default function ExpensesList({ status }: ExpensesListProps) {
+export default function ExpensesList({ status = "" }: ExpensesListProps) {
   const { lang } = useLanguage();
+  const [activeStatus, setActiveStatus] = useState<"" | "PENDING" | "APPROVED" | "REJECTED">(status);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalItems: 0 });
@@ -24,7 +25,7 @@ export default function ExpensesList({ status }: ExpensesListProps) {
   const fetchExpenses = async (page = 1) => {
     setLoading(true);
     try {
-      const urlParams = new URLSearchParams({ page: page.toString(), limit: "10", status });
+      const urlParams = new URLSearchParams({ page: page.toString(), limit: "10", status: activeStatus });
       const response = await fetch(`/api/expenses?${urlParams}`);
       const data = await response.json();
       setExpenses(data.expenses || []);
@@ -38,7 +39,7 @@ export default function ExpensesList({ status }: ExpensesListProps) {
 
   useEffect(() => {
     fetchExpenses(1);
-  }, [status]);
+  }, [activeStatus]);
 
   const handleConfirm = async () => {
     if (!pendingAction) return;
@@ -153,20 +154,20 @@ export default function ExpensesList({ status }: ExpensesListProps) {
       {/* Filters / Navigation Tabs */}
       <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-850/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
         {[
-          { key: "", label: L.filterAll, href: "/dashboard/expenses" },
-          { key: "PENDING", label: L.filterPending, href: "/dashboard/expenses/pending" },
-          { key: "APPROVED", label: L.filterApproved, href: "/dashboard/expenses/approved" },
-          { key: "REJECTED", label: L.filterRejected, href: "/dashboard/expenses/rejected" },
+          { key: "", label: L.filterAll },
+          { key: "PENDING", label: L.filterPending },
+          { key: "APPROVED", label: L.filterApproved },
+          { key: "REJECTED", label: L.filterRejected },
         ].map((tab) => {
-          const isActive = status === tab.key;
+          const isActive = activeStatus === tab.key;
           return (
-            <Link
+            <button
               key={tab.key}
-              href={tab.href}
-              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
+              onClick={() => setActiveStatus(tab.key as any)}
+              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-750 dark:text-gray-400 dark:hover:text-gray-250"}`}
             >
               {tab.label}
-            </Link>
+            </button>
           );
         })}
       </div>
@@ -174,14 +175,14 @@ export default function ExpensesList({ status }: ExpensesListProps) {
       {/* Table */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="min-w-[600px] sm:min-w-full text-left text-sm">
             <thead className="bg-gray-50/80 dark:bg-zinc-850/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.category}</th>
                 <th className="px-6 py-4">{L.amount}</th>
-                <th className="px-6 py-4">{L.date}</th>
-                <th className="px-6 py-4">{L.location}</th>
-                <th className="px-6 py-4">{L.loggedBy}</th>
+                <th className="px-6 py-4 hidden sm:table-cell">{L.date}</th>
+                <th className="px-6 py-4 hidden md:table-cell">{L.location}</th>
+                <th className="px-6 py-4 hidden md:table-cell">{L.loggedBy}</th>
                 <th className="px-6 py-4">{L.status}</th>
                 <th className="px-6 py-4 text-right">{L.action}</th>
               </tr>
@@ -198,11 +199,11 @@ export default function ExpensesList({ status }: ExpensesListProps) {
                     <td className="px-6 py-4 font-bold font-mono text-gray-850 dark:text-zinc-200">
                       {(exp.amount / 100).toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
                     </td>
-                    <td className="px-6 py-4 font-mono text-gray-600 dark:text-gray-300">
+                    <td className="px-6 py-4 font-mono text-gray-650 dark:text-gray-300 hidden sm:table-cell">
                       {new Date(exp.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                     </td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{exp.location}</td>
-                    <td className="px-6 py-4 text-gray-650 dark:text-gray-400">{exp.loggedBy.name || exp.loggedBy.email}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden md:table-cell">{exp.location}</td>
+                    <td className="px-6 py-4 text-gray-650 dark:text-gray-400 hidden md:table-cell">{exp.loggedBy.name || exp.loggedBy.email}</td>
                     <td className="px-6 py-4">{getStatusBadge(exp.status)}</td>
                     <td className="px-6 py-4 text-right space-x-2">
                       {exp.status === "PENDING" && (

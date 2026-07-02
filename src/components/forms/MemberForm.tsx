@@ -82,6 +82,7 @@ export default function MemberForm({ initialData, memberId, onSuccess }: MemberF
     initialData?.joinDate ? new Date(initialData.joinDate).toISOString().split("T")[0] : ""
   );
   const [status, setStatus] = useState(initialData?.status || "ACTIVE");
+  const [role, setRole] = useState("MEMBER");
 
   // Nominee states
   const [nomineeName, setNomineeName] = useState(initialData?.nominee?.name || "");
@@ -299,7 +300,8 @@ export default function MemberForm({ initialData, memberId, onSuccess }: MemberF
         paymentMode,
         bankAccountId: paymentMode === "BANK" ? bankAccountId : undefined,
         admissionFee,
-        password: password || undefined
+        password: password || undefined,
+        role
       })
     };
 
@@ -388,15 +390,29 @@ export default function MemberForm({ initialData, memberId, onSuccess }: MemberF
           </Field>
 
           {!isEditMode && (
-            <Field label={L.password} required error={fieldErrors.password}>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setFieldErrors(f => ({ ...f, password: undefined })); }}
-                placeholder={lang === "BN" ? "পাসওয়ার্ড টাইপ করুন" : "Enter password"}
-                className={inputClass(fieldErrors.password)}
-              />
-            </Field>
+            <>
+              <Field label={L.password} required error={fieldErrors.password}>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setFieldErrors(f => ({ ...f, password: undefined })); }}
+                  placeholder={lang === "BN" ? "পাসওয়ার্ড টাইপ করুন" : "Enter password"}
+                  className={inputClass(fieldErrors.password)}
+                />
+              </Field>
+
+              <Field label={lang === "BN" ? "সদস্যের রোল (Role)" : "Member Role"}>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className={inputClass()}
+                >
+                  <option value="MEMBER">{lang === "BN" ? "সাধারণ সদস্য (Member)" : "Member"}</option>
+                  <option value="ACCOUNTANT">{lang === "BN" ? "হিসাব রক্ষক (Accountant)" : "Accountant"}</option>
+                  <option value="SUPER_ADMIN">{lang === "BN" ? "সুপার এডমিন (Super Admin)" : "Super Admin"}</option>
+                </select>
+              </Field>
+            </>
           )}
 
           <Field label={L.address} required error={fieldErrors.address}>

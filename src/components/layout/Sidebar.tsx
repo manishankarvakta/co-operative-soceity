@@ -52,16 +52,7 @@ interface NavItem {
 const navigation: NavItem[] = [
   { key: "Dashboard", href: "/dashboard", icon: "home" },
   { key: "Deposits", href: "/dashboard/deposits", icon: "wallet" },
-  {
-    key: "People",
-    icon: "users",
-    children: [
-      { key: "AddMember", href: "/dashboard/members/new" },
-      { key: "MemberList", href: "/dashboard/members" },
-      { key: "Accounters", href: "/dashboard/members/accounters" },
-      { key: "Admins", href: "/dashboard/members/admins" },
-    ]
-  },
+  { key: "People", href: "/dashboard/members", icon: "users" },
   {
     key: "Shares",
     icon: "pie-chart",
@@ -70,26 +61,8 @@ const navigation: NavItem[] = [
       { key: "ShareReports", href: "/dashboard/shares/reports" },
     ]
   },
-  {
-    key: "Expenses",
-    icon: "credit-card",
-    children: [
-      { key: "AllExpenses", href: "/dashboard/expenses" },
-      { key: "PendingApproval", href: "/dashboard/expenses/pending" },
-      { key: "ApprovedExpenses", href: "/dashboard/expenses/approved" },
-      { key: "RejectedExpenses", href: "/dashboard/expenses/rejected" },
-    ]
-  },
-  {
-    key: "Microcredit",
-    icon: "bank-notes",
-    children: [
-      { key: "PendingApplications", href: "/dashboard/microfinance/pending-applications" },
-      { key: "RunningLoans", href: "/dashboard/microfinance/running-loans" },
-      { key: "ClosedPaidLoans", href: "/dashboard/microfinance/closed-loans" },
-      { key: "RejectedApplications", href: "/dashboard/microfinance/rejected-applications" },
-    ]
-  },
+  { key: "Expenses", href: "/dashboard/expenses", icon: "credit-card" },
+  { key: "Microcredit", href: "/dashboard/microfinance", icon: "bank-notes" },
   {
     key: "Accounting",
     icon: "calculator",
@@ -145,7 +118,7 @@ const navigation: NavItem[] = [
 const translations: Record<"BN" | "EN", Record<string, string>> = {
   BN: {
     Dashboard: "ড্যাশবোর্ড",
-    People: "পিপল ও রোল",
+    People: "সদস্যবৃন্দ",
     AddMember: "নতুন সদস্য ভর্তি",
     MemberList: "সদস্য তালিকা",
     Accounters: "হিসাব রক্ষক",
@@ -193,7 +166,7 @@ const translations: Record<"BN" | "EN", Record<string, string>> = {
   },
   EN: {
     Dashboard: "Dashboard",
-    People: "People",
+    People: "Members",
     AddMember: "Add New Member",
     MemberList: "Member",
     Accounters: "Accounters",
@@ -292,7 +265,7 @@ export default function Sidebar() {
   const { lang } = useLanguage();
 
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
-    Microcredit: true,
+    Microcredit: false,
     Accounting: false,
     People: false,
     Expenses: false,

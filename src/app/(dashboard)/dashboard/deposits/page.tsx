@@ -125,15 +125,15 @@ export default function DepositsListPage() {
       {/* Tables Grid */}
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="min-w-[600px] sm:min-w-full text-left text-sm">
             <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
-                <th className="px-6 py-4">{labels[lang].colReceipt}</th>
+                <th className="px-6 py-4 hidden md:table-cell">{labels[lang].colReceipt}</th>
                 <th className="px-6 py-4">{labels[lang].colName}</th>
-                <th className="px-6 py-4">{labels[lang].colCode}</th>
-                <th className="px-6 py-4">{labels[lang].colMode}</th>
+                <th className="px-6 py-4 hidden md:table-cell">{labels[lang].colCode}</th>
+                <th className="px-6 py-4 hidden sm:table-cell">{labels[lang].colMode}</th>
                 <th className="px-6 py-4">{labels[lang].colTotal}</th>
-                <th className="px-6 py-4">{labels[lang].colDate}</th>
+                <th className="px-6 py-4 hidden sm:table-cell">{labels[lang].colDate}</th>
                 <th className="px-6 py-4 text-right">{labels[lang].colAction}</th>
               </tr>
             </thead>
@@ -155,22 +155,22 @@ export default function DepositsListPage() {
                   const totalAmount = deposit.items.reduce((sum: number, item: any) => sum + item.amount, 0) / 100;
                   return (
                     <tr key={deposit.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-emerald-700 dark:text-emerald-400">
+                      <td className="px-6 py-4 font-mono font-bold text-emerald-700 dark:text-emerald-400 hidden md:table-cell">
                         {getReceiptCode(deposit.remarks)}
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-800 dark:text-white">
                         {deposit.member.name}
                       </td>
-                      <td className="px-6 py-4 font-mono text-gray-600 dark:text-gray-300">
+                      <td className="px-6 py-4 font-mono text-gray-600 dark:text-gray-300 hidden md:table-cell">
                         {deposit.member.memberCode}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 hidden sm:table-cell">
                         {getPaymentModeBadge(deposit.paymentMode)}
                       </td>
                       <td className="px-6 py-4 font-bold font-mono text-gray-800 dark:text-white">
                         {totalAmount.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
                       </td>
-                      <td className="px-6 py-4 text-gray-650 dark:text-gray-300">
+                      <td className="px-6 py-4 text-gray-650 dark:text-gray-300 hidden sm:table-cell">
                         {new Date(deposit.createdAt).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                       </td>
                       <td className="px-6 py-4 text-right space-x-2">

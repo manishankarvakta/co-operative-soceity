@@ -51,6 +51,7 @@ export class MemberService {
       paymentMode?: "CASH" | "BANK";
       bankAccountId?: string | null;
       admissionFee?: number;
+      role?: "MEMBER" | "ACCOUNTANT" | "SUPER_ADMIN";
     },
     actorId?: string | null
   ) {
@@ -85,7 +86,7 @@ export class MemberService {
           userRoles: {
             create: {
               role: {
-                connect: { name: "MEMBER" }
+                connect: { name: data.role || "MEMBER" }
               }
             }
           }

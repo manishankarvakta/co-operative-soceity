@@ -7,14 +7,15 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 interface LoansListProps {
-  status: "PENDING" | "ACTIVE" | "PAID" | "REJECTED";
-  title: string;
-  subtitle: string;
+  status?: "PENDING" | "ACTIVE" | "PAID" | "REJECTED";
+  title?: string;
+  subtitle?: string;
   showApplyButton?: boolean;
 }
 
-export default function LoansList({ status, title, subtitle, showApplyButton = false }: LoansListProps) {
+export default function LoansList({ status = "ACTIVE", title, subtitle, showApplyButton = true }: LoansListProps) {
   const { lang } = useLanguage();
+  const [activeStatus, setActiveStatus] = useState<"PENDING" | "ACTIVE" | "PAID" | "REJECTED">(status);
   const [loans, setLoans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +59,7 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
   const fetchLoans = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/loans?status=${status}`);
+      const res = await fetch(`/api/loans?status=${activeStatus}`);
       const data = await res.json();
       if (data.success) {
         setLoans(data.loans || []);
@@ -73,9 +74,35 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
     }
   };
 
+  const getTabHeadings = (st: string) => {
+    switch (st) {
+      case "PENDING":
+        return {
+          BN: { title: "পেন্ডিং লোন আবেদনসমূহ (Pending Applications)", subtitle: "অনুমোদনের অপেক্ষায় থাকা নতুন ঋণ আবেদনসমূহ" },
+          EN: { title: "Pending Applications", subtitle: "New loan applications waiting for signatures and approvals" }
+        }[lang];
+      case "PAID":
+        return {
+          BN: { title: "পরিশোধিত লোনসমূহ (Paid Loans)", subtitle: "পরিশোধ সম্পন্ন হওয়া বন্ধকৃত ঋণসমূহ" },
+          EN: { title: "Closed/Paid Loans", subtitle: "Loans that have been fully collected and settled" }
+        }[lang];
+      case "REJECTED":
+        return {
+          BN: { title: "প্রত্যাখ্যাত আবেদনসমূহ (Rejected Applications)", subtitle: "বাতিল বা নামঞ্জুর হওয়া ঋণের আবেদনসমূহ" },
+          EN: { title: "Rejected Applications", subtitle: "Applications that were rejected by management" }
+        }[lang];
+      case "ACTIVE":
+      default:
+        return {
+          BN: { title: "সক্রিয় লোনসমূহ (Running Loans)", subtitle: "বর্তমানে চলমান এবং কিস্তি আদায়যোগ্য লোনসমূহ" },
+          EN: { title: "Running Loans", subtitle: "Active disbursed loans undergoing collection" }
+        }[lang];
+    }
+  };
+
   useEffect(() => {
     fetchLoans();
-  }, [status]);
+  }, [activeStatus]);
 
   const labels = {
     BN: {
@@ -143,13 +170,17 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
     return memberName.includes(search) || memberCode.includes(search);
   });
 
+  const headings = getTabHeadings(activeStatus);
+  const currentTitle = title || headings.title;
+  const currentSubtitle = subtitle || headings.subtitle;
+
   return (
     <div className="w-full space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 dark:border-zinc-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{title}</h1>
-          <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{currentTitle}</h1>
+          <p className="text-xs text-gray-505 mt-1">{currentSubtitle}</p>
         </div>
         {showApplyButton && (
           <Link
@@ -162,6 +193,27 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
             {L.newBtn}
           </Link>
         )}
+      </div>
+
+      {/* Filters / Navigation Tabs */}
+      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-850/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
+        {[
+          { key: "PENDING", label: lang === "BN" ? "পেন্ডিং আবেদন" : "Pending Applications" },
+          { key: "ACTIVE", label: lang === "BN" ? "চলতি লোনসমূহ" : "Running Loans" },
+          { key: "PAID", label: lang === "BN" ? "পরিশোধিত লোন" : "Closed/Paid Loans" },
+          { key: "REJECTED", label: lang === "BN" ? "প্রত্যাখ্যাত" : "Rejected Applications" },
+        ].map((tab) => {
+          const isActive = activeStatus === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveStatus(tab.key as any)}
+              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-750 dark:text-gray-400 dark:hover:text-gray-250"}`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Search Input Bar */}
@@ -205,14 +257,14 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
         </div>
       ) : (
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
-          <table className="w-full text-left text-sm">
+          <table className="min-w-[600px] sm:min-w-full text-left text-sm">
             <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-150 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.member}</th>
                 <th className="px-6 py-4">{L.amount}</th>
-                <th className="px-6 py-4">{L.interest}</th>
-                <th className="px-6 py-4">{L.duration}</th>
-                {status === "PENDING" && <th className="px-6 py-4">{L.signatures}</th>}
+                <th className="px-6 py-4 hidden sm:table-cell">{L.interest}</th>
+                <th className="px-6 py-4 hidden md:table-cell">{L.duration}</th>
+                {activeStatus === "PENDING" && <th className="px-6 py-4 hidden md:table-cell">{L.signatures}</th>}
                 <th className="px-6 py-4">{L.status}</th>
                 <th className="px-6 py-4 text-right">{L.action}</th>
               </tr>
@@ -227,14 +279,14 @@ export default function LoansList({ status, title, subtitle, showApplyButton = f
                   <td className="px-6 py-4 font-bold font-mono">
                     {(loan.amount / 100).toLocaleString()} BDT
                   </td>
-                  <td className="px-6 py-4 font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
+                  <td className="px-6 py-4 font-semibold text-emerald-600 dark:text-emerald-400 font-mono hidden sm:table-cell">
                     {Number(loan.interestRate)}% Flat
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 hidden md:table-cell">
                     {loan.durationValue} {loan.durationType === "WEEKLY" ? (lang === "BN" ? "সপ্তাহ" : "Weeks") : (lang === "BN" ? "মাস" : "Months")}
                   </td>
-                  {status === "PENDING" && (
-                    <td className="px-6 py-4">
+                  {activeStatus === "PENDING" && (
+                    <td className="px-6 py-4 hidden md:table-cell">
                       {isSuperAdmin ? (
                         <button
                           onClick={() => handleApprove(loan.id)}

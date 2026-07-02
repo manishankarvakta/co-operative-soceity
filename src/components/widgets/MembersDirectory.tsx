@@ -13,13 +13,14 @@ interface MembersDirectoryProps {
   role?: string;
 }
 
-export default function MembersDirectory({ role }: MembersDirectoryProps) {
+export default function MembersDirectory({ role: initialRole = "" }: MembersDirectoryProps) {
   const { data: session } = useSession();
   const { lang } = useLanguage();
   const router = useRouter();
   const [members, setMembers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [selectedRole, setSelectedRole] = useState(initialRole);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -41,8 +42,8 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
         search,
         status
       });
-      if (role) {
-        urlParams.append("role", role);
+      if (selectedRole) {
+        urlParams.append("role", selectedRole);
       }
       const response = await fetch(`/api/members?${urlParams}`);
       const data = await response.json();
@@ -79,7 +80,7 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
 
   useEffect(() => {
     fetchMembers(1);
-  }, [search, status]);
+  }, [search, status, selectedRole]);
 
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
@@ -103,7 +104,7 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
   };
 
   const getRoleHeadings = () => {
-    if (role === "ACCOUNTANT") {
+    if (selectedRole === "ACCOUNTANT") {
       return {
         BN: {
           title: "হিসাব রক্ষক তালিকা (Accounters Directory)",
@@ -114,7 +115,7 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
           subtitle: "List of all registered accountants."
         }
       }[lang];
-    } else if (role === "SUPER_ADMIN") {
+    } else if (selectedRole === "SUPER_ADMIN" || selectedRole === "ADMIN") {
       return {
         BN: {
           title: "এডমিন তালিকা (Admins Directory)",
@@ -309,8 +310,10 @@ export default function MembersDirectory({ role }: MembersDirectoryProps) {
       <MemberSearchFilters
         search={search}
         status={status}
+        role={selectedRole}
         onSearchChange={setSearch}
         onStatusChange={setStatus}
+        onRoleChange={setSelectedRole}
       />
 
       {/* Tables Grid */}
