@@ -98,7 +98,8 @@ const navigation: NavItem[] = [
         groupName: "SETUP",
         children: [
           { key: "ChartOfAccounts", href: "/dashboard/accounting/chart-of-accounts", icon: "bar-chart" },
-          { key: "CashBank", href: "/dashboard/accounting/bank", icon: "wallet" }
+          { key: "CashBank", href: "/dashboard/accounting/bank", icon: "wallet" },
+          { key: "FiscalYears", href: "/dashboard/accounting/fiscal-years", icon: "building" }
         ]
       },
       {
@@ -167,6 +168,7 @@ const translations: Record<"BN" | "EN", Record<string, string>> = {
     PAYABLES: "প্রদেয় হিসাব (Payables)",
     ChartOfAccounts: "চার্ট অব অ্যাকাউন্টস",
     CashBank: "নগদ ও ব্যাংক হিসাব",
+    FiscalYears: "অর্থবছরসমূহ",
     Vouchers: "ভাউচারসমূহ",
     AccountLedger: "অ্যাকাউন্ট খতিয়ান",
     TrialBalance: "রেওয়ামিল (Trial Balance)",
@@ -214,6 +216,7 @@ const translations: Record<"BN" | "EN", Record<string, string>> = {
     PAYABLES: "Payables",
     ChartOfAccounts: "Chart of Accounts",
     CashBank: "Cash & Bank",
+    FiscalYears: "Fiscal Years",
     Vouchers: "Vouchers",
     AccountLedger: "Account Ledger",
     TrialBalance: "Trial Balance",
