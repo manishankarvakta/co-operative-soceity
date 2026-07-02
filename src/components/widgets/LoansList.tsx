@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 import LoanApplicationForm from "@/components/forms/LoanApplicationForm";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -196,7 +197,7 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
       </div>
 
       {/* Filters / Navigation Tabs */}
-      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-850/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
+      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-800/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
         {[
           { key: "PENDING", label: lang === "BN" ? "পেন্ডিং আবেদন" : "Pending Applications" },
           { key: "ACTIVE", label: lang === "BN" ? "চলতি লোনসমূহ" : "Running Loans" },
@@ -208,7 +209,7 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
             <button
               key={tab.key}
               onClick={() => setActiveStatus(tab.key as any)}
-              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-750 dark:text-gray-400 dark:hover:text-gray-250"}`}
+              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
             >
               {tab.label}
             </button>
@@ -234,8 +235,9 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
 
       {/* Error alert */}
       {error && (
-        <div className="p-4 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-200/50 dark:border-red-900/50">
-          ⚠️ {error}
+        <div className="p-4 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-200/50 dark:border-red-900/50 flex items-center gap-1.5">
+          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -250,7 +252,7 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
         </div>
       ) : filteredLoans.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-          <svg className="w-12 h-12 text-gray-350 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
           <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">{L.noLoans}</p>
@@ -259,7 +261,7 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden w-full max-w-full">
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
-            <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-150 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-800/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.member}</th>
                 <th className="px-6 py-4">{L.amount}</th>
@@ -272,7 +274,7 @@ export default function LoansList({ status = "ACTIVE", title, subtitle, showAppl
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-700 dark:text-gray-300">
               {filteredLoans.map((loan) => (
-                <tr key={loan.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/20 transition">
+                <tr key={loan.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/20 transition">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-gray-900 dark:text-white">{loan.member.name}</div>
                     <div className="text-xs text-gray-400 font-mono mt-0.5">{loan.member.memberCode}</div>

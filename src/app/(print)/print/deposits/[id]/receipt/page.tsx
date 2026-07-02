@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle, X, Printer } from "lucide-react";
 
 interface PrintReceiptPageProps {
   params: Promise<{ id: string }>;
@@ -113,8 +114,9 @@ export default function PrintDepositReceiptPage({ params }: PrintReceiptPageProp
   );
 
   if (error || !deposit) return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", fontFamily: "Arial, sans-serif", color: "#c00" }}>
-      ⚠️ {error || "Receipt not found."}
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", height: "100vh", fontFamily: "Arial, sans-serif", color: "#c00" }}>
+      <AlertTriangle style={{ width: "20px", height: "20px" }} />
+      <span>{error || "Receipt not found."}</span>
     </div>
   );
 
@@ -242,11 +244,13 @@ export default function PrintDepositReceiptPage({ params }: PrintReceiptPageProp
       <div className="receipt-wrapper">
         {/* Action toolbar — hidden on print */}
         <div className="action-bar no-print">
-          <button className="btn btn-close" onClick={() => window.close()}>
-            ✕ {L.closeBtn}
+          <button className="btn btn-close" onClick={() => window.close()} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <X style={{ width: "12px", height: "12px" }} />
+            <span>{L.closeBtn}</span>
           </button>
-          <button className="btn btn-print" onClick={() => window.print()}>
-            🖨️ {L.printBtn}
+          <button className="btn btn-print" onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <Printer style={{ width: "12px", height: "12px" }} />
+            <span>{L.printBtn}</span>
           </button>
         </div>
 

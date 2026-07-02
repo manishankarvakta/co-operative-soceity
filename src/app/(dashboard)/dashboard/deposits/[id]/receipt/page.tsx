@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import DepositReceipt from "@/components/widgets/DepositReceipt";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 
 interface DepositReceiptPageProps {
   params: Promise<{
@@ -64,8 +65,9 @@ export default function DepositReceiptPage({ params }: DepositReceiptPageProps) 
 
   if (error || !deposit) {
     return (
-      <div className="p-8 text-center text-red-500 font-bold">
-        ⚠️ {error || messages[lang].notFound}
+      <div className="p-8 text-center text-red-500 font-bold flex items-center justify-center gap-1.5">
+        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+        <span>{error || messages[lang].notFound}</span>
       </div>
     );
   }

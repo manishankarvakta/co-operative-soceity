@@ -103,7 +103,7 @@ export default function AccountsReceivablePage() {
 
         <div className="overflow-x-auto text-xs">
           <table className="w-full text-left">
-            <thead className="bg-gray-55 dark:bg-zinc-850 text-gray-500 font-bold border-b dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 font-bold border-b dark:border-zinc-800">
               <tr>
                 <th className="px-4 py-3">{labels[lang].colMember}</th>
                 <th className="px-4 py-3">{labels[lang].colDate}</th>
@@ -130,10 +130,10 @@ export default function AccountsReceivablePage() {
                   const outstanding = calculateOutstanding(loan);
                   const paid = calculateTotalPaid(loan);
                   return (
-                    <tr key={loan.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/10">
+                    <tr key={loan.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/10">
                       <td className="px-4 py-3">
-                        <span className="font-bold text-gray-850 dark:text-white block mb-0.5">{loan.member.name}</span>
-                        <span className="text-[10px] text-gray-450 font-mono">{loan.member.memberCode} | {loan.member.phone}</span>
+                        <span className="font-bold text-gray-800 dark:text-white block mb-0.5">{loan.member.name}</span>
+                        <span className="text-[10px] text-gray-400 font-mono">{loan.member.memberCode} | {loan.member.phone}</span>
                       </td>
                       <td className="px-4 py-3 font-mono text-gray-500">
                         {loan.disbursedAt ? new Date(loan.disbursedAt).toLocaleDateString() : "Pending"}

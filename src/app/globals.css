@@ -3,6 +3,70 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @variant dark (&:where(.dark, .dark *));
 
+/* ─── Global Cursor Pointer for Clickable Elements ─── */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"],
+[role="button"],
+a,
+summary,
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer !important;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="reset"]:disabled,
+[type="submit"]:disabled,
+[role="button"][aria-disabled="true"],
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+/* ─── Global Input Field Borders ─── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+select,
+textarea {
+  border-color: #cbd5e1 !important; /* Soft slate-300 border for light mode */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark input[type="tel"],
+.dark input[type="url"],
+.dark input[type="search"],
+.dark select,
+.dark textarea {
+  border-color: #3f3f46 !important; /* Soft zinc-700 border for dark mode */
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus {
+  border-color: #059669 !important; /* Emerald-600 focus border */
+}
+
 /* ─── Print: only show receipt, hide sidebar/topbar/browser chrome ─── */
 @page {
   /* Setting margin to 0 removes the browser's date/time and URL areas */
@@ -11,19 +75,54 @@
 }
 
 @media print {
-  /* Hide everything on the page */
-  body * {
+  /* Hide common navigation and UI elements on any page when printing */
+  .no-print,
+  .no-print *,
+  aside,
+  header,
+  nav {
+    display: none !important;
+  }
+
+  /* Reset layout constraints for print */
+  body, html {
+    background: white !important;
+    color: black !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Remove sidebar margin on dashboard layout */
+  .ml-64 {
+    margin-left: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure colours (backgrounds, greens, etc.) print correctly */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ─── Specific Receipt-Printable Mode ─── */
+  /* If a page has a #receipt-printable element, hide everything else except it */
+  body:has(#receipt-printable) * {
     visibility: hidden !important;
   }
 
-  /* Only the receipt area and its children are visible */
-  #receipt-printable,
-  #receipt-printable * {
+  body:has(#receipt-printable) #receipt-printable,
+  body:has(#receipt-printable) #receipt-printable * {
     visibility: visible !important;
   }
 
-  /* Position receipt at top-left of the print canvas */
-  #receipt-printable {
+  body:has(#receipt-printable) #receipt-printable {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -34,9 +133,33 @@
     box-shadow: none !important;
   }
 
-  /* Ensure colours (backgrounds, greens, etc.) print correctly */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  /* ─── Force light mode colors for printing when app is in dark mode ─── */
+  .dark,
+  .dark * {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-color: #e5e7eb !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Preserve green colors for positive balance/status in print */
+  .dark .text-emerald-600,
+  .dark .text-emerald-700,
+  .dark .dark\:text-emerald-400,
+  .dark .dark\:text-emerald-450 {
+    color: #047857 !important;
+  }
+
+  /* Preserve red colors for negative values/status in print */
+  .dark .text-rose-600,
+  .dark .text-rose-700,
+  .dark .dark\:text-rose-400,
+  .dark .dark\:text-rose-450,
+  .dark .text-red-650,
+  .dark .text-red-600,
+  .dark .dark\:text-red-400 {
+    color: #b91c1c !important;
   }
 }

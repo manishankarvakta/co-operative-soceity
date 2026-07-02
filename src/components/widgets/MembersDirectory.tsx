@@ -320,7 +320,7 @@ export default function MembersDirectory({ role: initialRole = "" }: MembersDire
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300 w-full max-w-full">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{labels[lang].colId}</th>
                 <th className="px-6 py-4">{labels[lang].colName}</th>
@@ -383,7 +383,7 @@ export default function MembersDirectory({ role: initialRole = "" }: MembersDire
                         <div className="flex gap-2 justify-end">
                           <Link
                             href={`/dashboard/members/${member.id}`}
-                            className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-250 dark:border-emerald-900/40 transition"
+                            className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-200 dark:border-emerald-900/40 transition"
                             title={lang === "BN" ? "বিস্তারিত দেখুন" : "View Details"}
                           >
                             <Eye className="w-4.5 h-4.5" />
@@ -400,7 +400,7 @@ export default function MembersDirectory({ role: initialRole = "" }: MembersDire
                               setMemberToDelete(member);
                               setDeleteModal(true);
                             }}
-                            className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-450 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
+                            className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
                             title={lang === "BN" ? "মুছে ফেলুন" : "Delete"}
                           >
                             <Trash2 className="w-4.5 h-4.5" />
@@ -417,7 +417,7 @@ export default function MembersDirectory({ role: initialRole = "" }: MembersDire
 
         {/* Pagination Console */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-800 border-t border-black/5 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>{labels[lang].totalMembers}: {pagination.totalItems} {labels[lang].unit}</span>
             <div className="flex gap-2">
               <button

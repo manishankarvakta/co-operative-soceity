@@ -30,7 +30,8 @@ import {
   ChevronRight,
   ArrowRight,
   ShieldCheck,
-  ShieldAlert
+  ShieldAlert,
+  X
 } from "lucide-react";
 
 interface ChartDataItem {
@@ -95,7 +96,7 @@ const portalItems: PortalItem[] = [
     name: { EN: "Accounters List", BN: "হিসাব রক্ষক তালিকা" },
     description: { EN: "Manage accounts staff and assigned workspace roles.", BN: "হিসাবরক্ষণ কর্মকর্তা ও দায়িত্বপ্রাপ্ত কর্মকর্তাদের তালিকা।" },
     category: "members",
-    href: "/dashboard/members/accounters",
+    href: "/dashboard/members?role=ACCOUNTANT",
     icon: "shield-check",
     color: "violet"
   },
@@ -104,7 +105,7 @@ const portalItems: PortalItem[] = [
     name: { EN: "Admins List", BN: "এডমিন তালিকা" },
     description: { EN: "Administrator panel configuration and system operators.", BN: "সিস্টেম এডমিনিস্ট্রেটর এবং অপারেটরদের তালিকা।" },
     category: "members",
-    href: "/dashboard/members/admins",
+    href: "/dashboard/members?role=ADMIN",
     icon: "shield-alert",
     color: "rose"
   },
@@ -149,7 +150,7 @@ const portalItems: PortalItem[] = [
     name: { EN: "Pending Expenses", BN: "পেন্ডিং অনুমোদন" },
     description: { EN: "Approve or reject pending expense vouchers.", BN: "অনুমোদনের অপেক্ষায় থাকা খরচের আবেদনসমূহ পর্যালোচনা করুন।" },
     category: "accounting",
-    href: "/dashboard/expenses/pending",
+    href: "/dashboard/expenses?status=PENDING",
     icon: "file-check",
     color: "yellow",
     badge: { EN: "Review", BN: "রিভিউ" }
@@ -159,7 +160,7 @@ const portalItems: PortalItem[] = [
     name: { EN: "Pending Loans", BN: "পেন্ডিং লোন আবেদন" },
     description: { EN: "Review submitted microcredit and loan applications.", BN: "আবেদনকৃত নতুন ঋণ ও মাইক্রোক্রেডিট আবেদনসমূহ যাচাই করুন।" },
     category: "loans",
-    href: "/dashboard/microfinance/pending-applications",
+    href: "/dashboard/microfinance?status=PENDING",
     icon: "landmark",
     color: "sky",
     badge: { EN: "New", BN: "নতুন" }
@@ -169,7 +170,7 @@ const portalItems: PortalItem[] = [
     name: { EN: "Running Loans", BN: "চলতি লোনসমূহ" },
     description: { EN: "Monitor active loan disbursements and repayment status.", BN: "চলমান সকল ঋণের বিতরণ, কিস্তি আদায় ও বর্তমান স্থিতি দেখুন।" },
     category: "loans",
-    href: "/dashboard/microfinance/running-loans",
+    href: "/dashboard/microfinance?status=ACTIVE",
     icon: "trending-up",
     color: "indigo"
   },
@@ -178,7 +179,7 @@ const portalItems: PortalItem[] = [
     name: { EN: "Closed & Paid Loans", BN: "পরিশোধিত লোনসমূহ" },
     description: { EN: "View fully settled and closed loan accounts history.", BN: "সম্পূর্ণ পরিশোধিত ও ক্লোজ হওয়া লোনসমূহের ইতিহাস দেখুন।" },
     category: "loans",
-    href: "/dashboard/microfinance/closed-loans",
+    href: "/dashboard/microfinance?status=PAID",
     icon: "history",
     color: "gray"
   },
@@ -474,7 +475,7 @@ export default function ExecutiveDashboard() {
         );
       default:
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-full dark:bg-rose-955/20 dark:text-rose-450 dark:border-rose-900/30">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-full dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30">
             <span className="w-2 h-2 bg-rose-500 rounded-full"></span>
             {labels[lang].error}
           </span>
@@ -639,14 +640,14 @@ export default function ExecutiveDashboard() {
                 placeholder={labels[lang].searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-10 py-2.5 text-sm bg-gray-55 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-450 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+                className="w-full pl-11 pr-10 py-2.5 text-sm bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs font-bold text-gray-450 hover:text-gray-700 dark:hover:text-zinc-200 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
                 >
-                  ✕
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -660,7 +661,7 @@ export default function ExecutiveDashboard() {
                   className={`px-4.5 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all duration-300 ${
                     selectedCategory === cat.id
                       ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 hover:bg-emerald-700"
-                      : "bg-gray-100 hover:bg-gray-200/80 text-gray-600 dark:bg-zinc-850 dark:text-zinc-450 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                      : "bg-gray-100 hover:bg-gray-200/80 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
                   }`}
                 >
                   {lang === "BN" ? cat.nameBN : cat.nameEN}
@@ -676,98 +677,98 @@ export default function ExecutiveDashboard() {
                 const colorMap: Record<string, { bg: string; text: string; ring: string; hoverBorder: string; gradient: string }> = {
                   emerald: {
                     bg: "bg-emerald-50 dark:bg-emerald-950/20",
-                    text: "text-emerald-650 dark:text-emerald-400",
+                    text: "text-emerald-600 dark:text-emerald-400",
                     ring: "ring-emerald-500/10 dark:ring-emerald-500/20",
                     hoverBorder: "hover:border-emerald-500/40 dark:hover:border-emerald-500/30",
                     gradient: "from-emerald-500/[0.04] to-teal-500/[0.04]",
                   },
                   blue: {
                     bg: "bg-blue-50 dark:bg-blue-950/20",
-                    text: "text-blue-650 dark:text-blue-400",
+                    text: "text-blue-600 dark:text-blue-400",
                     ring: "ring-blue-500/10 dark:ring-blue-500/20",
                     hoverBorder: "hover:border-blue-500/40 dark:hover:border-blue-500/30",
                     gradient: "from-blue-500/[0.04] to-indigo-500/[0.04]",
                   },
                   violet: {
                     bg: "bg-violet-50 dark:bg-violet-950/20",
-                    text: "text-violet-650 dark:text-violet-400",
+                    text: "text-violet-600 dark:text-violet-400",
                     ring: "ring-violet-500/10 dark:ring-violet-500/20",
                     hoverBorder: "hover:border-violet-500/40 dark:hover:border-violet-500/30",
                     gradient: "from-violet-500/[0.04] to-purple-500/[0.04]",
                   },
                   rose: {
                     bg: "bg-rose-50 dark:bg-rose-950/20",
-                    text: "text-rose-650 dark:text-rose-455",
+                    text: "text-rose-600 dark:text-rose-400",
                     ring: "ring-rose-500/10 dark:ring-rose-500/20",
                     hoverBorder: "hover:border-rose-500/40 dark:hover:border-rose-500/30",
                     gradient: "from-rose-500/[0.04] to-red-500/[0.04]",
                   },
                   teal: {
                     bg: "bg-teal-50 dark:bg-teal-950/20",
-                    text: "text-teal-650 dark:text-teal-400",
+                    text: "text-teal-600 dark:text-teal-400",
                     ring: "ring-teal-500/10 dark:ring-teal-500/20",
                     hoverBorder: "hover:border-teal-500/40 dark:hover:border-teal-500/30",
                     gradient: "from-teal-500/[0.04] to-emerald-500/[0.04]",
                   },
                   amber: {
                     bg: "bg-amber-50 dark:bg-amber-950/20",
-                    text: "text-amber-650 dark:text-amber-455",
+                    text: "text-amber-600 dark:text-amber-400",
                     ring: "ring-amber-500/10 dark:ring-amber-500/20",
                     hoverBorder: "hover:border-amber-500/40 dark:hover:border-amber-500/30",
                     gradient: "from-amber-500/[0.04] to-yellow-500/[0.04]",
                   },
                   orange: {
                     bg: "bg-orange-50 dark:bg-orange-950/20",
-                    text: "text-orange-650 dark:text-orange-400",
+                    text: "text-orange-600 dark:text-orange-400",
                     ring: "ring-orange-500/10 dark:ring-orange-500/20",
                     hoverBorder: "hover:border-orange-500/40 dark:hover:border-orange-500/30",
                     gradient: "from-orange-500/[0.04] to-amber-500/[0.04]",
                   },
                   red: {
                     bg: "bg-red-50 dark:bg-red-950/20",
-                    text: "text-red-650 dark:text-red-400",
+                    text: "text-red-600 dark:text-red-400",
                     ring: "ring-red-500/10 dark:ring-red-500/20",
                     hoverBorder: "hover:border-red-500/40 dark:hover:border-red-500/30",
                     gradient: "from-red-500/[0.04] to-rose-500/[0.04]",
                   },
                   yellow: {
                     bg: "bg-yellow-50 dark:bg-yellow-950/20",
-                    text: "text-yellow-650 dark:text-yellow-400",
+                    text: "text-yellow-600 dark:text-yellow-400",
                     ring: "ring-yellow-500/10 dark:ring-yellow-500/20",
                     hoverBorder: "hover:border-yellow-500/40 dark:hover:border-yellow-500/30",
                     gradient: "from-yellow-500/[0.04] to-amber-500/[0.04]",
                   },
                   sky: {
                     bg: "bg-sky-50 dark:bg-sky-950/20",
-                    text: "text-sky-650 dark:text-sky-400",
+                    text: "text-sky-600 dark:text-sky-400",
                     ring: "ring-sky-500/10 dark:ring-sky-500/20",
                     hoverBorder: "hover:border-sky-500/40 dark:hover:border-sky-500/30",
                     gradient: "from-sky-500/[0.04] to-cyan-500/[0.04]",
                   },
                   indigo: {
                     bg: "bg-indigo-50 dark:bg-indigo-950/20",
-                    text: "text-indigo-650 dark:text-indigo-400",
+                    text: "text-indigo-600 dark:text-indigo-400",
                     ring: "ring-indigo-500/10 dark:ring-indigo-500/20",
                     hoverBorder: "hover:border-indigo-500/40 dark:hover:border-indigo-500/30",
                     gradient: "from-indigo-500/[0.04] to-purple-500/[0.04]",
                   },
                   gray: {
-                    bg: "bg-gray-55 dark:bg-zinc-800/55",
-                    text: "text-gray-600 dark:text-zinc-350",
-                    ring: "ring-gray-500/10 dark:ring-zinc-755",
-                    hoverBorder: "hover:border-gray-500/45 dark:hover:border-zinc-650",
+                    bg: "bg-gray-50 dark:bg-zinc-800/55",
+                    text: "text-gray-600 dark:text-zinc-300",
+                    ring: "ring-gray-500/10 dark:ring-zinc-700",
+                    hoverBorder: "hover:border-gray-500/45 dark:hover:border-zinc-600",
                     gradient: "from-gray-500/[0.03] to-zinc-500/[0.03]",
                   },
                   cyan: {
                     bg: "bg-cyan-50 dark:bg-cyan-950/20",
-                    text: "text-cyan-650 dark:text-cyan-400",
+                    text: "text-cyan-600 dark:text-cyan-400",
                     ring: "ring-cyan-500/10 dark:ring-cyan-500/20",
                     hoverBorder: "hover:border-cyan-500/40 dark:hover:border-cyan-500/30",
                     gradient: "from-cyan-500/[0.04] to-blue-500/[0.04]",
                   },
                   pink: {
                     bg: "bg-pink-50 dark:bg-pink-950/20",
-                    text: "text-pink-650 dark:text-pink-400",
+                    text: "text-pink-600 dark:text-pink-400",
                     ring: "ring-pink-500/10 dark:ring-pink-500/20",
                     hoverBorder: "hover:border-pink-500/40 dark:hover:border-pink-500/30",
                     gradient: "from-pink-500/[0.04] to-rose-500/[0.04]",
@@ -781,21 +782,21 @@ export default function ExecutiveDashboard() {
                   },
                   purple: {
                     bg: "bg-purple-50 dark:bg-purple-950/20",
-                    text: "text-purple-650 dark:text-purple-400",
+                    text: "text-purple-600 dark:text-purple-400",
                     ring: "ring-purple-500/10 dark:ring-purple-500/20",
                     hoverBorder: "hover:border-purple-500/40 dark:hover:border-purple-500/30",
                     gradient: "from-purple-500/[0.04] to-fuchsia-500/[0.04]",
                   },
                   fuchsia: {
                     bg: "bg-fuchsia-50 dark:bg-fuchsia-950/20",
-                    text: "text-fuchsia-650 dark:text-fuchsia-400",
+                    text: "text-fuchsia-600 dark:text-fuchsia-400",
                     ring: "ring-fuchsia-500/10 dark:ring-fuchsia-500/20",
                     hoverBorder: "hover:border-fuchsia-500/45 dark:hover:border-fuchsia-500/30",
                     gradient: "from-fuchsia-500/[0.04] to-pink-500/[0.04]",
                   },
                   slate: {
                     bg: "bg-slate-50 dark:bg-slate-950/20",
-                    text: "text-slate-650 dark:text-slate-400",
+                    text: "text-slate-600 dark:text-slate-400",
                     ring: "ring-slate-500/10 dark:ring-slate-500/20",
                     hoverBorder: "hover:border-slate-500/40 dark:hover:border-slate-500/30",
                     gradient: "from-slate-500/[0.04] to-zinc-500/[0.04]",
@@ -822,14 +823,14 @@ export default function ExecutiveDashboard() {
 
                         {/* Badge */}
                         {item.badge && (
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 text-amber-700 bg-amber-50 border border-amber-200 rounded-full dark:bg-amber-955/20 dark:text-amber-400 dark:border-amber-900/30">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 text-amber-700 bg-amber-50 border border-amber-200 rounded-full dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
                             {lang === "BN" ? item.badge.BN : item.badge.EN}
                           </span>
                         )}
                       </div>
 
                       <div className="space-y-1.5">
-                        <h3 className="text-base font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-455 transition-colors duration-250">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-250">
                           {lang === "BN" ? item.name.BN : item.name.EN}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
@@ -838,7 +839,7 @@ export default function ExecutiveDashboard() {
                       </div>
                     </div>
 
-                    <div className="mt-5 pt-3.5 border-t border-gray-100 dark:border-zinc-850 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-455 transition-colors duration-250">
+                    <div className="mt-5 pt-3.5 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-250">
                       <span>{lang === "BN" ? "মডিউলে প্রবেশ" : "Open Module"}</span>
                       <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
@@ -848,7 +849,7 @@ export default function ExecutiveDashboard() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-zinc-900 rounded-2xl border border-black/5 dark:border-zinc-800 shadow-sm min-h-[320px] animate-fadeIn">
-              <div className="p-3.5 rounded-full bg-rose-50 dark:bg-rose-955/20 text-rose-500 dark:text-rose-455 mb-4">
+              <div className="p-3.5 rounded-full bg-rose-50 dark:bg-rose-950/20 text-rose-500 dark:text-rose-400 mb-4">
                 <ShieldAlert className="w-8 h-8" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -893,7 +894,7 @@ export default function ExecutiveDashboard() {
                 </div>
                 
                 <div className="mt-4 flex items-baseline">
-                  <span className="text-2xl font-black text-gray-850 dark:text-zinc-100 font-mono tracking-tight">
+                  <span className="text-2xl font-black text-gray-800 dark:text-zinc-100 font-mono tracking-tight">
                     {kpi.isCurrency
                       ? kpi.value.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })
                       : kpi.value.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")}
@@ -918,14 +919,14 @@ export default function ExecutiveDashboard() {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-6 text-xs font-semibold pb-2 border-b border-gray-100 dark:border-zinc-850">
+            <div className="flex items-center gap-6 text-xs font-semibold pb-2 border-b border-gray-100 dark:border-zinc-800">
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded bg-emerald-500 block"></span>
-                <span className="text-gray-650 dark:text-gray-300">{labels[lang].collections}</span>
+                <span className="text-gray-600 dark:text-gray-300">{labels[lang].collections}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded bg-rose-500 block"></span>
-                <span className="text-gray-650 dark:text-gray-300">{labels[lang].expenses}</span>
+                <span className="text-gray-600 dark:text-gray-300">{labels[lang].expenses}</span>
               </div>
             </div>
 
@@ -933,10 +934,10 @@ export default function ExecutiveDashboard() {
             <div className="h-80 w-full mt-4 flex items-end justify-between gap-4 pt-6 select-none relative font-mono">
               {/* Y Axis Guide Lines */}
               <div className="absolute inset-x-0 bottom-0 top-6 flex flex-col justify-between pointer-events-none z-0">
-                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-850" />
-                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-850" />
-                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-850" />
-                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-850" />
+                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-800" />
+                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-800" />
+                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-800" />
+                <div className="w-full border-t border-dashed border-gray-100 dark:border-zinc-800" />
                 <div className="w-full border-t border-gray-200 dark:border-zinc-800" />
               </div>
 

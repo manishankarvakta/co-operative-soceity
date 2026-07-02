@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 
 interface LoanRule {
   id: string;
@@ -225,7 +226,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
       title: "নতুন লোন আবেদন ফর্ম",
       member: "সদস্য নির্বাচন করুন",
       checking: "যাচাই করা হচ্ছে...",
-      activeLoanError: "⚠️ এই সদস্যের ইতিমধ্যে একটি রানিং লোন রয়েছে! লোন পরিশোধ হওয়ার আগে নতুন আবেদন করা যাবে না।",
+      activeLoanError: "এই সদস্যের ইতিমধ্যে একটি রানিং লোন রয়েছে! লোন পরিশোধ হওয়ার আগে নতুন আবেদন করা যাবে না।",
       savingsInfo: "মোট সঞ্চয়:",
       limitInfo: "সর্বোচ্চ ঋণ সীমা (৮০%):",
       amount: "লোনের পরিমাণ (Principal BDT)",
@@ -250,7 +251,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
       title: "Apply for a New Loan",
       member: "Select Member Profile",
       checking: "Checking details...",
-      activeLoanError: "⚠️ This member already has an active loan! Cannot apply for another until closed.",
+      activeLoanError: "This member already has an active loan! Cannot apply for another until closed.",
       savingsInfo: "Total Savings:",
       limitInfo: "Max Eligible Limit (80%):",
       amount: "Loan Principal Amount (BDT)",
@@ -277,7 +278,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="border-b border-gray-150 dark:border-zinc-800 pb-3">
+      <div className="border-b border-gray-100 dark:border-zinc-800 pb-3">
         <h3 className="text-lg font-bold text-gray-800 dark:text-white">{L.title}</h3>
       </div>
 
@@ -297,7 +298,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
             required
             value={memberId}
             onChange={(e) => setMemberId(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
           >
             <option value="">-- {lang === "BN" ? "সদস্য খুঁজুন" : "Search Member"} --</option>
             {members.map((m) => (
@@ -312,8 +313,11 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
           )}
 
           {memberId && !checkingSavings && hasActiveLoan && (
-            <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-zinc-850 border border-gray-100 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400">
-              <p className="text-rose-500 font-bold">{L.activeLoanError}</p>
+            <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-rose-500 font-bold flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                <span>{L.activeLoanError}</span>
+              </p>
             </div>
           )}
         </div>
@@ -327,7 +331,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
             required
             value={guarantor1Id}
             onChange={(e) => setGuarantor1Id(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
           >
             <option value="">-- {lang === "BN" ? "১ম জামিনদার খুঁজুন" : "Select Guarantor 1"} --</option>
             {members
@@ -351,7 +355,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
             disabled={hasActiveLoan || !memberId}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white font-mono"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white font-mono"
             placeholder="e.g. 10000"
           />
 
@@ -365,7 +369,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
           <select
             value={guarantor2Id}
             onChange={(e) => setGuarantor2Id(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
           >
             <option value="">-- {lang === "BN" ? "২য় জামিনদার খুঁজুন (ঐচ্ছিক)" : "Select Guarantor 2 (Optional)"} --</option>
             {members
@@ -386,7 +390,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
           <select
             value={selectedRuleId}
             onChange={(e) => handleRuleChange(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-205 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-205 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
           >
             {loanRules.map((rule) => {
               const typeStr = rule.durationType === "WEEKLY" ? (lang === "BN" ? "সপ্তাহ" : "Weeks") : (lang === "BN" ? "মাস" : "Months");
@@ -424,7 +428,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
             type="text"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all dark:text-white"
             placeholder="বিশেষ জামানত বা অনুমোদনের বিবরণ..."
           />
         </div>
@@ -452,7 +456,7 @@ export default function LoanApplicationForm({ onSuccess, onCancel }: LoanApplica
       )}
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-3 border-t border-gray-150 dark:border-zinc-800 pt-5">
+      <div className="flex justify-end gap-3 border-t border-gray-100 dark:border-zinc-800 pt-5">
         <button
           type="button"
           onClick={onCancel}

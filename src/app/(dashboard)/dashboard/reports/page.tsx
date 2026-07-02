@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { Printer, Download } from "lucide-react";
 
 export default function ReportsPage() {
   const { lang } = useLanguage();
@@ -252,7 +253,7 @@ export default function ReportsPage() {
                 <select
                   value={selectedPaymentMode}
                   onChange={(e) => setSelectedPaymentMode(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 >
                   <option value="">{lang === "BN" ? "সকল পেমেন্ট" : "All Modes"}</option>
                   <option value="CASH">CASH (নগদ)</option>
@@ -270,7 +271,7 @@ export default function ReportsPage() {
                 <select
                   value={selectedProjectId}
                   onChange={(e) => setSelectedProjectId(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 >
                   <option value="">{lang === "BN" ? "সকল প্রজেক্ট / সাধারণ খরচ" : "All Project / General Cost"}</option>
                   {projects.map((p) => (
@@ -285,7 +286,7 @@ export default function ReportsPage() {
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   placeholder="যেমন: অফিস ভাড়া"
-                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 />
               </div>
             </>
@@ -298,7 +299,7 @@ export default function ReportsPage() {
               <select
                 value={selectedMemberId}
                 onChange={(e) => setSelectedMemberId(e.target.value)}
-                className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
               >
                 <option value="">-- {lang === "BN" ? "মেম্বার সিলেক্ট করুন" : "Select Member"} --</option>
                 {members.map((m) => (
@@ -315,7 +316,7 @@ export default function ReportsPage() {
               <select
                 value={selectedBankAccountId}
                 onChange={(e) => setSelectedBankAccountId(e.target.value)}
-                className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
               >
                 <option value="">-- {lang === "BN" ? "অ্যাকাউন্ট সিলেক্ট করুন" : "Select Account"} --</option>
                 {bankAccounts.map((b) => (
@@ -334,7 +335,7 @@ export default function ReportsPage() {
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 />
               </div>
               <div>
@@ -343,7 +344,7 @@ export default function ReportsPage() {
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full text-xs px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 />
               </div>
             </>
@@ -368,22 +369,24 @@ export default function ReportsPage() {
       ) : (
         <div className="space-y-6">
           {/* Export bar (Floating Panel) */}
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border rounded-lg flex justify-between items-center no-print">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-800 border rounded-lg flex justify-between items-center no-print">
             <span className="text-xs text-gray-500 font-bold">
               {lang === "BN" ? "রিপোর্ট এক্সপোর্ট করুন:" : "Available Statement Export formats:"}
             </span>
             <div className="flex gap-3">
               <button
                 onClick={handlePrint}
-                className="px-4 py-2 bg-white dark:bg-zinc-900 border text-xs font-bold rounded hover:bg-gray-100 transition shadow-sm"
+                className="px-4 py-2 bg-white dark:bg-zinc-900 border text-xs font-bold rounded hover:bg-gray-100 transition shadow-sm flex items-center gap-1.5"
               >
-                🖨️ {lang === "BN" ? "প্রিন্ট / PDF" : "Print / PDF"}
+                <Printer className="w-3.5 h-3.5" />
+                <span>{lang === "BN" ? "প্রিন্ট / PDF" : "Print / PDF"}</span>
               </button>
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-800 text-xs font-bold rounded hover:bg-emerald-100 transition shadow-sm"
+                className="px-4 py-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs font-bold rounded hover:bg-emerald-100 transition shadow-sm flex items-center gap-1.5"
               >
-                📥 {lang === "BN" ? "CSV ডাউনলোড" : "CSV spreadsheet"}
+                <Download className="w-3.5 h-3.5" />
+                <span>{lang === "BN" ? "CSV ডাউনলোড" : "CSV spreadsheet"}</span>
               </button>
             </div>
           </div>
@@ -416,19 +419,19 @@ export default function ReportsPage() {
               <div className="space-y-6">
                 {/* Aggregates widgets */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                  <div className="p-3 bg-gray-50 dark:bg-zinc-850 rounded border">
+                  <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded border">
                     <span className="text-gray-400 font-bold block mb-1">মোট আদায়</span>
                     <strong className="text-base text-gray-800 dark:text-white">{reportData.totals.totalCollectedBdt.toLocaleString()} BDT</strong>
                   </div>
-                  <div className="p-3 bg-gray-50 dark:bg-zinc-850 rounded border">
+                  <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded border">
                     <span className="text-gray-400 font-bold block mb-1">নগদ আদায় (CASH)</span>
                     <strong className="text-base text-emerald-600 dark:text-emerald-400">{reportData.totals.totalCashBdt.toLocaleString()} BDT</strong>
                   </div>
-                  <div className="p-3 bg-gray-50 dark:bg-zinc-850 rounded border">
+                  <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded border">
                     <span className="text-gray-400 font-bold block mb-1">ব্যাংক আদায় (BANK)</span>
                     <strong className="text-base text-blue-600 dark:text-blue-400">{reportData.totals.totalBankBdt.toLocaleString()} BDT</strong>
                   </div>
-                  <div className="p-3 bg-gray-50 dark:bg-zinc-850 rounded border">
+                  <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded border">
                     <span className="text-gray-400 font-bold block mb-1">জরিমানা জরিমানা আদায়</span>
                     <strong className="text-base text-amber-600">{reportData.totals.penaltyBdt.toLocaleString()} BDT</strong>
                   </div>
@@ -436,7 +439,7 @@ export default function ReportsPage() {
 
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-zinc-850 font-bold text-gray-500 border-b">
+                    <thead className="bg-gray-50 dark:bg-zinc-800 font-bold text-gray-500 border-b">
                       <tr>
                         <th className="px-4 py-2">{lang === "BN" ? "তারিখ" : "Date"}</th>
                         <th className="px-4 py-2">{lang === "BN" ? "রসিদ নম্বর" : "Receipt No"}</th>
@@ -455,7 +458,7 @@ export default function ReportsPage() {
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">{d.receiptCode}</td>
                           <td className="px-4 py-3 font-mono">{d.memberCode}</td>
                           <td className="px-4 py-3 font-semibold text-gray-800">{d.memberName}</td>
-                          <td className="px-4 py-3 text-gray-550 uppercase font-bold text-[10px]">{d.paymentMode}</td>
+                          <td className="px-4 py-3 text-gray-500 uppercase font-bold text-[10px]">{d.paymentMode}</td>
                           <td className="px-4 py-3 text-right font-mono font-bold">{d.amountBdt.toLocaleString()} BDT</td>
                         </tr>
                       ))}
@@ -475,7 +478,7 @@ export default function ReportsPage() {
 
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-zinc-850 font-bold text-gray-500 border-b">
+                    <thead className="bg-gray-50 dark:bg-zinc-800 font-bold text-gray-500 border-b">
                       <tr>
                         <th className="px-4 py-2">{lang === "BN" ? "তারিখ" : "Date"}</th>
                         <th className="px-4 py-2">{lang === "BN" ? "ক্যাটাগরি" : "Category"}</th>
@@ -492,7 +495,7 @@ export default function ReportsPage() {
                             {new Date(e.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                           </td>
                           <td className="px-4 py-3 font-semibold text-gray-800">{e.category}</td>
-                          <td className="px-4 py-3 text-gray-550">{e.projectName}</td>
+                          <td className="px-4 py-3 text-gray-500">{e.projectName}</td>
                           <td className="px-4 py-3 text-gray-500 font-mono text-[10px]">{e.location}</td>
                           <td className="px-4 py-3 uppercase text-[10px] font-bold">
                             <span className={e.status === "APPROVED" ? "text-emerald-600" : "text-amber-600"}>{e.status}</span>
@@ -529,7 +532,7 @@ export default function ReportsPage() {
 
                 {/* Nominee details if present */}
                 {reportData.memberInfo.nominee && (
-                  <div className="p-4 bg-gray-50 dark:bg-zinc-850 rounded border border-black/5 text-xs">
+                  <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded border border-black/5 text-xs">
                     <span className="block font-bold text-[10px] text-gray-400 uppercase tracking-widest mb-1">nominee details</span>
                     <div className="grid grid-cols-3 gap-2">
                       <div>Name: <strong>{reportData.memberInfo.nominee.name}</strong></div>
@@ -541,7 +544,7 @@ export default function ReportsPage() {
 
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-zinc-850 font-bold text-gray-500 border-b">
+                    <thead className="bg-gray-50 dark:bg-zinc-800 font-bold text-gray-500 border-b">
                       <tr>
                         <th className="px-4 py-2">{lang === "BN" ? "তারিখ" : "Date"}</th>
                         <th className="px-4 py-2">{lang === "BN" ? "রসিদ কোড" : "Receipt"}</th>
@@ -577,14 +580,14 @@ export default function ReportsPage() {
                 <div className="grid grid-cols-3 gap-4 text-xs border-b pb-4 dark:border-zinc-800">
                   <div>
                     <span className="text-gray-400 block mb-1">ব্যাংক বিবরণী</span>
-                    <strong className="text-sm text-gray-850 dark:text-white">{reportData.accountInfo.name}</strong>
+                    <strong className="text-sm text-gray-800 dark:text-white">{reportData.accountInfo.name}</strong>
                     <span className="block font-mono text-gray-400">{reportData.accountInfo.accountNumber}</span>
                   </div>
-                  <div className="p-3 bg-gray-55 rounded border">
+                  <div className="p-3 bg-gray-50 rounded border">
                     <span className="text-gray-400 block">প্রারম্ভিক ব্যালেন্স</span>
                     <strong className="font-mono text-gray-800">{reportData.totals.startingBalanceBdt.toLocaleString()} BDT</strong>
                   </div>
-                  <div className="p-3 bg-emerald-50 rounded border border-emerald-250">
+                  <div className="p-3 bg-emerald-50 rounded border border-emerald-200">
                     <span className="text-emerald-700 block">সমাপনী ব্যালেন্স</span>
                     <strong className="font-mono text-emerald-800">{reportData.totals.closingBalanceBdt.toLocaleString()} BDT</strong>
                   </div>
@@ -592,7 +595,7 @@ export default function ReportsPage() {
 
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-zinc-850 font-bold text-gray-500 border-b">
+                    <thead className="bg-gray-50 dark:bg-zinc-800 font-bold text-gray-500 border-b">
                       <tr>
                         <th className="px-4 py-2">{lang === "BN" ? "তারিখ" : "Date"}</th>
                         <th className="px-4 py-2">{lang === "BN" ? "রেফারেন্স" : "Reference"}</th>
@@ -635,13 +638,13 @@ export default function ReportsPage() {
                   <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">assets (সম্পদসমূহ)</h4>
                   <div className="space-y-2">
                     {reportData.assets.map((item: any) => (
-                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
+                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-800 text-gray-700 dark:text-zinc-300">
                         <span>{item.name}</span>
                         <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
+                  <div className="flex justify-between font-bold text-gray-800 dark:text-white pt-2 text-base">
                     <span>Total Assets:</span>
                     <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals.totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
                   </div>
@@ -652,19 +655,19 @@ export default function ReportsPage() {
                   <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">liabilities & equity (দায় ও মূলধন)</h4>
                   <div className="space-y-2">
                     {reportData.liabilities.map((item: any) => (
-                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
+                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-800 text-gray-700 dark:text-zinc-300">
                         <span>{item.name}</span>
                         <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                     ))}
                     {reportData.equity.map((item: any) => (
-                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
+                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-800 text-gray-700 dark:text-zinc-300">
                         <span>{item.name}</span>
                         <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
+                  <div className="flex justify-between font-bold text-gray-800 dark:text-white pt-2 text-base">
                     <span>Total Liabilities & Equity:</span>
                     <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals.totalLiabilitiesAndEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
                   </div>
@@ -680,13 +683,13 @@ export default function ReportsPage() {
                   <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">Revenue (আয়সমূহ)</h4>
                   <div className="space-y-2">
                     {reportData.revenue.map((item: any) => (
-                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
+                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-800 text-gray-700 dark:text-zinc-300">
                         <span>{item.name}</span>
                         <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
+                  <div className="flex justify-between font-bold text-gray-800 dark:text-white pt-2 text-base">
                     <span>Total Revenue:</span>
                     <span className="font-mono text-emerald-700 dark:text-emerald-400">{reportData.totals.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
                   </div>
@@ -697,20 +700,20 @@ export default function ReportsPage() {
                   <h4 className="font-bold border-b pb-1 mb-2 text-gray-800 dark:text-white uppercase tracking-wider">Expenses (ব্যয়সমূহ)</h4>
                   <div className="space-y-2">
                     {reportData.expenses.map((item: any) => (
-                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-850 text-gray-750 dark:text-zinc-350">
+                      <div key={item.code} className="flex justify-between border-b pb-1 dark:border-zinc-800 text-gray-700 dark:text-zinc-300">
                         <span>{item.name}</span>
                         <span className="font-mono font-semibold">{item.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between font-bold text-gray-850 dark:text-white pt-2 text-base">
+                  <div className="flex justify-between font-bold text-gray-800 dark:text-white pt-2 text-base">
                     <span>Total Expenses:</span>
                     <span className="font-mono text-amber-700 dark:text-amber-400">{reportData.totals.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
                   </div>
                 </div>
 
                 {/* Net Profit */}
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 rounded-xl flex justify-between items-center text-lg font-black">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 rounded-xl flex justify-between items-center text-lg font-black">
                   <span className="text-emerald-800 dark:text-emerald-400 font-bold">Net Profit (নিট মুনাফা):</span>
                   <span className="font-mono text-emerald-800 dark:text-emerald-400">{reportData.totals.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
                 </div>

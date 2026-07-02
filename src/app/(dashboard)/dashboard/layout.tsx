@@ -17,7 +17,7 @@ export default function DashboardLayout({
       {/* Main content area, pushed to the right by the sidebar width */}
       <div className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
         {/* Optional top navbar could go here */}
-        <header className="h-16 border-b border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-6">
+        <header className="h-16 border-b border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-6 no-print">
           <Breadcrumbs />
           <div className="flex items-center gap-4">
             <LanguageToggle />

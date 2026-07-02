@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/providers/LanguageProvider";
+import { Printer } from "lucide-react";
 
 interface DepositReceiptProps {
   deposit: {
@@ -244,9 +245,10 @@ export default function DepositReceipt({ deposit }: DepositReceiptProps) {
       <div className="flex justify-end items-center mb-6 border-b pb-4 border-gray-100 dark:border-zinc-800">
         <button
           onClick={handlePrint}
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition"
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition flex items-center gap-1.5"
         >
-          🖨️ {L.printBtn}
+          <Printer className="w-4 h-4" />
+          <span>{L.printBtn}</span>
         </button>
       </div>
 

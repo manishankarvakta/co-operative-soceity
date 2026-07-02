@@ -92,7 +92,7 @@ export default function NewBankAccountPage() {
             value={accName}
             onChange={(e) => setAccName(e.target.value)}
             placeholder="e.g. Cash on Hand, Sonali Bank"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-zinc-850 dark:text-white transition"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-zinc-800 dark:text-white transition"
           />
         </div>
         <div>
@@ -103,7 +103,7 @@ export default function NewBankAccountPage() {
             value={accNumber}
             onChange={(e) => setAccNumber(e.target.value)}
             placeholder="e.g. CASH_BOX, 100234892348"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-zinc-850 dark:text-white transition"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-zinc-800 dark:text-white transition"
           />
         </div>
         <div>
@@ -114,7 +114,7 @@ export default function NewBankAccountPage() {
             value={accBalance}
             onChange={(e) => setAccBalance(e.target.value)}
             placeholder="0.00"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-zinc-850 dark:text-white transition"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-zinc-800 dark:text-white transition"
           />
         </div>
         

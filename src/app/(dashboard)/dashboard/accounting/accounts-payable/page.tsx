@@ -85,10 +85,10 @@ export default function AccountsPayablePage() {
 
         <div className="overflow-x-auto text-xs">
           <table className="w-full text-left">
-            <thead className="bg-gray-55 dark:bg-zinc-850 text-gray-500 font-bold border-b dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 font-bold border-b dark:border-zinc-800">
               <tr>
                 <th className="px-4 py-3">{labels[lang].colMember}</th>
-                <th className="px-4 py-3 text-right font-bold text-emerald-750 dark:text-emerald-400">{labels[lang].colSavings}</th>
+                <th className="px-4 py-3 text-right font-bold text-emerald-700 dark:text-emerald-400">{labels[lang].colSavings}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
@@ -106,10 +106,10 @@ export default function AccountsPayablePage() {
                 </tr>
               ) : (
                 memberPayables.map((payable) => (
-                  <tr key={payable.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/10">
+                  <tr key={payable.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/10">
                     <td className="px-4 py-3">
-                      <span className="font-bold text-gray-850 dark:text-white block mb-0.5">{payable.name}</span>
-                      <span className="text-[10px] text-gray-450 font-mono">{payable.memberCode} | {payable.phone}</span>
+                      <span className="font-bold text-gray-800 dark:text-white block mb-0.5">{payable.name}</span>
+                      <span className="text-[10px] text-gray-400 font-mono">{payable.memberCode} | {payable.phone}</span>
                     </td>
                     <td className="px-4 py-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
                       {payable.savingsBdt.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT

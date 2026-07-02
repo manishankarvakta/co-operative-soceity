@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { Printer } from "lucide-react";
 
 export default function AccountLedgerPage() {
   const { lang } = useLanguage();
@@ -115,7 +116,7 @@ export default function AccountLedgerPage() {
             <select
               value={selectedAccCode}
               onChange={(e) => setSelectedAccCode(e.target.value)}
-              className="w-full text-xs px-3 py-2.5 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-semibold"
+              className="w-full text-xs px-3 py-2.5 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-semibold"
             >
               <option value="">-- অ্যাকাউন্ট সিলেক্ট করুন --</option>
               {accounts.map((acc) => (
@@ -131,7 +132,7 @@ export default function AccountLedgerPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full text-xs px-3 py-2.5 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full text-xs px-3 py-2.5 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
             />
           </div>
           <div>
@@ -140,7 +141,7 @@ export default function AccountLedgerPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full text-xs px-3 py-2.5 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full text-xs px-3 py-2.5 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
             />
           </div>
           <button
@@ -156,15 +157,16 @@ export default function AccountLedgerPage() {
       {/* Result Panel */}
       {ledgerData && (
         <div className="space-y-6">
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border rounded-lg flex justify-between items-center no-print">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-800 border rounded-lg flex justify-between items-center no-print">
             <span className="text-xs text-gray-500 font-bold">
               {lang === "BN" ? "রিপোর্ট এক্সপোর্ট করুন:" : "Available Statement Export formats:"}
             </span>
             <button
               onClick={handlePrint}
-              className="px-4 py-2 bg-white dark:bg-zinc-900 border text-xs font-bold rounded hover:bg-gray-100 transition shadow-sm"
+              className="px-4 py-2 bg-white dark:bg-zinc-900 border text-xs font-bold rounded hover:bg-gray-100 transition shadow-sm flex items-center gap-1.5"
             >
-              🖨️ {labels[lang].print}
+              <Printer className="w-3.5 h-3.5" />
+              <span>{labels[lang].print}</span>
             </button>
           </div>
 
@@ -190,14 +192,14 @@ export default function AccountLedgerPage() {
               </div>
               <div className="space-y-1 text-right">
                 <span className="block font-bold text-[10px] text-gray-400 uppercase tracking-widest">Balances Overview</span>
-                <div>{labels[lang].startingBalance}: <strong className="font-mono text-gray-850 dark:text-white">{ledgerData.startingBalanceBdt.toLocaleString()} BDT</strong></div>
-                <div>{labels[lang].endingBalance}: <strong className="font-mono text-emerald-700 dark:text-emerald-450">{ledgerData.endingBalanceBdt.toLocaleString()} BDT</strong></div>
+                <div>{labels[lang].startingBalance}: <strong className="font-mono text-gray-800 dark:text-white">{ledgerData.startingBalanceBdt.toLocaleString()} BDT</strong></div>
+                <div>{labels[lang].endingBalance}: <strong className="font-mono text-emerald-700 dark:text-emerald-400">{ledgerData.endingBalanceBdt.toLocaleString()} BDT</strong></div>
               </div>
             </div>
 
             <div className="overflow-x-auto text-xs font-sans">
               <table className="w-full text-left">
-                <thead className="bg-gray-55 dark:bg-zinc-850 font-bold text-gray-500 border-b">
+                <thead className="bg-gray-50 dark:bg-zinc-800 font-bold text-gray-500 border-b">
                   <tr>
                     <th className="px-4 py-3">{labels[lang].colDate}</th>
                     <th className="px-4 py-3">{labels[lang].colDesc}</th>
@@ -231,7 +233,7 @@ export default function AccountLedgerPage() {
                     </tr>
                   ) : (
                     ledgerData.lines.map((line: any) => (
-                      <tr key={line.id} className="hover:bg-gray-50/30 dark:hover:bg-zinc-850/20">
+                      <tr key={line.id} className="hover:bg-gray-50/30 dark:hover:bg-zinc-800/20">
                         <td className="px-4 py-3 font-mono text-gray-500">
                           {new Date(line.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                         </td>
@@ -247,7 +249,7 @@ export default function AccountLedgerPage() {
                         <td className="px-4 py-3 text-right font-mono text-gray-700 dark:text-gray-300">
                           {line.credit > 0 ? line.credit.toLocaleString() : "—"}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono font-bold text-gray-850 dark:text-zinc-200">
+                        <td className="px-4 py-3 text-right font-mono font-bold text-gray-800 dark:text-zinc-200">
                           {line.runningBalance.toLocaleString()} BDT
                         </td>
                       </tr>

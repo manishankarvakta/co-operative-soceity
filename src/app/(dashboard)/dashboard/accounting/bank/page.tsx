@@ -174,7 +174,7 @@ export default function BankWorkspacePage() {
         <div className="flex gap-3">
           <Link
             href="/dashboard/accounting/bank/new"
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-250 dark:bg-zinc-800 text-gray-850 dark:text-white font-bold text-sm rounded-lg shadow transition text-center"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-white font-bold text-sm rounded-lg shadow transition text-center"
           >
             {labels[lang].addAcc}
           </Link>
@@ -209,7 +209,7 @@ export default function BankWorkspacePage() {
               {accounts.map((acc) => (
                 <div key={acc.id} className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow flex justify-between items-center transition hover:shadow-md">
                   <div>
-                    <h4 className="font-bold text-gray-850 dark:text-white">{acc.name}</h4>
+                    <h4 className="font-bold text-gray-800 dark:text-white">{acc.name}</h4>
                     <span className="text-xs text-gray-400 font-mono select-all">{acc.accountNumber}</span>
                   </div>
                   <strong className="text-lg font-black text-emerald-700 dark:text-emerald-400 font-mono">
@@ -227,7 +227,7 @@ export default function BankWorkspacePage() {
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow overflow-hidden">
             <div className="overflow-x-auto text-sm">
               <table className="w-full text-left">
-                <thead className="bg-gray-55 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800">
+                <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800">
                   <tr>
                     <th className="px-6 py-4">{labels[lang].colAccName}</th>
                     <th className="px-6 py-4">{labels[lang].colTxType}</th>
@@ -259,19 +259,19 @@ export default function BankWorkspacePage() {
                         <td className="px-6 py-4 space-y-1">
                           <div className="flex gap-2 text-[10px] font-bold">
                             {tx.presidentApproved ? (
-                              <span className="text-emerald-650 bg-emerald-50 px-1 rounded">Pres: {labels[lang].signed}</span>
+                              <span className="text-emerald-600 bg-emerald-50 px-1 rounded">Pres: {labels[lang].signed}</span>
                             ) : (
                               <button onClick={() => handleSignOff(tx.id, "PRESIDENT")} className="text-amber-700 bg-amber-50 px-1 rounded hover:bg-amber-100">{labels[lang].signPresident}</button>
                             )}
 
                             {tx.secretaryApproved ? (
-                              <span className="text-emerald-650 bg-emerald-50 px-1 rounded">Sec: {labels[lang].signed}</span>
+                              <span className="text-emerald-600 bg-emerald-50 px-1 rounded">Sec: {labels[lang].signed}</span>
                             ) : (
                               <button onClick={() => handleSignOff(tx.id, "SECRETARY")} className="text-amber-700 bg-amber-50 px-1 rounded hover:bg-amber-100">{labels[lang].signSecretary}</button>
                             )}
 
                             {tx.treasurerApproved ? (
-                              <span className="text-emerald-650 bg-emerald-50 px-1 rounded">Treas: {labels[lang].signed}</span>
+                              <span className="text-emerald-600 bg-emerald-50 px-1 rounded">Treas: {labels[lang].signed}</span>
                             ) : (
                               <button onClick={() => handleSignOff(tx.id, "TREASURER")} className="text-amber-700 bg-amber-50 px-1 rounded hover:bg-amber-100">{labels[lang].signTreasurer}</button>
                             )}

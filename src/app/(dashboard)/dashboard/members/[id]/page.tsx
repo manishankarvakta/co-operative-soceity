@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, AlertTriangle } from "lucide-react";
 import MemberForm from "@/components/forms/MemberForm";
 import NomineeForm from "@/components/forms/NomineeForm";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
@@ -188,8 +188,9 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
 
   if (error || !member) {
     return (
-      <div className="p-8 text-center text-red-500 font-bold">
-        ⚠️ {error || labels[lang].errorNotFoud}
+      <div className="p-8 text-center text-red-500 font-bold flex items-center justify-center gap-1.5">
+        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+        <span>{error || labels[lang].errorNotFoud}</span>
       </div>
     );
   }
@@ -243,7 +244,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
       {successModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
           <div 
-            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 text-center shadow-2xl border border-gray-100 dark:border-zinc-850 overflow-hidden"
+            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 text-center shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden"
             style={{ animation: "cm-slideUp 0.22s cubic-bezier(0.34,1.56,0.64,1)" }}
           >
             <div className="h-1 w-full bg-emerald-500 absolute top-0 left-0" />
@@ -360,7 +361,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
                 </div>
                 <div className="py-4">
                   <dt className="text-gray-500 dark:text-gray-400 font-medium mb-2">{labels[lang].address}</dt>
-                  <dd className="bg-gray-50 dark:bg-zinc-850/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
+                  <dd className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
                     {member.address}
                   </dd>
                 </div>
@@ -372,7 +373,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
           {isSuperAdmin && (
             <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden p-6">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <ShieldAlert className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-450" />
+                <ShieldAlert className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
                 {lang === "BN" ? "ভূমিকা ও অ্যাক্সেস নিয়ন্ত্রণ" : "Role & Access Control"}
               </h3>
               <div className="flex items-center gap-4">
@@ -432,7 +433,7 @@ export default function MemberProfilePage({ params }: ProfilePageProps) {
                 </div>
                 <div className="py-4">
                   <dt className="text-gray-500 dark:text-gray-400 font-medium mb-2">{labels[lang].nomineeAddress}</dt>
-                  <dd className="bg-gray-50 dark:bg-zinc-850/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
+                  <dd className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-xl text-gray-700 dark:text-zinc-300 leading-relaxed ring-1 ring-gray-900/5 dark:ring-white/5">
                     {member.nominee.address}
                   </dd>
                 </div>

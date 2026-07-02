@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { Printer } from "lucide-react";
 
 export default function ProfitLossPage() {
   const { lang } = useLanguage();
@@ -54,9 +55,10 @@ export default function ProfitLossPage() {
         </span>
         <button
           onClick={handlePrint}
-          className="px-4 py-2 bg-white dark:bg-zinc-900 border dark:border-zinc-800 text-xs font-bold rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition shadow-sm"
+          className="px-4 py-2 bg-white dark:bg-zinc-900 border dark:border-zinc-800 text-xs font-bold rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition shadow-sm flex items-center gap-1.5"
         >
-          🖨️ {labels[lang].print}
+          <Printer className="w-3.5 h-3.5" />
+          <span>{labels[lang].print}</span>
         </button>
       </div>
 
@@ -88,7 +90,7 @@ export default function ProfitLossPage() {
               </div>
               <div className="flex justify-between font-bold text-gray-800 dark:text-white pt-2 text-base">
                 <span>Total Revenue:</span>
-                <span className="font-mono text-emerald-700 dark:text-emerald-450">
+                <span className="font-mono text-emerald-700 dark:text-emerald-400">
                   {reportData.totals?.totalRevenue?.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT
                 </span>
               </div>
@@ -107,7 +109,7 @@ export default function ProfitLossPage() {
               </div>
               <div className="flex justify-between font-bold text-gray-800 dark:text-white pt-2 text-base">
                 <span>Total Expenses:</span>
-                <span className="font-mono text-amber-700 dark:text-amber-450">
+                <span className="font-mono text-amber-700 dark:text-amber-400">
                   {reportData.totals?.totalExpenses?.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT
                 </span>
               </div>

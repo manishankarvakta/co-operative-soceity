@@ -318,7 +318,7 @@ export default function Sidebar() {
   }, [pathname]);
 
   return (
-    <div className="flex h-screen w-64 flex-col bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 shadow-sm fixed z-40 overflow-y-auto select-none transition-colors duration-300">
+    <div className="flex h-screen w-64 flex-col bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 shadow-sm fixed z-40 overflow-y-auto select-none transition-colors duration-300 no-print">
       {/* Brand Header */}
       <div className="flex h-16 shrink-0 items-center px-6 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3">
@@ -453,7 +453,7 @@ export default function Sidebar() {
                           href={child.href}
                           className={`flex items-center gap-3 px-6.5 py-2 rounded-md text-xs font-medium tracking-wide transition-all duration-200 ${isChildActive
                               ? "bg-zinc-200/40 dark:bg-zinc-800/60 text-zinc-900 dark:text-white font-semibold"
-                              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-250 hover:bg-zinc-200/20 dark:hover:bg-zinc-800/20"
+                              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/20 dark:hover:bg-zinc-800/20"
                             }`}
                         >
                           <span>{childDisplayName}</span>

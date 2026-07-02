@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface ProjectFormProps {
   onSuccess?: () => void;
@@ -184,7 +185,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
             setSuccessMsg(null);
           }}
           className={`pb-2 text-sm font-bold border-b-2 transition-all ${
-            mode === "project" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
+            mode === "project" ? "border-emerald-600 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
           }`}
         >
           {labels[lang].tabProj}
@@ -197,7 +198,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
             setSuccessMsg(null);
           }}
           className={`pb-2 text-sm font-bold border-b-2 transition-all ${
-            mode === "investment" ? "border-emerald-650 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
+            mode === "investment" ? "border-emerald-600 text-emerald-600 dark:text-emerald-400" : "border-transparent text-gray-500 hover:text-gray-700"
           }`}
         >
           {labels[lang].tabInv}
@@ -218,14 +219,16 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
       </div>
 
       {error && (
-        <div className="p-3 mb-4 text-xs font-semibold text-red-650 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200">
-          ⚠️ {error}
+        <div className="p-3 mb-4 text-xs font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200 flex items-center gap-1.5">
+          <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 mb-4 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 rounded-lg border border-emerald-200">
-          ✅ {successMsg}
+        <div className="p-3 mb-4 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 rounded-lg border border-emerald-200 flex items-center gap-1.5">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+          <span>{successMsg}</span>
         </div>
       )}
 

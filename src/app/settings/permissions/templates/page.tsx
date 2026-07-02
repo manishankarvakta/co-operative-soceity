@@ -256,7 +256,7 @@ export default function DesignationTemplates() {
         <div className="flex items-center gap-3">
           <Link
             href="/settings/permissions"
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-550 dark:text-zinc-400"
+            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -296,7 +296,7 @@ export default function DesignationTemplates() {
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                     isActive
                       ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white"
-                      : "text-zinc-650 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/30"
+                      : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/30"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -316,12 +316,12 @@ export default function DesignationTemplates() {
           <div className="lg:col-span-3 space-y-6">
             {/* Status alerts */}
             {actionSuccess && (
-              <div className="p-3 text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 rounded-xl animate-in fade-in">
+              <div className="p-3 text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 rounded-xl animate-in fade-in">
                 {actionSuccess}
               </div>
             )}
             {actionError && (
-              <div className="p-3 text-xs font-bold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/20 border border-rose-250 dark:border-rose-900/50 rounded-xl animate-in fade-in">
+              <div className="p-3 text-xs font-bold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-xl animate-in fade-in">
                 {actionError}
               </div>
             )}
@@ -334,11 +334,11 @@ export default function DesignationTemplates() {
                     <span className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">
                       {selectedRole.name}
                     </span>
-                    <span className="px-2 py-0.5 text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 rounded-md">
+                    <span className="px-2 py-0.5 text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-md">
                       Template Config
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-550 dark:text-zinc-400 mt-1">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                     নিচে এই পদবীর ব্যবহারকারীদের ডিফল্ট অ্যাক্সেস কনফিগার করুন।
                   </p>
                 </div>
@@ -356,7 +356,7 @@ export default function DesignationTemplates() {
 
               {/* Description editor */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider">
+                <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   বিবরণ (Description)
                 </label>
                 <input
@@ -364,7 +364,7 @@ export default function DesignationTemplates() {
                   value={editDesc}
                   disabled={selectedRole.name === "SUPER_ADMIN"}
                   onChange={(e) => setEditDesc(e.target.value)}
-                  className="w-full px-4 py-2 border border-zinc-200 dark:border-zinc-850 dark:bg-zinc-950/20 dark:text-white rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-4 py-2 border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950/20 dark:text-white rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   placeholder="যেমনঃ হিসাবরক্ষণ ও বিল ভাউচার এন্ট্রি নেওয়ার পদবী।"
                 />
               </div>
@@ -407,22 +407,22 @@ export default function DesignationTemplates() {
                           onClick={() => togglePermission(perm.id)}
                           className={`flex items-start text-left gap-3.5 p-3 rounded-xl border transition-all ${
                             isChecked
-                              ? "border-emerald-550/30 bg-emerald-50/10 dark:bg-emerald-950/5 text-zinc-900 dark:text-white"
-                              : "border-zinc-150 dark:border-zinc-850 hover:bg-zinc-50 dark:hover:bg-zinc-805/30 text-zinc-600 dark:text-zinc-400"
+                              ? "border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/5 text-zinc-900 dark:text-white"
+                              : "border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-805/30 text-zinc-600 dark:text-zinc-400"
                           } ${isSuper ? "opacity-90" : ""}`}
                         >
                           <div className="shrink-0 mt-0.5">
                             {isChecked ? (
-                              <CheckSquare className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-450" />
+                              <CheckSquare className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
                             ) : (
-                              <Square className="w-4.5 h-4.5 text-zinc-300 dark:text-zinc-650" />
+                              <Square className="w-4.5 h-4.5 text-zinc-300 dark:text-zinc-600" />
                             )}
                           </div>
                           <div>
                             <div className="text-xs font-bold leading-tight font-mono tracking-tight">
                               {perm.name}
                             </div>
-                            <div className="text-[10px] text-zinc-450 dark:text-zinc-550 mt-1">
+                            <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
                               {perm.description}
                             </div>
                           </div>
@@ -456,7 +456,7 @@ export default function DesignationTemplates() {
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-450 dark:text-zinc-550 uppercase tracking-wider">
+                <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   টেমপ্লেট রোল নাম (উদাঃ AUDITOR)
                 </label>
                 <input
@@ -470,7 +470,7 @@ export default function DesignationTemplates() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-450 dark:text-zinc-550 uppercase tracking-wider">
+                <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   বিবরণ (Description)
                 </label>
                 <textarea
@@ -486,7 +486,7 @@ export default function DesignationTemplates() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-xs font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-350 border border-zinc-200 dark:border-zinc-800 rounded-xl"
+                className="px-4 py-2 text-xs font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 rounded-xl"
               >
                 বাতিল
               </button>

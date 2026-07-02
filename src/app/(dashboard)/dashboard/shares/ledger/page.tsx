@@ -110,7 +110,7 @@ export default function ShareLedgerPage() {
         <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden transition-all duration-300">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50/80 dark:bg-zinc-850/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
+              <thead className="bg-gray-50/80 dark:bg-zinc-800/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
                 <tr>
                   <th className="px-6 py-4">{labels.memberCode}</th>
                   <th className="px-6 py-4">{labels.name}</th>
@@ -149,7 +149,7 @@ export default function ShareLedgerPage() {
                       <td className="px-6 py-4 text-center font-mono font-bold text-gray-800 dark:text-white">
                         {item.totalShares.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")}
                       </td>
-                      <td className="px-6 py-4 text-right font-mono font-bold text-gray-850 dark:text-zinc-200">
+                      <td className="px-6 py-4 text-right font-mono font-bold text-gray-800 dark:text-zinc-200">
                         {item.totalValue.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
                       </td>
                       <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
@@ -160,7 +160,7 @@ export default function ShareLedgerPage() {
                       <td className="px-6 py-4 text-right">
                         <Link
                           href={`/dashboard/shares/history/${item.memberId}`}
-                          className="inline-block px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-250 dark:border-emerald-800 rounded-md transition-all"
+                          className="inline-block px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 rounded-md transition-all"
                         >
                           {labels.viewHistory}
                         </Link>
@@ -174,7 +174,7 @@ export default function ShareLedgerPage() {
 
           {/* Pagination console */}
           {ledgerPagination.totalPages > 1 && (
-            <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="p-4 bg-gray-50/50 dark:bg-zinc-800/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
               <span>
                 {lang === "BN"
                   ? `মোট শেয়ার হোল্ডার: ${ledgerPagination.totalItems} জন`

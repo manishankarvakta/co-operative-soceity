@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface BankTransactionFormProps {
   onSuccess?: () => void;
@@ -131,7 +132,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-150 dark:border-zinc-800 shadow-md">
+    <form onSubmit={handleSubmit} className="w-full bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-md">
       <div className="flex justify-between items-center mb-6 border-b pb-3 dark:border-zinc-800">
         <h2 className="text-lg font-bold text-gray-800 dark:text-white">{labels[lang].title}</h2>
         <button
@@ -144,14 +145,16 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
       </div>
 
       {error && (
-        <div className="p-3 mb-4 text-xs font-semibold text-red-650 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200">
-          ⚠️ {error}
+        <div className="p-3 mb-4 text-xs font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200 flex items-center gap-1.5">
+          <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 mb-4 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 rounded-lg border border-emerald-200">
-          ✅ {successMsg}
+        <div className="p-3 mb-4 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 rounded-lg border border-emerald-200 flex items-center gap-1.5">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+          <span>{successMsg}</span>
         </div>
       )}
 
@@ -163,7 +166,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
           <select
             value={txType}
             onChange={(e) => setTxType(e.target.value as any)}
-            className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
           >
             <option value="CREDIT">{labels[lang].deposit}</option>
             <option value="DEBIT">{labels[lang].withdrawal}</option>
@@ -180,7 +183,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
               <select
                 value={sourceAccountId}
                 onChange={(e) => setSourceAccountId(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
               >
                 <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Source"} --</option>
                 {accounts.map((acc) => (
@@ -198,7 +201,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
               <select
                 value={destAccountId}
                 onChange={(e) => setDestAccountId(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
               >
                 <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Destination"} --</option>
                 {accounts.map((acc) => (
@@ -217,7 +220,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
             <select
               value={bankAccountId}
               onChange={(e) => setBankAccountId(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
             >
               <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Account"} --</option>
               {accounts.map((acc) => (
@@ -239,7 +242,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
           />
         </div>
 
@@ -252,7 +255,7 @@ export default function BankTransactionForm({ onSuccess }: BankTransactionFormPr
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             placeholder={lang === "BN" ? "চেক নম্বর বা ট্রানজেকশন রেফারেন্স..." : "Check number or txn ref..."}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
           />
         </div>
 

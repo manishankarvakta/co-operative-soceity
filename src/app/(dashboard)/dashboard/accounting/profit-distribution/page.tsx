@@ -219,7 +219,7 @@ export default function ProfitDistributionPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Panel: Available profit & Execution */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-md space-y-6">
+            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200/60 dark:border-zinc-800 shadow-md space-y-6">
               {/* Profit Indicator Card */}
               <div className="p-4 bg-gradient-to-r from-emerald-50/50 to-teal-50/20 dark:from-emerald-950/20 dark:to-teal-950/5 rounded-xl border border-emerald-100/50 dark:border-emerald-950/30 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -237,13 +237,13 @@ export default function ProfitDistributionPage() {
 
               {/* Distribute Form */}
               <form onSubmit={handleOpenConfirm} className="space-y-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
-                <h4 className="font-bold text-sm text-gray-850 dark:text-white flex items-center gap-1.5">
+                <h4 className="font-bold text-sm text-gray-800 dark:text-white flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-emerald-500" />
                   {t.panelTitle}
                 </h4>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-650 dark:text-gray-300 mb-1.5">
+                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1.5">
                     {t.amountLabel} <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -254,18 +254,18 @@ export default function ProfitDistributionPage() {
                     value={distAmountBdt}
                     onChange={(e) => setDistAmountBdt(e.target.value)}
                     placeholder="0.00"
-                    className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-mono"
+                    className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-650 dark:text-gray-300 mb-1.5">
+                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1.5">
                     {t.modeLabel}
                   </label>
                   <select
                     value={distPaymentMode}
                     onChange={(e) => setDistPaymentMode(e.target.value as any)}
-                    className="w-full px-3.5 py-2.5 text-xs border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-semibold"
+                    className="w-full px-3.5 py-2.5 text-xs border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-semibold"
                   >
                     <option value="CASH">{t.cashOption}</option>
                     <option value="BANK">{t.bankOption}</option>
@@ -274,7 +274,7 @@ export default function ProfitDistributionPage() {
 
                 {/* Calculation Preview */}
                 {inputAmountBdt > 0 && (
-                  <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/20 border border-gray-150/40 dark:border-zinc-800 rounded-lg text-xs space-y-2.5 text-gray-600 dark:text-gray-350">
+                  <div className="p-4 bg-gray-50/50 dark:bg-zinc-800/20 border border-gray-100/40 dark:border-zinc-800 rounded-lg text-xs space-y-2.5 text-gray-600 dark:text-gray-300">
                     <span className="block font-bold text-[10px] text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                       <Percent className="w-3.5 h-3.5 text-emerald-500" />
                       {t.splitsTitle}
@@ -301,9 +301,9 @@ export default function ProfitDistributionPage() {
                       </strong>
                     </div>
 
-                    <div className="flex justify-between items-center border-t border-dashed dark:border-zinc-850 pt-2 font-bold text-emerald-650 dark:text-emerald-400">
+                    <div className="flex justify-between items-center border-t border-dashed dark:border-zinc-800 pt-2 font-bold text-emerald-600 dark:text-emerald-400">
                       <span className="flex items-center gap-1">
-                        <PiggyBank className="w-3.5 h-3.5 text-emerald-650" />
+                        <PiggyBank className="w-3.5 h-3.5 text-emerald-600" />
                         {t.fdReserve}
                       </span>
                       <strong className="font-mono">
@@ -326,9 +326,9 @@ export default function ProfitDistributionPage() {
 
           {/* Right Panel: History of distributions */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-md">
+            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200/60 dark:border-zinc-800 shadow-md">
               <h3 className="font-bold text-sm text-gray-800 dark:text-white mb-4 uppercase tracking-wider flex items-center gap-1.5">
-                <History className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
+                <History className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 {t.historyTitle}
               </h3>
 
@@ -339,7 +339,7 @@ export default function ProfitDistributionPage() {
               ) : (
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-zinc-850/80 text-gray-500 font-bold border-b dark:border-zinc-800">
+                    <thead className="bg-gray-50 dark:bg-zinc-800/80 text-gray-500 font-bold border-b dark:border-zinc-800">
                       <tr>
                         <th className="px-4 py-3">{t.dateCol}</th>
                         <th className="px-4 py-3 text-right">{t.totalCol}</th>
@@ -367,7 +367,7 @@ export default function ProfitDistributionPage() {
                           <td className="px-4 py-3.5 text-right font-mono text-gray-500 dark:text-gray-300">
                             {(d.sportsFund / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
-                          <td className="px-4 py-3.5 text-right font-mono font-bold text-emerald-650 dark:text-emerald-400">
+                          <td className="px-4 py-3.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
                             {(d.fixedDeposit / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
                         </tr>

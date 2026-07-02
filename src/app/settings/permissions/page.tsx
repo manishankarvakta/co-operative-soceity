@@ -9,10 +9,10 @@ export default function PermissionsDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight flex items-center gap-3">
-          <ShieldAlert className="w-8 h-8 text-emerald-600 dark:text-emerald-450" />
+          <ShieldAlert className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
           <span>অনুমতিসমূহ (Permissions)</span>
         </h1>
-        <p className="text-sm text-zinc-550 dark:text-zinc-400 mt-2 leading-relaxed">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed">
           ইউজার পারমিশন এবং পদবীভিত্তিক টেমপ্লেটসমূহ ম্যানেজ করুন।
         </p>
       </div>
@@ -22,7 +22,7 @@ export default function PermissionsDashboard() {
         {/* Templates Card */}
         <div className="group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
           <div className="space-y-4">
-            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center rounded-xl transition-colors group-hover:bg-emerald-600 group-hover:text-white">
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center rounded-xl transition-colors group-hover:bg-emerald-600 group-hover:text-white">
               <Layers className="w-6 h-6" />
             </div>
             <div>
@@ -48,7 +48,7 @@ export default function PermissionsDashboard() {
         {/* User Permissions Card */}
         <div className="group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
           <div className="space-y-4">
-            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center rounded-xl transition-colors group-hover:bg-emerald-600 group-hover:text-white">
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center rounded-xl transition-colors group-hover:bg-emerald-600 group-hover:text-white">
               <Users className="w-6 h-6" />
             </div>
             <div>
@@ -80,10 +80,10 @@ export default function PermissionsDashboard() {
         <div className="flex flex-col gap-2">
           <Link
             href="/settings/permissions/templates?new=true"
-            className="flex items-center justify-between p-3.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950/30 dark:hover:bg-zinc-805/50 border border-zinc-150 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-200 text-sm font-semibold transition-all group"
+            className="flex items-center justify-between p-3.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950/30 dark:hover:bg-zinc-805/50 border border-zinc-100 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-200 text-sm font-semibold transition-all group"
           >
             <div className="flex items-center gap-3">
-              <span className="text-lg text-emerald-650 dark:text-emerald-450 font-light">+</span>
+              <span className="text-lg text-emerald-600 dark:text-emerald-400 font-light">+</span>
               <span>Create New Template</span>
             </div>
             <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
@@ -91,10 +91,10 @@ export default function PermissionsDashboard() {
 
           <Link
             href="/settings/permissions/users"
-            className="flex items-center justify-between p-3.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950/30 dark:hover:bg-zinc-805/50 border border-zinc-150 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-200 text-sm font-semibold transition-all group"
+            className="flex items-center justify-between p-3.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950/30 dark:hover:bg-zinc-805/50 border border-zinc-100 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-200 text-sm font-semibold transition-all group"
           >
             <div className="flex items-center gap-3">
-              <Key className="w-4.5 h-4.5 text-emerald-650 dark:text-emerald-450" />
+              <Key className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
               <span>Assign Permissions to Users</span>
             </div>
             <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />

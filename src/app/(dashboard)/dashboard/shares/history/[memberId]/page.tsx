@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 
 interface HistoryPageProps {
   params: Promise<{
@@ -101,8 +102,9 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
       </div>
 
       {error && (
-        <div className="p-3 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/50">
-          ⚠️ {error}
+        <div className="p-3 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/40 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -167,7 +169,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
                     <td className="px-6 py-4 text-center font-mono text-gray-500">
                       {lang === "BN" ? (index + 1).toLocaleString("bn-BD") : index + 1}
                     </td>
-                    <td className="px-6 py-4 text-gray-650 dark:text-gray-300 font-mono">
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300 font-mono">
                       {new Date(row.createdAt).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                     </td>
                     <td className="px-6 py-4 text-gray-800 dark:text-zinc-200">
@@ -176,7 +178,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
                     <td className="px-6 py-4 text-center font-mono font-bold text-gray-800 dark:text-white">
                       +{row.count.toLocaleString(lang === "BN" ? "bn-BD" : "en-US")}
                     </td>
-                    <td className="px-6 py-4 text-right font-mono font-bold text-gray-850 dark:text-zinc-200">
+                    <td className="px-6 py-4 text-right font-mono font-bold text-gray-800 dark:text-zinc-200">
                       {row.value.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-6 py-4 text-right font-mono text-emerald-600 dark:text-emerald-400">
@@ -197,7 +199,7 @@ export default function MemberShareHistoryPage({ params }: HistoryPageProps) {
 
         {/* Pagination Console */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50/50 dark:bg-zinc-800/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>
               {labels[lang].totalItems}: {pagination.totalItems}
             </span>

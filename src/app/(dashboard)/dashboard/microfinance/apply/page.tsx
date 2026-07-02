@@ -7,11 +7,11 @@ export default function ApplyLoanPage() {
   const router = useRouter();
 
   const handleSuccess = () => {
-    router.push("/dashboard/microfinance/pending-applications");
+    router.push("/dashboard/microfinance?status=PENDING");
   };
 
   const handleCancel = () => {
-    router.push("/dashboard/microfinance/pending-applications");
+    router.push("/dashboard/microfinance?status=PENDING");
   };
 
   return (

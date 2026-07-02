@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { CheckCircle2 } from "lucide-react";
 
 const translations = {
   BN: {
@@ -101,7 +102,7 @@ export default function AdmitFeeSettingsPage() {
                   min="0"
                   value={admissionFee}
                   onChange={(e) => setAdmissionFee(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-750 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:text-white transition-colors"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-800 dark:text-white transition-colors"
                 />
                 <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                   {t.helpText}
@@ -111,14 +112,14 @@ export default function AdmitFeeSettingsPage() {
 
             {/* Success message banner */}
             {success && (
-              <div className="p-3 text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 rounded-lg flex items-center gap-2 animate-in fade-in duration-200">
-                <span>✓</span>
+              <div className="p-3 text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 rounded-lg flex items-center gap-2 animate-in fade-in duration-200">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{t.successMsg}</span>
               </div>
             )}
 
             {/* Actions */}
-            <div className="pt-4 border-t border-gray-150 dark:border-zinc-850 flex justify-end">
+            <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 flex justify-end">
               <button
                 type="button"
                 onClick={handleSave}

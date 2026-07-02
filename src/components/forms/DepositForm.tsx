@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 
 export default function DepositForm() {
   const router = useRouter();
@@ -247,8 +248,9 @@ export default function DepositForm() {
       </div>
 
       {error && (
-        <div className="p-3 mb-6 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/50">
-          ⚠️ {error}
+        <div className="p-3 mb-6 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/40 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -261,7 +263,7 @@ export default function DepositForm() {
             required
             value={selectedMemberId}
             onChange={(e) => setSelectedMemberId(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           >
             <option value="">-- মেম্বার সিলেক্ট করুন --</option>
             {members.map((m) => (
@@ -280,7 +282,7 @@ export default function DepositForm() {
             <select
               value={paymentMode}
               onChange={(e) => setPaymentMode(e.target.value as any)}
-              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             >
               <option value="CASH">Cash (ক্যাশ বক্স)</option>
               <option value="BANK">Bank Account (ব্যাংক)</option>
@@ -291,7 +293,7 @@ export default function DepositForm() {
                 required
                 value={bankAccountId}
                 onChange={(e) => setBankAccountId(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
               >
                 <option value="">-- {labels[lang].selectBank} --</option>
                 {bankAccounts.map((acc) => (
@@ -320,7 +322,7 @@ export default function DepositForm() {
       {/* Bulk checkboxes table list */}
       <div className="rounded-xl overflow-hidden mb-8 ring-1 ring-gray-200 dark:ring-zinc-800 shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-zinc-800">
+          <thead className="bg-gray-50 dark:bg-zinc-800/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-zinc-800">
             <tr>
               <th className="px-5 py-4 w-16 text-center">সিলেক্ট</th>
               <th className="px-5 py-4">{labels[lang].type}</th>
@@ -330,7 +332,7 @@ export default function DepositForm() {
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
             {Object.entries(bills).filter(([_, b]) => b.visible).map(([type, b]) => (
-              <tr key={type} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/30 transition-colors">
+              <tr key={type} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                 <td className="px-5 py-4 text-center">
                   <input
                     type="checkbox"
@@ -356,7 +358,7 @@ export default function DepositForm() {
                     disabled={!b.checked}
                     value={b.amount}
                     onChange={(e) => handleAmountChange(type as any, e.target.value)}
-                    className="w-32 px-3 py-2 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-40 font-mono"
+                    className="w-32 px-3 py-2 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-40 font-mono"
                   />
                 </td>
                 <td className="px-5 py-4">
@@ -366,7 +368,7 @@ export default function DepositForm() {
                     value={b.period}
                     onChange={(e) => handlePeriodChange(type as any, e.target.value)}
                     placeholder="যেমন: Week 12, June"
-                    className="w-full max-w-xs px-3 py-2 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-40"
+                    className="w-full max-w-xs px-3 py-2 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-40"
                   />
                 </td>
               </tr>
@@ -377,7 +379,7 @@ export default function DepositForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start border-t pt-8 border-gray-100 dark:border-zinc-800">
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="p-5 bg-gray-50 dark:bg-zinc-850/50 rounded-xl ring-1 ring-gray-900/5 dark:ring-white/5 flex flex-col flex-1">
+          <div className="p-5 bg-gray-50 dark:bg-zinc-800/50 rounded-xl ring-1 ring-gray-900/5 dark:ring-white/5 flex flex-col flex-1">
             <span className="text-[10px] uppercase font-bold tracking-wider text-gray-500 mb-1">{labels[lang].total}</span>
             <span className="text-2xl font-black text-gray-800 dark:text-white font-mono">{totalBdt.toLocaleString()} BDT</span>
           </div>
@@ -398,7 +400,7 @@ export default function DepositForm() {
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="ব্যাংক ট্রানজেকশন আইডি বা অন্য মন্তব্য..."
-              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             />
           </div>
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { Printer } from "lucide-react";
 
 export default function TrialBalancePage() {
   const { lang } = useLanguage();
@@ -54,15 +55,16 @@ export default function TrialBalancePage() {
   return (
     <div className="space-y-6">
       {/* Export Bar */}
-      <div className="p-4 bg-gray-50 dark:bg-zinc-850 border rounded-lg flex justify-between items-center no-print">
+      <div className="p-4 bg-gray-50 dark:bg-zinc-800 border rounded-lg flex justify-between items-center no-print">
         <span className="text-xs text-gray-500 font-bold">
           {lang === "BN" ? "রিপোর্ট এক্সপোর্ট করুন:" : "Available Statement Export formats:"}
         </span>
         <button
           onClick={handlePrint}
-          className="px-4 py-2 bg-white dark:bg-zinc-900 border text-xs font-bold rounded hover:bg-gray-100 transition shadow-sm"
+          className="px-4 py-2 bg-white dark:bg-zinc-900 border text-xs font-bold rounded hover:bg-gray-100 transition shadow-sm flex items-center gap-1.5"
         >
-          🖨️ {labels[lang].print}
+          <Printer className="w-3.5 h-3.5" />
+          <span>{labels[lang].print}</span>
         </button>
       </div>
 
@@ -82,7 +84,7 @@ export default function TrialBalancePage() {
 
           <table className="w-full text-left text-sm border-collapse border border-gray-300 dark:border-zinc-800 font-sans">
             <thead>
-              <tr className="bg-gray-55 dark:bg-zinc-850 text-gray-700 dark:text-zinc-200 font-bold border-b border-gray-300 dark:border-zinc-800">
+              <tr className="bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-bold border-b border-gray-300 dark:border-zinc-800">
                 <th className="px-4 py-3 border-r border-gray-300 dark:border-zinc-800">হিসাব কোড / লেজার নাম</th>
                 <th className="px-4 py-3 border-r border-gray-300 dark:border-zinc-800 text-right">{labels[lang].debit}</th>
                 <th className="px-4 py-3 text-right">{labels[lang].credit}</th>
@@ -104,7 +106,7 @@ export default function TrialBalancePage() {
               ))}
             </tbody>
             <tfoot>
-              <tr className="bg-gray-50 dark:bg-zinc-850 text-gray-805 dark:text-white font-bold border-t-2 border-gray-350 dark:border-zinc-700 text-base">
+              <tr className="bg-gray-50 dark:bg-zinc-800 text-gray-805 dark:text-white font-bold border-t-2 border-gray-300 dark:border-zinc-700 text-base">
                 <td className="px-4 py-3 border-r border-gray-300 dark:border-zinc-800 text-right">{labels[lang].total}:</td>
                 <td className="px-4 py-3 border-r border-gray-300 dark:border-zinc-800 text-right font-mono text-emerald-700 dark:text-emerald-400">
                   {reportData.totals?.totalDebit?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"} BDT

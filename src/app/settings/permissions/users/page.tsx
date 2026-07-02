@@ -312,7 +312,7 @@ export default function UserPermissions() {
         );
       case "INACTIVE":
         return (
-          <span className="px-2.5 py-1 text-xs font-semibold text-gray-650 bg-gray-50 border border-gray-200 rounded-full dark:bg-zinc-800 dark:text-gray-400 dark:border-zinc-700">
+          <span className="px-2.5 py-1 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-full dark:bg-zinc-800 dark:text-gray-400 dark:border-zinc-700">
             {L.inactive}
           </span>
         );
@@ -372,7 +372,7 @@ export default function UserPermissions() {
         <div className="flex items-center gap-3">
           <Link
             href="/settings/permissions"
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-550 dark:text-zinc-400"
+            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -403,7 +403,7 @@ export default function UserPermissions() {
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto text-sm">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800 uppercase tracking-wider">
+            <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 font-bold border-b dark:border-zinc-800 uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4">{L.colId}</th>
                 <th className="px-6 py-4">{L.colName}</th>
@@ -416,14 +416,14 @@ export default function UserPermissions() {
             <tbody className="divide-y divide-gray-150 dark:divide-zinc-800">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-zinc-450 font-medium">
+                  <td colSpan={6} className="text-center py-12 text-zinc-400 font-medium">
                     কোনো ব্যবহারকারী পাওয়া যায়নি।
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((u) => (
                   <tr key={u.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-6 py-4 font-mono font-bold text-emerald-700 dark:text-emerald-450 select-all">
+                    <td className="px-6 py-4 font-mono font-bold text-emerald-700 dark:text-emerald-400 select-all">
                       {u.memberCode || "SYSTEM"}
                     </td>
                     <td className="px-6 py-4 font-bold text-gray-800 dark:text-white">
@@ -436,7 +436,7 @@ export default function UserPermissions() {
                     <td className="px-6 py-4">
                       {getStatusBadge(u.status)}
                     </td>
-                    <td className="px-6 py-4 text-zinc-650 dark:text-zinc-300">
+                    <td className="px-6 py-4 text-zinc-600 dark:text-zinc-300">
                       {u.joinDate ? new Date(u.joinDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US") : "—"}
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
@@ -445,7 +445,7 @@ export default function UserPermissions() {
                           <>
                             <Link
                               href={`/dashboard/members/${u.memberId}`}
-                              className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-250 dark:border-emerald-900/40 transition"
+                              className="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-200 dark:border-emerald-900/40 transition"
                               title={lang === "BN" ? "বিস্তারিত দেখুন" : "View Details"}
                             >
                               <Eye className="w-4.5 h-4.5" />
@@ -462,7 +462,7 @@ export default function UserPermissions() {
                                 setMemberToDelete(u);
                                 setDeleteModal(true);
                               }}
-                              className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-450 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
+                              className="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-lg border border-rose-200 dark:border-rose-900/40 transition"
                               title={lang === "BN" ? "মুছে ফেলুন" : "Delete"}
                             >
                               <Trash2 className="w-4.5 h-4.5" />
@@ -476,7 +476,7 @@ export default function UserPermissions() {
                             selectUser(u);
                             setIsPermissionModalOpen(true);
                           }}
-                          className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-250 dark:border-amber-900/40 transition"
+                          className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-200 dark:border-amber-900/40 transition"
                           title={lang === "BN" ? "পারমিশন সেট করুন" : "Set Permissions"}
                         >
                           <Lock className="w-4.5 h-4.5" />
@@ -516,12 +516,12 @@ export default function UserPermissions() {
 
             {/* Status indicators inside Modal */}
             {actionSuccess && (
-              <div className="p-3 text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 rounded-xl">
+              <div className="p-3 text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 rounded-xl">
                 {actionSuccess}
               </div>
             )}
             {actionError && (
-              <div className="p-3 text-xs font-bold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/20 border border-rose-250 dark:border-rose-900/50 rounded-xl">
+              <div className="p-3 text-xs font-bold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-xl">
                 {actionError}
               </div>
             )}
@@ -545,7 +545,7 @@ export default function UserPermissions() {
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                           isChecked
                             ? "bg-zinc-900 border-zinc-900 text-white dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-400 font-bold"
-                            : "border-zinc-200 dark:border-zinc-800 text-zinc-550 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/40"
+                            : "border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/40"
                         }`}
                       >
                         <Shield className="w-3.5 h-3.5" />
@@ -570,7 +570,7 @@ export default function UserPermissions() {
                         key={role.id}
                         type="button"
                         onClick={() => applyRoleTemplate(role)}
-                        className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-350 text-[10px] font-bold rounded-lg transition-colors border dark:border-zinc-700"
+                        className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold rounded-lg transition-colors border dark:border-zinc-700"
                       >
                         {role.name} এর সেট ইম্পোর্ট করুন
                       </button>
@@ -596,7 +596,7 @@ export default function UserPermissions() {
                     className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm"
                   >
                     <div className="px-6 py-4 bg-zinc-50 dark:bg-zinc-950/40 border-b border-zinc-200 dark:border-zinc-800">
-                      <h3 className="text-xs font-bold text-zinc-850 dark:text-zinc-200 uppercase tracking-wider">
+                      <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
                         {getCategoryTitle(category)}
                       </h3>
                     </div>
@@ -610,20 +610,20 @@ export default function UserPermissions() {
                             onClick={() => handlePermissionToggle(perm.name)}
                             className={`flex items-start text-left gap-3.5 p-3 rounded-xl border transition-all ${
                               isChecked
-                                ? "border-emerald-550/30 bg-emerald-50/10 dark:bg-emerald-950/5 text-zinc-900 dark:text-white"
-                                : "border-zinc-150 dark:border-zinc-850 hover:bg-zinc-50 dark:hover:bg-zinc-805/30 text-zinc-650 dark:text-zinc-400"
+                                ? "border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/5 text-zinc-900 dark:text-white"
+                                : "border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-805/30 text-zinc-600 dark:text-zinc-400"
                             } ${isSuperAdmin ? "opacity-90" : ""}`}
                           >
                             <div className="shrink-0 mt-0.5">
                               {isChecked ? (
-                                <CheckSquare className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-450" />
+                                <CheckSquare className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
                               ) : (
-                                <Square className="w-4.5 h-4.5 text-zinc-300 dark:text-zinc-650" />
+                                <Square className="w-4.5 h-4.5 text-zinc-300 dark:text-zinc-600" />
                               )}
                             </div>
                             <div>
                               <div className="text-xs font-bold leading-tight font-mono tracking-tight">{perm.name}</div>
-                              <div className="text-[10px] text-zinc-450 dark:text-zinc-550 mt-1">{perm.description}</div>
+                              <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">{perm.description}</div>
                             </div>
                           </button>
                         );
@@ -639,7 +639,7 @@ export default function UserPermissions() {
               <button
                 type="button"
                 onClick={() => setIsPermissionModalOpen(false)}
-                className="px-4 py-2 border rounded-xl text-xs font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-350 dark:border-zinc-800 transition"
+                className="px-4 py-2 border rounded-xl text-xs font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 dark:border-zinc-800 transition"
               >
                 {L.cancel}
               </button>

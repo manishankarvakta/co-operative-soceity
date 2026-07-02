@@ -181,7 +181,7 @@ export default function ExpenseCategorySettingsPage() {
                             type="text"
                             value={editNameBN}
                             onChange={(e) => setEditNameBN(e.target.value)}
-                            className="w-full px-2 py-1 text-sm bg-gray-50 dark:bg-zinc-850 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all dark:text-white"
+                            className="w-full px-2 py-1 text-sm bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all dark:text-white"
                           />
                         ) : (
                           cat.nameBN

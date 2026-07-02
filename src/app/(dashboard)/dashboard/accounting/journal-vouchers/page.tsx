@@ -254,7 +254,7 @@ export default function JournalVouchersPage() {
         <div className="transition-all">
           <form
             onSubmit={handleCreateJournal}
-            className="w-full bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-lg space-y-6"
+            className="w-full bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-200/60 dark:border-zinc-800 shadow-lg space-y-6"
           >
             <div className="flex items-center gap-2 border-b dark:border-zinc-800 pb-3">
               <span className="p-1.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg text-emerald-600 dark:text-emerald-400">
@@ -277,7 +277,7 @@ export default function JournalVouchersPage() {
                   value={journalDesc}
                   onChange={(e) => setJournalDesc(e.target.value)}
                   placeholder={lang === "BN" ? "যেমন: নতুন অফিস চেয়ার ক্রয়" : "e.g. Purchase of office supplies"}
-                  className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 />
               </div>
               <div>
@@ -289,7 +289,7 @@ export default function JournalVouchersPage() {
                   required
                   value={journalDate}
                   onChange={(e) => setJournalDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-mono"
+                  className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-mono"
                 />
               </div>
             </div>
@@ -304,7 +304,7 @@ export default function JournalVouchersPage() {
                   value={journalRef}
                   onChange={(e) => setJournalRef(e.target.value)}
                   placeholder="JV-2026-001"
-                  className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                  className="w-full px-3.5 py-2.5 text-xs border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                 />
               </div>
             </div>
@@ -324,7 +324,7 @@ export default function JournalVouchersPage() {
                 {journalLines.map((line, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end border border-gray-100 dark:border-zinc-850/65 p-3 rounded-lg bg-gray-50/30 dark:bg-zinc-850/10"
+                    className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end border border-gray-100 dark:border-zinc-800/65 p-3 rounded-lg bg-gray-50/30 dark:bg-zinc-800/10"
                   >
                     <div className="md:col-span-1 text-xs font-bold text-gray-400 pb-2">
                       {t.lineNo} {index + 1}
@@ -337,7 +337,7 @@ export default function JournalVouchersPage() {
                         required
                         value={line.accountCode}
                         onChange={(e) => handleLineChange(index, "accountCode", e.target.value)}
-                        className="w-full px-2.5 py-2 border text-xs rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-semibold"
+                        className="w-full px-2.5 py-2 border text-xs rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-semibold"
                       >
                         <option value="">-- {lang === "BN" ? "হিসাব সিলেক্ট করুন" : "Select Account"} --</option>
                         {accounts.map((acc) => (
@@ -354,7 +354,7 @@ export default function JournalVouchersPage() {
                       <select
                         value={line.type}
                         onChange={(e) => handleLineChange(index, "type", e.target.value as any)}
-                        className="w-full px-2.5 py-2 border text-xs rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-semibold"
+                        className="w-full px-2.5 py-2 border text-xs rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-semibold"
                       >
                         <option value="DEBIT">{t.debitLabel}</option>
                         <option value="CREDIT">{t.creditLabel}</option>
@@ -372,7 +372,7 @@ export default function JournalVouchersPage() {
                         value={line.amount}
                         onChange={(e) => handleLineChange(index, "amount", e.target.value)}
                         placeholder="0.00"
-                        className="w-full px-2.5 py-2 border text-xs rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white font-mono"
+                        className="w-full px-2.5 py-2 border text-xs rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white font-mono"
                       />
                     </div>
 
@@ -404,7 +404,7 @@ export default function JournalVouchersPage() {
             </div>
 
             {/* Validation Panel */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-xl border border-dashed dark:border-zinc-800 text-xs bg-gray-50/50 dark:bg-zinc-850/10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-xl border border-dashed dark:border-zinc-800 text-xs bg-gray-50/50 dark:bg-zinc-800/10">
               <div className="flex flex-col gap-1">
                 <span className="text-gray-400 font-bold uppercase text-[10px]">{t.totalDebit}</span>
                 <span className="font-mono text-base font-black text-gray-700 dark:text-white">
@@ -419,12 +419,12 @@ export default function JournalVouchersPage() {
               </div>
               <div className="flex items-center gap-2 md:justify-end">
                 {isBalanced ? (
-                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/20 px-3 py-1.5 rounded-lg font-bold border border-emerald-200/30">
+                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-3 py-1.5 rounded-lg font-bold border border-emerald-200/30">
                     <CheckCircle2 className="w-4 h-4" />
                     <span>{t.balanced}</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-450 bg-amber-50 dark:bg-amber-950/20 px-3 py-1.5 rounded-lg font-bold border border-amber-200/30">
+                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-3 py-1.5 rounded-lg font-bold border border-amber-200/30">
                     <AlertTriangle className="w-4 h-4" />
                     <span>{t.unbalanced}</span>
                   </div>
@@ -471,7 +471,7 @@ export default function JournalVouchersPage() {
                       <span>Ref: <strong className="text-gray-500 dark:text-gray-300">{entry.reference || "N/A"}</strong></span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-355 self-start sm:self-auto font-mono text-[11px] font-bold bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-gray-100 dark:border-zinc-800 shadow-2xs">
+                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-300 self-start sm:self-auto font-mono text-[11px] font-bold bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-gray-100 dark:border-zinc-800 shadow-2xs">
                     <Calendar className="w-3.5 h-3.5 text-gray-400" />
                     <span>{new Date(entry.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US", { dateStyle: "medium" })}</span>
                   </div>
@@ -491,7 +491,7 @@ export default function JournalVouchersPage() {
                       {entry.lines.map((line: any) => (
                         <tr
                           key={line.id}
-                          className="hover:bg-gray-50/20 dark:hover:bg-zinc-850/10 transition-colors"
+                          className="hover:bg-gray-50/20 dark:hover:bg-zinc-800/10 transition-colors"
                         >
                           <td className="px-6 py-3">
                             <div className={`flex flex-col ${line.type === "CREDIT" ? "pl-8" : ""}`}>
@@ -517,7 +517,7 @@ export default function JournalVouchersPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-100 dark:border-zinc-850/80 pt-4 text-xs font-semibold">
+              <div className="flex items-center justify-between border-t border-gray-100 dark:border-zinc-800/80 pt-4 text-xs font-semibold">
                 <span className="text-gray-500">
                   {lang === "BN"
                     ? `মোট ${totalItems.toLocaleString("bn-BD")} টি ভাউচারের মধ্যে পৃষ্ঠা ${currentPage.toLocaleString("bn-BD")} / ${totalPages.toLocaleString("bn-BD")}`

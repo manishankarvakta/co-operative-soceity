@@ -110,7 +110,7 @@ export function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ animation: "cm-fadeIn 0.18s ease" }}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !loading && onCancel()} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm h-screen" onClick={() => !loading && onCancel()} />
 
       {/* Dialog */}
       <div

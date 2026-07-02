@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/providers/LanguageProvider";
 import { useExpenseCategory } from "@/providers/ExpenseCategoryProvider";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface ExpenseFormProps {
   onSuccess?: () => void;
@@ -182,14 +183,16 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
       </div>
 
       {error && (
-        <div className="p-3 mb-4 text-xs font-semibold text-red-650 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200">
-          ⚠️ {error}
+        <div className="p-3 mb-4 text-xs font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200 flex items-center gap-1.5">
+          <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 mb-4 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 rounded-lg border border-emerald-200">
-          ✅ {successMsg}
+        <div className="p-3 mb-4 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400 rounded-lg border border-emerald-200 flex items-center gap-1.5">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+          <span>{successMsg}</span>
         </div>
       )}
 
@@ -201,14 +204,14 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           >
             {categories.map((cat) => (
               <option 
                 key={cat.id} 
                 value={cat.id}
                 disabled={cat.id === "SALARY"}
-                className={cat.id === "SALARY" ? "text-gray-450 dark:text-zinc-500 bg-gray-150/40 dark:bg-zinc-800/20 cursor-not-allowed" : ""}
+                className={cat.id === "SALARY" ? "text-gray-400 dark:text-zinc-500 bg-gray-100/40 dark:bg-zinc-800/20 cursor-not-allowed" : ""}
               >
                 {lang === "BN" ? cat.nameBN : cat.nameEN}
               </option>
@@ -227,7 +230,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white font-mono"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white font-mono"
             />
           </div>
 
@@ -240,7 +243,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             />
           </div>
         </div>
@@ -254,7 +257,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
               <select
                 value={paymentMode}
                 onChange={(e) => setPaymentMode(e.target.value as any)}
-                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
               >
                 <option value="CASH">{labels[lang].cash}</option>
                 <option value="BANK">{labels[lang].bank}</option>
@@ -265,7 +268,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                   required
                   value={bankAccountId}
                   onChange={(e) => setBankAccountId(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+                  className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
                 >
                   <option value="">-- {labels[lang].selectBank} --</option>
                   {bankAccounts.map((acc) => (
@@ -285,7 +288,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             <select
               value={projectId}
               onChange={(e) => setProjectId(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+              className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
             >
               <option value="">-- {lang === "BN" ? "সিলেক্ট করুন" : "Select Project"} --</option>
               {projects.map((p) => (
@@ -305,7 +308,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder={lang === "BN" ? "যেমন: ঢাকা অফিস, রংপুর প্রজেক্ট এলাকা" : "e.g. Dhaka office"}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           />
         </div>
 
@@ -318,7 +321,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
             placeholder={lang === "BN" ? "বিশেষ কোনো বিবরণ বা নোট..." : "Add descriptions or notes..."}
-            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+            className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
           />
         </div>
 

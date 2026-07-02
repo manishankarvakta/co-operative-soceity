@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { Shield, Upload, Download, AlertTriangle, RefreshCw, Trash2, AlertOctagon, CheckCircle2, XCircle } from "lucide-react";
 
 interface BackupRecord {
   id: string;
@@ -161,7 +162,7 @@ export default function BackupsPage() {
     switch (status) {
       case "SUCCESS":
         return (
-          <span className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-250 rounded-full dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
+          <span className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
             {lang === "BN" ? "সফল" : "Success"}
           </span>
         );
@@ -180,7 +181,7 @@ export default function BackupsPage() {
         );
       default:
         return (
-          <span className="px-2.5 py-1 text-xs font-semibold text-gray-650 bg-gray-50 border border-gray-200 rounded-full dark:bg-zinc-800 dark:text-gray-400 dark:border-zinc-700">
+          <span className="px-2.5 py-1 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-full dark:bg-zinc-800 dark:text-gray-400 dark:border-zinc-700">
             {status}
           </span>
         );
@@ -249,7 +250,8 @@ export default function BackupsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-4 border-gray-200 dark:border-zinc-800">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white leading-tight flex items-center gap-2">
-            🛡️ {labels[lang].title}
+            <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
+            <span>{labels[lang].title}</span>
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {labels[lang].subtitle}
@@ -266,9 +268,10 @@ export default function BackupsPage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={actionLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-md transition-all"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-md transition-all flex items-center gap-1.5"
           >
-            {lang === "BN" ? "⬆️ আপলোড" : "⬆️ Upload Backup"}
+            <Upload className="w-3.5 h-3.5" />
+            <span>{lang === "BN" ? "আপলোড" : "Upload Backup"}</span>
           </button>
           <button
             onClick={handleCreateBackup}
@@ -282,7 +285,7 @@ export default function BackupsPage() {
 
       {/* Warning Alert Banner */}
       <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl dark:bg-amber-950/20 dark:border-amber-900/30 flex items-start gap-3">
-        <span className="text-xl">⚠️</span>
+        <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
         <div>
           <strong className="block text-sm text-amber-800 dark:text-amber-400 font-bold">
             {labels[lang].warningTitle}
@@ -297,7 +300,7 @@ export default function BackupsPage() {
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{labels[lang].tableHeaderFile}</th>
                 <th className="px-6 py-4">{labels[lang].tableHeaderSize}</th>
@@ -325,10 +328,10 @@ export default function BackupsPage() {
               ) : (
                 backups.map((backup) => (
                   <tr key={backup.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-6 py-4 font-mono text-emerald-800 dark:text-emerald-450 font-bold max-w-xs truncate">
+                    <td className="px-6 py-4 font-mono text-emerald-800 dark:text-emerald-400 font-bold max-w-xs truncate">
                       {backup.filename}
                     </td>
-                    <td className="px-6 py-4 text-gray-650 dark:text-gray-300 font-mono text-xs">
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300 font-mono text-xs">
                       {formatFileSize(backup.fileSize)}
                     </td>
                     <td className="px-6 py-4">
@@ -342,18 +345,20 @@ export default function BackupsPage() {
                         <>
                           <button
                             onClick={() => window.location.href = `/api/backups/download?id=${backup.id}`}
-                            className="px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100 border border-blue-200 dark:border-blue-900/40 rounded-md transition"
+                            className="px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100 border border-blue-200 dark:border-blue-900/40 rounded-md transition inline-flex items-center gap-1"
                           >
-                            ⬇️ {lang === "BN" ? "ডাউনলোড" : "Download"}
+                            <Download className="w-3 h-3" />
+                            <span>{lang === "BN" ? "ডাউনলোড" : "Download"}</span>
                           </button>
                           <button
                             onClick={() => {
                               setSelectedBackup(backup);
                               setShowRestoreModal(true);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-900/40 rounded-md transition"
+                            className="px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-900/40 rounded-md transition inline-flex items-center gap-1"
                           >
-                            🔄 {labels[lang].restoreBtn}
+                            <RefreshCw className="w-3 h-3" />
+                            <span>{labels[lang].restoreBtn}</span>
                           </button>
                         </>
                       )}
@@ -362,9 +367,10 @@ export default function BackupsPage() {
                           setSelectedBackup(backup);
                           setShowDeleteModal(true);
                         }}
-                        className="px-3 py-1.5 text-xs font-bold text-rose-600 dark:text-rose-450 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 border border-rose-200 dark:border-rose-900/40 rounded-md transition"
+                        className="px-3 py-1.5 text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 border border-rose-200 dark:border-rose-900/40 rounded-md transition inline-flex items-center gap-1"
                       >
-                        🗑️ {labels[lang].deleteBtn}
+                        <Trash2 className="w-3 h-3" />
+                        <span>{labels[lang].deleteBtn}</span>
                       </button>
                     </td>
                   </tr>
@@ -380,14 +386,15 @@ export default function BackupsPage() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in duration-200">
             <h3 className="text-lg font-black text-rose-600 flex items-center gap-1.5">
-              🛑 Critical DB Restoration
+              <AlertOctagon className="w-5 h-5 text-rose-600" />
+              <span>Critical DB Restoration</span>
             </h3>
-            <p className="text-sm text-gray-650 dark:text-gray-300 leading-relaxed">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
               {lang === "BN"
                 ? `আপনি কি নিশ্চিতভাবে "${selectedBackup.filename}" ফাইলটি থেকে ডাটাবেজ রিস্টোর করতে চান? এটি আপনার বর্তমান সমস্ত পরিবর্তন মুছে ফেলবে।`
                 : `Are you sure you want to restore the database to "${selectedBackup.filename}" snapshot? All current data will be permanently overwritten.`}
             </p>
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg dark:bg-rose-950/10 dark:border-rose-900/30 text-xs text-rose-800 dark:text-rose-450 leading-relaxed font-bold">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg dark:bg-rose-950/10 dark:border-rose-900/30 text-xs text-rose-800 dark:text-rose-400 leading-relaxed font-bold">
               {lang === "BN"
                 ? "নিশ্চিত করতে নিচে খালি ঘরে বড় হাতের অক্ষরে 'RESTORE' টাইপ করুন:"
                 : "To confirm, please type 'RESTORE' in uppercase in the input field below:"}
@@ -426,10 +433,11 @@ export default function BackupsPage() {
       {showDeleteModal && selectedBackup && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-lg font-black text-gray-800 dark:text-white">
-              🗑️ Delete Backup Snapshot
+            <h3 className="text-lg font-black text-gray-800 dark:text-white flex items-center gap-1.5">
+              <Trash2 className="w-5 h-5 text-rose-500" />
+              <span>Delete Backup Snapshot</span>
             </h3>
-            <p className="text-sm text-gray-650 dark:text-gray-300 leading-relaxed">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
               {lang === "BN"
                 ? `আপনি কি নিশ্চিতভাবে "${selectedBackup.filename}" ব্যাকআপ ফাইলটি মুছে ফেলতে চান? ফাইলটি স্থায়ীভাবে ডিলিট হয়ে যাবে।`
                 : `Are you sure you want to permanently delete the backup file "${selectedBackup.filename}" from disk?`}
@@ -464,14 +472,16 @@ export default function BackupsPage() {
               alertModal.type === "warning" ? "text-amber-600 dark:text-amber-400" :
               "text-rose-600 dark:text-rose-400"
             }`}>
-              {alertModal.type === "success" && "✅ "}
-              {alertModal.type === "warning" && "⚠️ "}
-              {alertModal.type === "error" && "❌ "}
-              {alertModal.type === "success" ? (lang === "BN" ? "সফল" : "Success") :
-               alertModal.type === "warning" ? (lang === "BN" ? "সতর্কতা" : "Warning") :
-               (lang === "BN" ? "ত্রুটি" : "Error")}
+              {alertModal.type === "success" && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+              {alertModal.type === "warning" && <AlertTriangle className="w-5 h-5 text-amber-500" />}
+              {alertModal.type === "error" && <XCircle className="w-5 h-5 text-rose-500" />}
+              <span>
+                {alertModal.type === "success" ? (lang === "BN" ? "সফল" : "Success") :
+                 alertModal.type === "warning" ? (lang === "BN" ? "সতর্কতা" : "Warning") :
+                 (lang === "BN" ? "ত্রুটি" : "Error")}
+              </span>
             </h3>
-            <p className="text-sm text-gray-650 dark:text-gray-300 leading-relaxed">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
               {alertModal.message}
             </p>
             <div className="flex justify-end pt-2">

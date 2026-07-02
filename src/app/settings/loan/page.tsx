@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface LoanRule {
   id: string;
@@ -173,8 +174,9 @@ export default function LoanSettingsPage() {
       </div>
 
       {error && (
-        <div className="p-3.5 text-sm font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/20 dark:text-rose-400 rounded-xl border border-rose-200 dark:border-rose-900/50">
-          ⚠️ {error}
+        <div className="p-3.5 text-sm font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/20 dark:text-rose-400 rounded-xl border border-rose-200 dark:border-rose-900/40 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -194,7 +196,7 @@ export default function LoanSettingsPage() {
 
         <div className="p-6 space-y-6">
           {/* Add Rule Form */}
-          <form onSubmit={handleAddRule} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end bg-gray-50/50 dark:bg-zinc-850/30 p-4 rounded-xl border border-gray-100 dark:border-zinc-800">
+          <form onSubmit={handleAddRule} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end bg-gray-50/50 dark:bg-zinc-800/30 p-4 rounded-xl border border-gray-100 dark:border-zinc-800">
             <div className="col-span-1">
               <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5 uppercase">
                 {t.durationValue}
@@ -243,7 +245,7 @@ export default function LoanSettingsPage() {
             <div className="col-span-1">
               <button
                 type="submit"
-                className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/30 text-emerald-600 dark:text-emerald-450 border border-emerald-200 dark:border-emerald-900/50 font-bold text-sm rounded-xl transition"
+                className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 font-bold text-sm rounded-xl transition"
               >
                 + {t.addRule}
               </button>
@@ -251,9 +253,9 @@ export default function LoanSettingsPage() {
           </form>
 
           {/* Rules Table */}
-          <div className="border border-gray-150 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+          <div className="border border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-150 dark:border-zinc-800">
+              <thead className="bg-gray-50 dark:bg-zinc-800/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-zinc-800">
                 <tr>
                   <th className="px-5 py-3.5">{t.durationValue}</th>
                   <th className="px-5 py-3.5">{t.durationType}</th>
@@ -270,7 +272,7 @@ export default function LoanSettingsPage() {
                   </tr>
                 ) : (
                   rules.map((rule) => (
-                    <tr key={rule.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/20 transition">
+                    <tr key={rule.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/20 transition">
                       <td className="px-5 py-3.5 text-gray-900 dark:text-white font-bold">{rule.durationValue}</td>
                       <td className="px-5 py-3.5 font-sans">
                         {rule.durationType === "WEEKLY" ? t.weekly : t.monthly}
@@ -296,14 +298,14 @@ export default function LoanSettingsPage() {
 
           {/* Success banner */}
           {success && (
-            <div className="p-3 text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 rounded-xl flex items-center gap-2 animate-in fade-in duration-200">
-              <span>✓</span>
+            <div className="p-3 text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 rounded-xl flex items-center gap-2 animate-in fade-in duration-200">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{t.successMsg}</span>
             </div>
           )}
 
           {/* Actions Footer */}
-          <div className="pt-4 border-t border-gray-150 dark:border-zinc-800 flex justify-end">
+          <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 flex justify-end">
             <button
               type="button"
               onClick={handleSave}

@@ -94,13 +94,13 @@ export default function DepositsListPage() {
   const getPaymentModeBadge = (mode: string) => {
     if (mode === "CASH") {
       return (
-        <span className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-250 rounded-full dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50">
+        <span className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50">
           {labels[lang].cash}
         </span>
       );
     }
     return (
-      <span className="px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-250 rounded-full dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50">
+      <span className="px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-full dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50">
         {labels[lang].bank}
       </span>
     );
@@ -126,7 +126,7 @@ export default function DepositsListPage() {
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md overflow-hidden transition-all duration-300 w-full max-w-full">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
-            <thead className="bg-gray-50 dark:bg-zinc-850 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
+            <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-black/5 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4 hidden md:table-cell">{labels[lang].colReceipt}</th>
                 <th className="px-6 py-4">{labels[lang].colName}</th>
@@ -170,13 +170,13 @@ export default function DepositsListPage() {
                       <td className="px-6 py-4 font-bold font-mono text-gray-800 dark:text-white">
                         {totalAmount.toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
                       </td>
-                      <td className="px-6 py-4 text-gray-650 dark:text-gray-300 hidden sm:table-cell">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden sm:table-cell">
                         {new Date(deposit.createdAt).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                       </td>
                       <td className="px-6 py-4 text-right space-x-2">
                         <Link
                           href={`/dashboard/deposits/${deposit.id}/receipt`}
-                          className="inline-block px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-250 dark:border-emerald-800 rounded-md transition-all"
+                          className="inline-block px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 rounded-md transition-all"
                         >
                           {labels[lang].viewReceipt}
                         </Link>
@@ -191,7 +191,7 @@ export default function DepositsListPage() {
 
         {/* Pagination Console */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50 dark:bg-zinc-850 border-t border-black/5 dark:border-zinc-850 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50 dark:bg-zinc-800 border-t border-black/5 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>{labels[lang].totalRecords}: {pagination.totalItems} {labels[lang].unit}</span>
             <div className="flex gap-2">
               <button

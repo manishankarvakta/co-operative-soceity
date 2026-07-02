@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ConfirmModal, Toast, useToast } from "@/components/ui/ConfirmModal";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { MapPin } from "lucide-react";
 
 export default function ProjectsPage() {
   const { lang } = useLanguage();
@@ -106,7 +107,7 @@ export default function ProjectsPage() {
       case "ACTIVE":
         return <span className="px-2 py-0.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-full">চলমান (Active)</span>;
       case "COMPLETED":
-        return <span className="px-2 py-0.5 text-xs font-semibold text-gray-750 bg-gray-50 rounded-full">সমাপ্ত (Completed)</span>;
+        return <span className="px-2 py-0.5 text-xs font-semibold text-gray-700 bg-gray-50 rounded-full">সমাপ্ত (Completed)</span>;
       case "CANCELLED":
         return <span className="px-2 py-0.5 text-xs font-semibold text-red-700 bg-red-50 rounded-full">বাতিল (Cancelled)</span>;
       default:
@@ -242,7 +243,10 @@ export default function ProjectsPage() {
                         <h4 className="font-bold text-gray-800 dark:text-white text-base">{proj.name}</h4>
                         {getStatusBadge(proj.status)}
                       </div>
-                      <span className="block text-xs text-gray-500 dark:text-gray-400 mb-4">📍 {proj.location}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-500" />
+                        <span>{proj.location}</span>
+                      </span>
 
                       {/* Progress meter */}
                       <div className="space-y-1 mb-4">
@@ -250,7 +254,7 @@ export default function ProjectsPage() {
                           <span>{labels[lang].collected}: {(proj.currentCapital / 100).toLocaleString()} BDT</span>
                           <span>{percentage.toFixed(0)}%</span>
                         </div>
-                        <div className="w-full bg-gray-100 dark:bg-zinc-850 h-2 rounded-full overflow-hidden">
+                        <div className="w-full bg-gray-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                           <div
                             className="bg-emerald-500 h-full transition-all duration-300"
                             style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -264,7 +268,7 @@ export default function ProjectsPage() {
 
                     <button
                       onClick={() => handleSelectProject(proj)}
-                      className="w-full mt-4 py-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-800 text-xs font-bold rounded hover:bg-emerald-100 transition"
+                      className="w-full mt-4 py-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs font-bold rounded hover:bg-emerald-100 transition"
                     >
                       {labels[lang].roiBtn}
                     </button>
@@ -281,7 +285,7 @@ export default function ProjectsPage() {
             <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-black/5 dark:border-zinc-800 shadow-md space-y-6 sticky top-6">
               <div className="border-b pb-3 dark:border-zinc-800">
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">selected project</span>
-                <h3 className="font-bold text-gray-850 dark:text-white text-base">{selectedProject.name}</h3>
+                <h3 className="font-bold text-gray-800 dark:text-white text-base">{selectedProject.name}</h3>
               </div>
 
               {/* Investors list */}
@@ -294,7 +298,7 @@ export default function ProjectsPage() {
                 ) : (
                   <div className="space-y-3 max-h-48 overflow-y-auto pr-1 text-xs">
                     {roiData.ratios.map((r: any) => (
-                      <div key={r.memberId} className="flex justify-between items-center border-b pb-2 dark:border-zinc-850">
+                      <div key={r.memberId} className="flex justify-between items-center border-b pb-2 dark:border-zinc-800">
                         <div>
                           <strong className="text-gray-800 dark:text-white block">{r.memberName}</strong>
                           <span className="text-[10px] text-gray-400 font-mono">{r.memberCode}</span>
@@ -312,9 +316,9 @@ export default function ProjectsPage() {
               {/* Profit distribution form */}
               {selectedProject.status !== "COMPLETED" && roiData && roiData.ratios.length > 0 && (
                 <form onSubmit={handleDistributeProfit} className="pt-4 border-t border-gray-100 dark:border-zinc-800 space-y-4">
-                  <h4 className="font-bold text-sm text-gray-850 dark:text-white">{labels[lang].distTitle}</h4>
+                  <h4 className="font-bold text-sm text-gray-800 dark:text-white">{labels[lang].distTitle}</h4>
                   <div>
-                    <label className="block text-xs font-bold text-gray-650 dark:text-gray-300 mb-1">
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
                       {labels[lang].distAmt} <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -323,18 +327,18 @@ export default function ProjectsPage() {
                       value={distributeAmount}
                       onChange={(e) => setDistributeAmount(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-650 dark:text-gray-300 mb-1">
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">
                       {labels[lang].paymentMode}
                     </label>
                     <select
                       value={paymentMode}
                       onChange={(e) => setPaymentMode(e.target.value as any)}
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-850 dark:border-zinc-700 dark:text-white"
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                     >
                       <option value="CASH">{labels[lang].cashOption}</option>
                       <option value="BANK">{labels[lang].bankOption}</option>
@@ -343,7 +347,7 @@ export default function ProjectsPage() {
 
                   {/* Calculations Preview */}
                   {inputAmountBdt > 0 && (
-                    <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/20 border border-gray-150/40 dark:border-zinc-800 rounded-lg text-xs space-y-2 text-gray-600 dark:text-gray-300">
+                    <div className="p-4 bg-gray-50/50 dark:bg-zinc-800/20 border border-gray-100/40 dark:border-zinc-800 rounded-lg text-xs space-y-2 text-gray-600 dark:text-gray-300">
                       <span className="block font-bold text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                         {labels[lang].splitsTitle}
                       </span>

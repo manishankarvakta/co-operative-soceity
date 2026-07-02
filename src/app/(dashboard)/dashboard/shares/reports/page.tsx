@@ -136,7 +136,7 @@ export default function ShareReportsPage() {
                   <dl className="divide-y divide-gray-100 dark:divide-zinc-800">
                     {Object.entries(reports.distribution).map(([bracket, count]) => (
                       <div key={bracket} className="py-4 flex justify-between items-center text-sm">
-                        <dt className="text-gray-600 dark:text-zinc-350">{bracket}</dt>
+                        <dt className="text-gray-600 dark:text-zinc-300">{bracket}</dt>
                         <dd className="text-gray-900 dark:text-white font-mono font-bold">
                           {Number(count).toLocaleString(lang === "BN" ? "bn-BD" : "en-US")} {lang === "BN" ? "জন" : "Shareholders"}
                         </dd>

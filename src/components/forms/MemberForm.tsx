@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 
 interface MemberFormProps {
   initialData?: any;
@@ -50,7 +51,8 @@ function Field({
       {children}
       {error && (
         <p className="mt-1 text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
-          <span>⚠</span> {error}
+          <AlertTriangle className="w-3 h-3 text-red-500 shrink-0" />
+          <span>{error}</span>
         </p>
       )}
     </div>
@@ -58,7 +60,7 @@ function Field({
 }
 
 function inputClass(hasError?: string) {
-  return `w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-850 dark:text-white transition-colors ${
+  return `w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-zinc-800 dark:text-white transition-colors ${
     hasError
       ? "border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-950/20"
       : "border-gray-300 dark:border-zinc-700"
@@ -346,8 +348,8 @@ export default function MemberForm({ initialData, memberId, onSuccess }: MemberF
 
       {/* Server-level error banner */}
       {serverError && (
-        <div className="p-3 mb-6 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/50 flex items-start gap-2">
-          <span className="mt-0.5">⚠️</span>
+        <div className="p-3 mb-6 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/40 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
           <span>{serverError}</span>
         </div>
       )}

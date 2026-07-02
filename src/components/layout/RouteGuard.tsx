@@ -39,7 +39,7 @@ export default function RouteGuard({ children }: { children: React.ReactNode }) 
   if (resource && !canAccess(user as any, resource, "read")) {
     return (
       <div className="flex flex-col items-center justify-center p-12 min-h-[60vh] text-center">
-        <div className="w-16 h-16 bg-red-100 dark:bg-red-950/20 text-red-650 dark:text-red-400 flex items-center justify-center rounded-full mb-6 shadow-sm">
+        <div className="w-16 h-16 bg-red-100 dark:bg-red-950/20 text-red-600 dark:text-red-400 flex items-center justify-center rounded-full mb-6 shadow-sm">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>

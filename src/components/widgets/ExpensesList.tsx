@@ -152,7 +152,7 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
       </div>
 
       {/* Filters / Navigation Tabs */}
-      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-850/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
+      <div className="flex gap-2 p-1.5 rounded-lg w-fit bg-gray-50/50 dark:bg-zinc-800/50 ring-1 ring-gray-200 dark:ring-zinc-800 text-xs font-semibold">
         {[
           { key: "", label: L.filterAll },
           { key: "PENDING", label: L.filterPending },
@@ -164,7 +164,7 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
             <button
               key={tab.key}
               onClick={() => setActiveStatus(tab.key as any)}
-              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-750 dark:text-gray-400 dark:hover:text-gray-250"}`}
+              className={`px-3 py-1.5 rounded-md transition ${isActive ? "bg-white dark:bg-zinc-800 shadow text-gray-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
             >
               {tab.label}
             </button>
@@ -176,7 +176,7 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 overflow-hidden w-full max-w-full">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[700px] md:min-w-full table-auto">
-            <thead className="bg-gray-50/80 dark:bg-zinc-850/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
+            <thead className="bg-gray-50/80 dark:bg-zinc-800/50 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">{L.category}</th>
                 <th className="px-6 py-4">{L.amount}</th>
@@ -196,14 +196,14 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
                 expenses.map((exp) => (
                   <tr key={exp.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                     <td className="px-6 py-4 font-bold text-gray-800 dark:text-white">{getExpenseLabel(exp.category)}</td>
-                    <td className="px-6 py-4 font-bold font-mono text-gray-850 dark:text-zinc-200">
+                    <td className="px-6 py-4 font-bold font-mono text-gray-800 dark:text-zinc-200">
                       {(exp.amount / 100).toLocaleString(lang === "BN" ? "bn-BD" : "en-US", { minimumFractionDigits: 2 })} BDT
                     </td>
-                    <td className="px-6 py-4 font-mono text-gray-650 dark:text-gray-300 hidden sm:table-cell">
+                    <td className="px-6 py-4 font-mono text-gray-600 dark:text-gray-300 hidden sm:table-cell">
                       {new Date(exp.date).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US")}
                     </td>
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden md:table-cell max-w-[200px] break-words">{exp.location}</td>
-                    <td className="px-6 py-4 text-gray-650 dark:text-gray-400 hidden md:table-cell max-w-[155px] truncate" title={exp.loggedBy.name || exp.loggedBy.email}>{exp.loggedBy.name || exp.loggedBy.email}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400 hidden md:table-cell max-w-[155px] truncate" title={exp.loggedBy.name || exp.loggedBy.email}>{exp.loggedBy.name || exp.loggedBy.email}</td>
                     <td className="px-6 py-4">{getStatusBadge(exp.status)}</td>
                     <td className="px-6 py-4 text-right space-x-2">
                       {exp.status === "PENDING" && (
@@ -227,7 +227,7 @@ export default function ExpensesList({ status = "" }: ExpensesListProps) {
         </div>
 
         {pagination.totalPages > 1 && (
-          <div className="p-4 bg-gray-50/50 dark:bg-zinc-850/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-gray-50/50 dark:bg-zinc-800/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
             <span>{lang === "BN" ? "মোট খরচ এন্ট্রি" : "Total Entries"}: {pagination.totalItems} {lang === "BN" ? "টি" : ""}</span>
             <div className="flex gap-2">
               <button disabled={pagination.currentPage === 1} onClick={() => fetchExpenses(pagination.currentPage - 1)}

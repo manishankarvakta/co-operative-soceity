@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { AlertTriangle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -123,19 +124,19 @@ export default function LoanDetailsPage({ params }: PageProps) {
   };
 
   const getBackLink = () => {
-    if (!loan) return "/dashboard/microfinance/pending-applications";
+    if (!loan) return "/dashboard/microfinance?status=PENDING";
     switch (loan.status) {
       case "PENDING":
       case "APPROVED":
-        return "/dashboard/microfinance/pending-applications";
+        return "/dashboard/microfinance?status=PENDING";
       case "ACTIVE":
-        return "/dashboard/microfinance/running-loans";
+        return "/dashboard/microfinance?status=ACTIVE";
       case "PAID":
-        return "/dashboard/microfinance/closed-loans";
+        return "/dashboard/microfinance?status=PAID";
       case "REJECTED":
-        return "/dashboard/microfinance/rejected-applications";
+        return "/dashboard/microfinance?status=REJECTED";
       default:
-        return "/dashboard/microfinance/pending-applications";
+        return "/dashboard/microfinance?status=PENDING";
     }
   };
 
@@ -247,9 +248,12 @@ export default function LoanDetailsPage({ params }: PageProps) {
   );
 
   if (error && !loan) return (
-    <div className="p-4 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900/50">
-      ⚠️ {error}
-      <div className="mt-3">
+    <div className="p-4 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900/40 flex flex-col gap-2">
+      <div className="flex items-center gap-1.5">
+        <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+        <span>{error}</span>
+      </div>
+      <div className="mt-1">
         <Link href={getBackLink()} className="text-xs text-blue-600 dark:text-blue-400 underline">{L.backLink}</Link>
       </div>
     </div>
@@ -303,7 +307,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
             <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
             {L.title}
           </h2>
-          <Link href={getBackLink()} className="text-xs text-emerald-650 hover:underline flex items-center gap-1 mt-1 font-semibold">
+          <Link href={getBackLink()} className="text-xs text-emerald-600 hover:underline flex items-center gap-1 mt-1 font-semibold">
             ← {L.backLink}
           </Link>
         </div>
@@ -313,8 +317,9 @@ export default function LoanDetailsPage({ params }: PageProps) {
       </div>
 
       {error && (
-        <div className="p-3 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900/50">
-          ⚠️ {error}
+        <div className="p-3 text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900/40 flex items-center gap-1.5">
+          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -338,7 +343,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
             </div>
             <div>
               <span className="block text-[10px] font-bold text-gray-400 uppercase">{L.address}</span>
-              <strong className="text-gray-800 dark:text-gray-250">{loan.member.address}</strong>
+              <strong className="text-gray-800 dark:text-gray-200">{loan.member.address}</strong>
             </div>
           </div>
         </div>
@@ -420,7 +425,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
                 <select
                   value={paymentMode}
                   onChange={(e) => setPaymentMode(e.target.value as any)}
-                  className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
+                  className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
                 >
                   <option value="CASH">Cash (ক্যাশ বক্স)</option>
                   <option value="BANK">Bank Account (ব্যাংক)</option>
@@ -431,7 +436,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
                     required
                     value={bankAccountId}
                     onChange={(e) => setBankAccountId(e.target.value)}
-                    className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
+                    className="w-1/2 px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white"
                   >
                     <option value="">-- {lang === "BN" ? "ব্যাংক নির্বাচন" : "Select Bank"} --</option>
                     {bankAccounts.map((acc) => (
@@ -451,7 +456,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
                 onChange={(e) => setRemarks(e.target.value)}
                 placeholder={L.remarksPlaceholder}
                 rows={2}
-                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-850/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white resize-none"
+                className="w-full px-4 py-2.5 text-sm bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none dark:text-white resize-none"
               />
             </div>
 
@@ -469,7 +474,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
                 type="button"
                 disabled={actionLoading}
                 onClick={() => handleApproval("APPROVED")}
-                className="flex-1 px-4 py-2.5 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow transition"
+                className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow transition"
               >
                 {actionLoading ? L.processing : L.approveBtn}
               </button>
@@ -492,7 +497,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
 
           <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-150 dark:border-zinc-800">
+              <thead className="bg-gray-50 dark:bg-zinc-800/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-zinc-800">
                 <tr>
                   <th className="px-5 py-3 w-16 text-center">{L.emiNum}</th>
                   <th className="px-5 py-3">{L.dueDate}</th>
@@ -508,9 +513,9 @@ export default function LoanDetailsPage({ params }: PageProps) {
                 {loan.schedules.map((s: any) => {
                   const rem = Math.max(0, s.totalAmount - s.paidAmount);
                   return (
-                    <tr key={s.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/20 transition">
+                    <tr key={s.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/20 transition">
                       <td className="px-5 py-3 text-center font-bold">{s.emiNumber}</td>
-                      <td className="px-5 py-3 text-gray-600 dark:text-gray-450 font-sans">
+                      <td className="px-5 py-3 text-gray-600 dark:text-gray-400 font-sans">
                         {new Date(s.dueDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
                       </td>
                       <td className="px-5 py-3 text-right">{(s.principalAmount / 100).toFixed(2)}</td>
@@ -535,7 +540,7 @@ export default function LoanDetailsPage({ params }: PageProps) {
           
           <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-zinc-850/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-150 dark:border-zinc-800">
+              <thead className="bg-gray-50 dark:bg-zinc-800/50 font-bold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-zinc-800">
                 <tr>
                   <th className="px-5 py-3">{L.paymentDate}</th>
                   <th className="px-5 py-3">{L.receipt}</th>
@@ -548,8 +553,8 @@ export default function LoanDetailsPage({ params }: PageProps) {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-700 dark:text-gray-300">
                 {loan.payments.map((p: any) => (
-                  <tr key={p.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/20 transition">
-                    <td className="px-5 py-3 text-gray-600 dark:text-gray-450 text-xs">
+                  <tr key={p.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/20 transition">
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400 text-xs">
                       {new Date(p.paymentDate).toLocaleDateString(lang === "BN" ? "bn-BD" : "en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </td>
                     <td className="px-5 py-3 font-mono font-bold text-emerald-700 dark:text-emerald-400">{p.remarks?.split(" ").slice(0,1).join("") || "LN-PAY"}</td>
