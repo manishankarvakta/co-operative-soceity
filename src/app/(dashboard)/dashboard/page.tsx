@@ -672,7 +672,7 @@ export default function ExecutiveDashboard() {
 
           {/* Module Cards Grid */}
           {filteredPortalItems.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {filteredPortalItems.map((item) => {
                 const colorMap: Record<string, { bg: string; text: string; ring: string; hoverBorder: string; gradient: string }> = {
                   emerald: {
@@ -809,39 +809,39 @@ export default function ExecutiveDashboard() {
                   <Link
                     key={item.id}
                     href={item.href}
-                    className={`group relative flex flex-col justify-between bg-white dark:bg-zinc-900 rounded-2xl border border-black/5 dark:border-zinc-800 shadow-sm p-6 hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden ${c.hoverBorder}`}
+                    className={`group relative flex flex-col justify-between bg-white dark:bg-zinc-900 rounded-2xl border border-black/5 dark:border-zinc-800 shadow-sm p-4 hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden ${c.hoverBorder}`}
                   >
                     {/* Subtle gradient pattern background */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${c.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10`} />
 
-                    <div className="space-y-4.5">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         {/* Icon frame */}
-                        <div className={`p-3 rounded-xl ${c.bg} ${c.text} ring-4 ${c.ring} group-hover:scale-105 transition-transform duration-300`}>
-                          {getPortalIcon(item.icon, "w-5.5 h-5.5")}
+                        <div className={`p-2.5 rounded-xl ${c.bg} ${c.text} ring-2 ${c.ring} group-hover:scale-105 transition-transform duration-300`}>
+                          {getPortalIcon(item.icon, "w-5 h-5")}
                         </div>
 
                         {/* Badge */}
                         {item.badge && (
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 text-amber-700 bg-amber-50 border border-amber-200 rounded-full dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
+                          <span className="text-[9px] font-bold px-2 py-0.5 text-amber-700 bg-amber-50 border border-amber-200 rounded-full dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
                             {lang === "BN" ? item.badge.BN : item.badge.EN}
                           </span>
                         )}
                       </div>
 
                       <div className="space-y-1.5">
-                        <h3 className="text-base font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-250">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-250 leading-tight">
                           {lang === "BN" ? item.name.BN : item.name.EN}
                         </h3>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                        <p className="text-[11px] text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                           {lang === "BN" ? item.description.BN : item.description.EN}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-5 pt-3.5 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-250">
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-250">
                       <span>{lang === "BN" ? "মডিউলে প্রবেশ" : "Open Module"}</span>
-                      <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
                   </Link>
                 );
